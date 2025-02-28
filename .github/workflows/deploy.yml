@@ -21,5 +21,7 @@ jobs:
               run: |
                   pip install mkdocs-material mkdocs-roamlinks-plugin mkdocs-rss-plugin
 
-            - name: Build and deploy site
-              run: mkdocs gh-deploy --force
+            - name: Deploy to GitHub Pages
+              run: mkdocs gh-deploy --force --strict
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
