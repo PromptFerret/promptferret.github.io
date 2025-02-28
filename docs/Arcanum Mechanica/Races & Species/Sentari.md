@@ -1,8 +1,8 @@
 ![[sentari.webp]]{width=300 style="display: block; margin: auto;"}
----
->Sentari comprises those beings that possess advanced cognitive abilities, self-awareness, and complex communication skills. Rather than being defined by their physical appearance, this group is united by its mental and cultural attributes.
->
->Under Sentari, sentient life can take many forms—from traditional human shapes to entirely non-humanoid beings, such as those with avian or other exotic morphologies. For instance, a Sentari that appears predominantly crow-like (retaining most of its natural features) may be considered [[#Aviaryn]] if it demonstrates intelligence and cultural complexity. Likewise, even if a being is primarily human in shape, distinctive crow-like features would still qualify it as [[#Aviaryn]], provided it exhibits advanced cognition and culture.
+
+Sentari comprises those beings that possess advanced cognitive abilities, self-awareness, and complex communication skills. Rather than being defined by their physical appearance, this group is united by its mental and cultural attributes.
+
+Under Sentari, sentient life can take many forms—from traditional human shapes to entirely non-humanoid beings, such as those with avian or other exotic morphologies. For instance, a Sentari that appears predominantly crow-like (retaining most of its natural features) may be considered [[#Aviaryn]] if it demonstrates intelligence and cultural complexity. Likewise, even if a being is primarily human in shape, distinctive crow-like features would still qualify it as [[#Aviaryn]], provided it exhibits advanced cognition and culture.
 
 ---
 ### **Mamaryn**

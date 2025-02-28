@@ -4,7 +4,7 @@
 # About
 >Arcanum Mechanica is a dark and brutal universe, born from the desperate sacrifice of a fleeing goddess. In her final moments, as she fled a relentless war in another dimension, her death unleashed a cataclysmic burst of ancient, chaotic mana. This raw energy coalesced to forge an entire cosmos—a realm where the natural laws are fluid and unpredictable, and where magic is both a force of creation and destruction.
 >
->In this universe, power is the ultimate currency. Mortals, left without divine guidance, have learned to harness the remnants of that catastrophic energy. They craft ingenious clockwork marvels, build airships that defy gravity, and wage wars where alliances are as treacherous as they are necessary. Every being, from the sentient Noemari to the instinct-driven Naturari, struggles to carve out its destiny amid the pervasive chaos.
+>In this universe, power is the ultimate currency. Mortals, left without divine guidance, have learned to harness the remnants of that catastrophic energy. They craft ingenious clockwork marvels, build airships that defy gravity, and wage wars where alliances are as treacherous as they are necessary. Every being, from the sentient Sentari to the instinct-driven Animari, struggles to carve out its destiny amid the pervasive chaos.
 >
 >The spiritual landscape is equally volatile. Without living gods, desperate prayers echo into the void, stirring the latent mana into unpredictable manifestations. These capricious responses can offer fleeting aid or unleash further calamity, reflecting a cosmos where hope and despair are two sides of the same coin.
 >
