@@ -54,14 +54,13 @@ nav:
           - Arcanum Mechanica/Welcome.md
           - Races & Species:
                 - Arcanum Mechanica/Races & Species/Overview.md
-                - Animari:
-                      - Arcanum Mechanica/Races & Species/Animari/Overview.md
-                      - Noemari: Arcanum Mechanica/Races & Species/Animari/Noemari.md
+                - Animari: Arcanum Mechanica/Races & Species/Animari.md
+                - Sentari: Arcanum Mechanica/Races & Species/Sentari.md
 
 # Extensions
 markdown_extensions:
     - footnotes
-    # - attr_list
+    - attr_list
     - pymdownx.arithmatex:
           generic: true
     # - pymdownx.superfences
@@ -97,11 +96,11 @@ plugins:
               - tags
 
 extra_css:
-    # - overrides/stylesheets/custom.css
+    # - assets/stylesheet/custom.css
 
 extra_javascript:
-    # - overrides/javascripts/disable-mobile.js
-    - javascript/mathjax.js
+    # - assets/javascript/disable-mobile.js
+    - assets/javascript/mathjax.js
     - https://polyfill.io/v3/polyfill.min.js?features=es6
     - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
     - https://unpkg.com/mermaid/dist/mermaid.min.js
