@@ -1,6 +1,6 @@
 ![[races_and_species.webp]]{width=300 style="display: block; margin: auto;"}
 
-The living tapestry of Arcanum Mechanica is woven from countless, diverse forms of life—all imbued with the ancient, chaotic mana that birthed this universe. Species here are organized into several fundamental groups, each reflecting both conventional biological kingdoms and the unique, arcane influences at work. These classifications form the foundation for understanding the intricate ecosystems and interactions in this dark, unforgiving realm:
+The living tapestry of Arcanum Mechanica is woven from countless, diverse forms of life—all imbued with the ancient, chaotic mana that birthed this universe. Species here are organized into several fundamental groups, each reflecting both conventional biological kingdoms and the unique, arcane influences at work. These classifications form the foundation for understanding the intricate ecosystems and interactions in this dark, unforgiving realm.
 
 ---
 ## [[Sentari]]

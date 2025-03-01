@@ -13,5 +13,10 @@ Projects:
 ---
 Tools:
 
+* [Zen Browser](https://zen-browser.app/)
 * [Obsidian](https://obsidian.md/)
-* [Vault to Blog](https://github.com/barkstone2/vault-to-blog#readme)
+* [MkDocs](https://www.mkdocs.org/)
+* [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
+* [Visual Studio Code](https://code.visualstudio.com/)
+* [GitHub Copilot](https://github.com/features/copilot)
+* [OpenAI/ChatGPT](https://openai.com/chatgpt/overview/)
