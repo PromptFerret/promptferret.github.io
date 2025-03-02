@@ -56,6 +56,10 @@ nav:
                 - Arcanum Mechanica/Races & Species/Overview.md
                 - Animari: Arcanum Mechanica/Races & Species/Animari.md
                 - Sentari: Arcanum Mechanica/Races & Species/Sentari.md
+          - Stars & Solar Systems:
+                - Arcanum Mechanica/Stars & Solar Systems/Overview.md
+                - Eldraluma:
+                      - Arcanum Mechanica/Stars & Solar Systems/Eldraluma/Overview.md
 
 # Extensions
 markdown_extensions:
@@ -75,11 +79,11 @@ markdown_extensions:
     - pymdownx.mark
     - pymdownx.tilde
     - wikilinks
-    # - pymdownx.superfences:
-    #       custom_fences:
-    #           - name: mermaid
-    #             class: mermaid
-    #             format: !!python/name:pymdownx.superfences.fence_code_format
+    - pymdownx.superfences:
+          custom_fences:
+              - name: mermaid
+                class: mermaid
+                format: !!python/name:pymdownx.superfences.fence_code_format
     - toc:
           permalink: true
 
