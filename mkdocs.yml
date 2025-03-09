@@ -103,11 +103,12 @@ extra_css:
     - assets/stylesheet/custom.css
 
 extra_javascript:
-    - assets/javascript/random-story.js
-    - assets/javascript/copy-code.js
-    - assets/javascript/copy-image-url.js
-    # - assets/javascript/disable-mobile.js
     - assets/javascript/mathjax.js
     - https://polyfill.io/v3/polyfill.min.js?features=es6
     - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
     - https://unpkg.com/mermaid/dist/mermaid.min.js
+    - https://code.jquery.com/jquery-3.7.1.min.js
+    - assets/javascript/random-story.js
+    - assets/javascript/copy-code.js
+    - assets/javascript/copy-image-url.js
+    # - assets/javascript/disable-mobile.js
