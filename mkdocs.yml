@@ -100,9 +100,11 @@ plugins:
               - tags
 
 extra_css:
-    # - assets/stylesheet/custom.css
+    - assets/stylesheet/custom.css
 
 extra_javascript:
+    - assets/javascript/random-story.js
+    - assets/javascript/copy-code.js
     # - assets/javascript/disable-mobile.js
     - assets/javascript/mathjax.js
     - https://polyfill.io/v3/polyfill.min.js?features=es6

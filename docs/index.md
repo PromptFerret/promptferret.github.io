@@ -1,18 +1,24 @@
 ## Welcome to the home of Prompt Ferret (@promptferret)
 
 ---
-This is my brain... on git.
 
-This will be where I host my Obsidian notebook with all my personal projects on it
+<div id="random-story" style="text-align: justify;"><p>Loading a tale from the archives...</p></div>
 
 ---
-Projects:
+This is my ADHD brain... on git and markdown.
 
+This will be where I host my Obsidian notebook with all my personal projects on it.
+
+---
+### Projects
 * [Arcanum Mechanica](Arcanum Mechanica/Welcome.md)
 
 ---
-Tools:
+### Characters
+* [[Nyx]]
 
+---
+### Tools
 * [Zen Browser](https://zen-browser.app/)
 * [Obsidian](https://obsidian.md/)
 * [MkDocs](https://www.mkdocs.org/)
