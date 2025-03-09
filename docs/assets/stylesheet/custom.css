@@ -1,3 +1,15 @@
+/* Ensure the image container is positioned correctly */
+img {
+    position: relative;
+    display: block;
+}
+
+/* Ensure the image container is correctly positioned */
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
 .justify {
     text-align: justify;
 }
@@ -35,4 +47,31 @@ pre:hover .copy-button {
     width: 20px;
     height: 20px;
     stroke: #fff; /* Change color if needed */
+}
+
+/* Fix the position of the copy button */
+/* Style the copy button */
+.copy-image-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    opacity: 0.1;
+    transition: opacity 0.3s ease;
+}
+
+/* Show the button when hovering over the image */
+.image-container:hover .copy-image-button {
+    opacity: 1;
+}
+
+/* SVG Icon Styling */
+.copy-image-button svg {
+    width: 18px;
+    height: 18px;
+    stroke: #fff;
 }
