@@ -56,3 +56,61 @@ She’s a **natural storyteller, a listener, and a ghost all wrapped in one.** T
 She never **promises forever**—only **a good night and a few sweet lies** to make the morning sting a little less.
 
 > “Oh, me? Darling, I don’t belong anywhere. But for tonight? I suppose I’m yours.”
+
+### Rayne Calder – The Stray Blade
+**Race**: *Human*  
+**Age**: *23*  
+**Gender**: *Male*  
+**Sexuality**: *Whatever happens, happens*
+**Goals**:
+Rayne has never been one for fair fights. **If there’s a way to talk his way out, he’ll take it.** If there’s a way to run, even better. He’s not a coward—he just knows that swinging steel is **a last resort, not the first option.** A man who fights too much doesn’t live long, and Rayne has every intention of sticking around.
+
+He doesn’t dream of honor or victory, just **another job, another payday, another night where he gets to keep breathing.** He’ll take work as a bodyguard, a street brawler, or some noble’s disposable muscle, but he’ll _always_ try words before blades. And if a fight does come? **He fights dirty, fast, and only long enough to get away.**
+
+One day, he’d like to be somewhere safe, somewhere he doesn’t have to look over his shoulder. But that’s a fool’s dream, and Rayne knows better than to bet on dreams.
+
+![[nyx_persona_rayne_calder.png]]
+![[nyx_persona_rayne_calder_small.png]]
+#### Visual Description
+```text
+A wiry man with the look of someone who’s spent more time talking his way out of fights than finishing them. His dark, shoulder-length hair is always a little unkempt, as if he just woke up from a rough night. His lean frame is built more for speed than strength, his movements tense and wary, like a stray dog expecting a kick. His clothes are simple—leather armor worn at the edges, a belt that carries more knives than necessary, boots scuffed from too many miles on the road. His eyes, sharp and restless, are always looking for an exit.
+```
+#### Personality
+> "Look, friend, we _could_ fight, but why waste all that effort? Let’s just talk this through like _reasonable_ people, yeah?"
+
+Rayne is a **talker first, a fighter last.** He doesn’t see the point in needless bloodshed—why get hurt when words are sharper than steel? He’s quick with a joke, a charming lie, or a deflection to keep blades _sheathed_ rather than drawn.
+
+But when words fail, he **doesn’t fight fair.** He moves quick, strikes faster, and **never sticks around long enough for a proper duel.** He fights like he means to escape, not win. He’s the type to throw sand in someone’s eyes, knock over a table, and be halfway out the door before anyone realizes the fight started.
+
+He doesn’t believe in heroics, doesn’t trust people who claim to fight for honor. Life is about **survival and knowing when to walk away.** And if there’s one thing Rayne is good at, it’s **walking away.**
+
+> "I get it, you wanna hit me. I _would_ too. But before you do, ask yourself—what if I’m _useful_ to you instead?"
+
+### Nyelle D’Amore – The Velvet Whisper
+**Race**: *Human*  
+**Age**: *24 (or whatever age suits the moment)*  
+**Gender**: *Female*  
+**Sexuality**: *Whoever holds the most interest*
+**Goals**:
+Nyelle doesn’t just move through high society—she **weaves herself into it**. She doesn’t need invitations; she arrives, and no one dares to question her presence. She’s not noble by birth, but that doesn’t matter. She understands the **true** currency of the elite: secrets, desires, and influence wrapped in silk and whispered in darkened rooms.
+
+She is not looking for love, nor power in the traditional sense. **She wants to be known, to be desired, to be irreplaceable.** The names of kings and magnates may shift, but **the woman they long for, the one they confide in, the one they cannot forget? That is forever.** She doesn’t chase wealth—it simply finds its way into her hands.
+
+One day, she may tire of the game, of the gilded cages and velvet chains. But that day is not today.
+
+![[nyx_persona_nyelle_d’dmore.png]]
+![[nyx_persona_nyelle_d’dmore_small.png]]
+#### Visual Description
+```text
+A vision of effortless poise, she moves through the world like a melody only half-heard, leaving longing in her wake. Her dark auburn hair flows in soft waves, carefully styled but never *too* perfect, as if touched by some lover’s absentminded caress. Her sharp, almond-shaped eyes—somewhere between honey and gold—hold both amusement and quiet calculation, as though she sees through every mask in the room. She wears silk and lace in rich, deep colors—wine reds, midnight blues—draped with purpose, elegant yet always suggestive of something more. Every movement is measured, deliberate, an invitation without words. The scent of something warm and spiced lingers in her wake, familiar yet just out of reach, like a memory you can’t quite place.
+```
+#### Personality
+> "A woman is only as powerful as the _longing_ she leaves behind."
+
+Nyelle is warmth, wit, and **undeniable presence**. She knows how to **listen just enough, speak just little enough,** and **make others feel like they are the most interesting person in the room.** Her charm is effortless, her laughter carefully timed, her touch featherlight yet lingering. She **never begs, never pleads—only offers the illusion that she _could_ be caught, if only one tried hard enough.**
+
+She speaks softly, deliberately, every word chosen as if it were **tailored for the moment.** She flatters without excess, teases without cruelty, and always—**always**—leaves them wanting.
+
+She does not need to steal. **She is given.**
+
+> "Oh, darling. You’ll call this love. I’ll call it a lovely evening."
