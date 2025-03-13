@@ -75,3 +75,32 @@ pre:hover .copy-button {
     height: 18px;
     stroke: #fff;
 }
+
+/* Wrap inline code blocks */
+.inline-code-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Copy button for inline code */
+.copy-inline-button {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    opacity: 0.1;
+    transition: opacity 0.3s ease;
+}
+
+/* Show button on hover */
+.inline-code-wrapper:hover .copy-inline-button {
+    opacity: 1;
+}
+
+/* Small icon size */
+.copy-inline-button svg {
+    width: 14px;
+    height: 14px;
+    stroke: #fff;
+}

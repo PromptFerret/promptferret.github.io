@@ -79,11 +79,11 @@ markdown_extensions:
     - pymdownx.mark
     - pymdownx.tilde
     - wikilinks
-    - pymdownx.superfences:
-          custom_fences:
-              - name: mermaid
-                class: mermaid
-                format: !!python/name:pymdownx.superfences.fence_code_format
+    - pymdownx.superfences
+        custom_fences:
+            - name: mermaid
+              class: mermaid
+              format: !!python/name:pymdownx.superfences.fence_code_format
     - toc:
           permalink: true
 
@@ -109,6 +109,7 @@ extra_javascript:
     - https://unpkg.com/mermaid/dist/mermaid.min.js
     - https://code.jquery.com/jquery-3.7.1.min.js
     - assets/javascript/random-story.js
+    - assets/javascript/copy-inline-code.js
     - assets/javascript/copy-code.js
     - assets/javascript/copy-image-url.js
     # - assets/javascript/disable-mobile.js
