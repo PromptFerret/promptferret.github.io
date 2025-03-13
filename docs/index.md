@@ -18,6 +18,11 @@ This will be where I host my Obsidian notebook with all my personal projects on 
 * [[Nyx]]
 
 ---
+
+### Guides
+* [[Avrae - Tupper - TSS]]
+
+---
 ### Tools
 * [Zen Browser](https://zen-browser.app/)
 * [Obsidian](https://obsidian.md/)

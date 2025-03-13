@@ -1,3 +1,10 @@
+See [[Nyx Mission Log]]
+
+## Notes
+```
+* Agrona does not like the noise of the oasis, or alchahol drinks.
+```
+
 [D&D Beyond](https://www.dndbeyond.com/characters/142863253/cxzBdE)
 ![[nyx.png]]
 ![[nyx_small.png]]
@@ -114,3 +121,37 @@ She speaks softly, deliberately, every word chosen as if it were **tailored for 
 She does not need to steal. **She is given.**
 
 > "Oh, darling. You’ll call this love. I’ll call it a lovely evening."
+#### Flavor Actions
+```text
+She dips a finger into the drink, swirling it slowly before pulling it free, a whispered word hanging in the air. Bringing the same finger to her tongue, she licks the altered flavor with a thoughtful pause, then smiles and nods, as if it had always been exactly as she preferred.
+```
+### Log
+1. Entered world.
+```text
+*The magic took hold—not a violent pull, but a shift, a whisper of unseen hands rearranging the world around her. A breath, a heartbeat, and then—**elsewhere**.*
+
+*Nyelle’s boots touched unfamiliar ground, the air different, the weight of unseen consequences left behind. She inhaled slowly, golden eyes flicking across her surroundings, wary but measured. No pursuers. No judgment. No lingering whispers of the trouble she had stirred.*
+
+*A pause. A tilt of her head. Then, just at the corner of her lips—**a smile**.*
+
+*A clean escape. For now.*
+```
+
+### People I have met:
+ * Agrona
+	 * Does not drink booze?
+	 * Sites on a roof on main-street
+ * Jade
+ * Saylor
+	 * I am still waiting on my Cider
+ * Pykzh
+	 * Shifter?
+ * Bevora
+	 * The honey flavored paper
+	 * The milkshake incident
+ * Pancake Faneheart
+	 * Likes to force people to eat, I think they are trying to fatten them up for eating.
+ * Salem Coco Bloodborne
+ * Mae
+	 * Got lost, found themselves here
+
