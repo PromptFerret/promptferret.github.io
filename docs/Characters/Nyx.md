@@ -1,13 +1,60 @@
-See [[Nyx Mission Log]]
+**Race**: Changeling  
+**Age**: 22 (Appears early twenties)  
+**Gender**: Fluid, but naturally leans feminine  
+**Sexuality**: Undefined, uncertain
+**Goals**:
+Nyx has spent her life wearing faces, slipping into lives as easily as others slip into conversation. Each of her personas **has found belonging**—a purpose, a place, a role to fill. But Nyx herself? **She has never truly belonged anywhere.**
 
-## Notes
-```
-* Agrona does not like the noise of the oasis, or alchahol drinks.
-```
+She does not know what it means to be changeling. She has never met another like herself, never heard her own truth spoken by another. Her existence has been a **performance**—an act perfected not out of deception, but survival. She is _what others need her to be_ because she does not know what it means to simply be _herself_.
 
-[D&D Beyond](https://www.dndbeyond.com/characters/142863253/cxzBdE)
-![[nyx.png]]
-![[nyx_small.png]]
+But she wants to. **She needs to.**
+
+She searches not just for knowledge of her kind, but for **people who will accept her as she is**, without a mask, without expectation, without judgment.
+
+* [[Nyx Mission Log]]
+* [D&D Beyond](https://www.dndbeyond.com/characters/142863253/cxzBdE)
+
+![[nyx_v2.png]]
+![[nyx_v2_small.png]]
+## Early Life
+
+She was raised among statics, surrounded by faces that never shifted, names that never changed. From the moment she could remember, she was **Nyellee**, the noble-born misfit, the too-clever child with laughter that danced between charm and trouble. She learned early that she was different—too quick, too fluid, too _wrong_ in ways she didn’t understand.
+
+By the time she was grown, she had already been labeled a disgrace by the family that raised her. Not for **what** she was—because they had never dared put words to that—but for **who she became**. The scandal, the indulgence, the effortless way she **slipped through their rules like water through fingers**.
+
+But noble society? They didn’t care what she was, only **what she could offer**. And she gave them everything—her time, her whispers, her attention. It was just another transaction, a game of favors and indulgences, a trade where she always knew the price.
+
+It wasn’t high society that cast her out. It was **her family**. They had tolerated her scandals, her wildness, her refusal to be the daughter they had hoped for. But in the end, she was **too much**—too reckless, too free, too unbound by the expectations they had placed upon her. So they severed her as cleanly as a frayed thread, cutting her from their name without so much as a final word.
+
+She never looked back. But sometimes, in the quiet moments between masks, she wonders if they ever **truly saw her at all.**
+
+## Visual Description
+
+```
+A small, androgynous figure, standing just five feet tall, shifts uneasily in her own skin, as if unsure she has the right to stand there at all. Muted feminine features carry an unfinished softness, her pale blue eyes flickering with nervous energy, darting around as though expecting something—_everything_—to go wrong. Her short, white hair is unevenly cut, strands refusing to settle, much like the rest of her. A delicate earpiece hooks into her ear, linked to her lobe by a thin chain—the only thing she never changes, though even she isn’t sure why. Her posture is wary, almost withdrawn, shoulders tense as if bracing for something unseen. Every movement is careful, measured, like someone who doesn’t know whether she’s meant to be noticed or forgotten.
+```
+## Personality
+> "I don’t know who I am. I only know who I’ve been."
+
+Nyx is **uneasy in her own skin**, as though standing still in it for too long feels *wrong*. She is not bold, not sharp-tongued like her personas, not charming or dangerous or alluring. She is **uncertain**, her confidence **fractured** by the simple fact that she has spent her entire life being *someone else*.
+
+She is **afraid of being seen**, not because she fears recognition, but because she fears **rejection**—that without a mask, without a crafted role, she will be found **lacking**.
+
+She does not know what it means to simply **be Nyx**, to exist outside of the names and faces she wears. Her personas slip into their places effortlessly, each finding purpose, each **becoming someone real**. But she? **She is no one.** And yet, **she longs to be someone.** She longs for people who will see her—not the mask, not the persona, but **her**—and **stay.**
+
+> "I’ve spent my whole life becoming someone else. Maybe it’s time I learned how to be *me*."
+
+## Personalities
+
+Nyx’s fractured sense of self was shaped by both her **circumstances and choices**. As a child raised among statics, she never took her real form, fearing they might walk in unannounced and see her for what she was. She learned early that it was safer to **always be someone else**—to never risk being caught as _herself_.
+
+As an adult, she continued to **avoid solitude**, surrounding herself with others at all times. She **shared upscale taverns, balls, and whispered conversations by day**, and **slipped into bedrooms at night**, ensuring she was never truly alone. Over time, the personas she wore stopped being simple disguises. They became **their own beings**, with their own mannerisms, desires, and identities.
+
+They are her shield, **walls between herself and the things she has done**. When she whispers secrets into the ears of nobles, it is **Nyelle D’Amore** who speaks. When she drinks and laughs in some nameless tavern, it is **Nyssa Brightwater** at the table. When the dagger slides between ribs, quick and unceremonious, it is **Lirin Vey** who wields it.
+
+Not Nyx. **Never Nyx.**
+
+She has spent so long as _them_ that she no longer knows who she is **when the masks come off**. She fears what she might find—**or worse, what might be missing.**
 ## Personas
 
 ### Tivvy Bramblethorn – The Sparksmith of Tomorrow
@@ -15,7 +62,7 @@ See [[Nyx Mission Log]]
 **Age**: *21.35*
 **Gender**: *Female*
 **Sexuality**: *Undecided/Exploring*
-**Goals**: 
+**Goals**:
 Tivvy’s goal isn’t just to invent—she wants to **discover**. She travels not to learn from the old masters, but to **find the ones who have already proven them wrong.** The tinkerers who built machines that defy logic, the inventors who threw out the rulebooks and **made something truly new.** She wants to see the impossible, the forbidden, the things they told her _couldn’t_ be done—because if someone else has done it, then she knows she’s not crazy. She knows the **old ways are the real failure**, not her. And once she finds enough proof, she won’t need to argue with the masters. Their legacy will collapse under the weight of their own irrelevance.
 
 ![[nyx_persona_tivvy_bramblethorn.png]]
@@ -36,9 +83,9 @@ She loathes the “Old Guard,” the masters and teachers who sneer at innovatio
 > You wanna know what the difference between a genius and a lunatic is? Simple. **One of ‘em succeeds.**
 
 ### Nyssa "Nys" Brightwater – The Wandering Ember
-**Race**: _Half-Elf_  
-**Age**: _26 (or so, depending on who asks)_  
-**Gender**: _Female_  
+**Race**: _Half-Elf_
+**Age**: _26 (or so, depending on who asks)_
+**Gender**: _Female_
 **Sexuality**: _Fluid—whatever keeps the night interesting_
 **Goals**:
 Nys doesn’t stay anywhere long, and that’s exactly how she likes it. She drifts from **tavern to tavern, town to town**, never quite putting down roots but always leaving behind whispers of her name. She isn’t looking for **glory or heroics**—those are for people who think life is a straight road. Hers? It’s a winding path of **new faces, warm beds, full tankards, and secrets traded in the flicker of candlelight.**
@@ -65,9 +112,9 @@ She never **promises forever**—only **a good night and a few sweet lies** to m
 > “Oh, me? Darling, I don’t belong anywhere. But for tonight? I suppose I’m yours.”
 
 ### Rayne Calder – The Stray Blade
-**Race**: *Human*  
-**Age**: *23*  
-**Gender**: *Male*  
+**Race**: *Human*
+**Age**: *23*
+**Gender**: *Male*
 **Sexuality**: *Whatever happens, happens*
 **Goals**:
 Rayne has never been one for fair fights. **If there’s a way to talk his way out, he’ll take it.** If there’s a way to run, even better. He’s not a coward—he just knows that swinging steel is **a last resort, not the first option.** A man who fights too much doesn’t live long, and Rayne has every intention of sticking around.
@@ -94,9 +141,9 @@ He doesn’t believe in heroics, doesn’t trust people who claim to fight for h
 > "I get it, you wanna hit me. I _would_ too. But before you do, ask yourself—what if I’m _useful_ to you instead?"
 
 ### Nyelle D’Amore – The Velvet Whisper
-**Race**: *Human*  
-**Age**: *24 (or whatever age suits the moment)*  
-**Gender**: *Female*  
+**Race**: *Human*
+**Age**: *24 (or whatever age suits the moment)*
+**Gender**: *Female*
 **Sexuality**: *Whoever holds the most interest*
 **Goals**:
 Nyelle doesn’t just move through high society—she **weaves herself into it**. She doesn’t need invitations; she arrives, and no one dares to question her presence. She’s not noble by birth, but that doesn’t matter. She understands the **true** currency of the elite: secrets, desires, and influence wrapped in silk and whispered in darkened rooms.
@@ -125,6 +172,42 @@ She does not need to steal. **She is given.**
 ```text
 She dips a finger into the drink, swirling it slowly before pulling it free, a whispered word hanging in the air. Bringing the same finger to her tongue, she licks the altered flavor with a thoughtful pause, then smiles and nods, as if it had always been exactly as she preferred.
 ```
+
+### Lirin Vey – The Unseen Blade
+**Race**: Human  
+**Age**: 29  
+**Gender**: Female  
+**Sexuality**: Doesn’t matter; survival comes first
+**Goals**:
+Lirin doesn’t fight for glory, wealth, or power—**she fights to live.** There’s no art to killing, no honor in a clean strike. **It’s just work.** Simple, efficient, necessary.
+
+She prefers **odd jobs over bloodshed**, fixing what needs fixing, delivering what needs delivering. But when coin runs dry, or danger finds her, she falls back on the trade that’s always been there. The blade is reliable. The blade doesn’t lie. **And when the blade is needed, it finishes the job quickly.**
+
+Lirin doesn’t stand out, and that’s exactly how she wants it.
+
+
+![[nys_persona_lirin_vey.png]]
+![[nys_persona_lirin_vey_small.png]]
+#### Visual Description
+```
+A woman built to be overlooked, her presence neither inviting nor off-putting—just there, **unremarkable by design.** Her brown hair, tied back in a loose knot, holds no shine, no flair, just enough effort to keep it from falling in her face. Her sharp, slate-gray eyes scan her surroundings with quiet intent, always watching, always wary. Her clothing is practical—muted tones, well-worn fabrics, nothing that draws a second glance. A simple leather belt rests at her waist, the curve of a dagger’s hilt barely visible, her weapons tucked away like an afterthought. She moves without flourish, without waste, as if every step is measured for efficiency alone.
+```
+
+Tupper Description:
+```
+She moves with quiet purpose, each step measured and efficient. Black studded leather armor fits snugly, offering both protection and ease of movement. A rapier rests beneath her cloak, secured but within easy reach, while twin silvered daggers remain hidden at her sides. A simple earring hooks into her ear, connected to her lobe by a thin chain, the only ornament she wears. A dark cloak drapes over her shoulders, its folds concealing the weapons beneath. A backpack rests against her back, adjusted for practical carry. Her brown hair is pulled into a loose knot, and slate-gray eyes scan her surroundings with quiet intent, always taking in more than they give away.
+```
+#### Personality
+
+> "Flashy gets you killed. Quick keeps you breathing."
+
+Lirin doesn’t waste words any more than she wastes movement. **She’s blunt, efficient, and utterly disinterested in theatrics.** She doesn’t take pride in her kills, nor does she dwell on them. **It’s a trade, not a calling.**
+
+She prefers **blending in**, letting others take the spotlight while she watches from the edges. She’s no stranger to hard labor, and if she can **earn coin without drawing steel, all the better.** She keeps her head down, does the work, and **moves on before anyone remembers her name.**
+
+But when trouble comes—and it always does—she handles it **fast and clean.** No speeches. No games. Just **a blade where it needs to be, and then she’s gone.**
+
+> "Some kill for coin. Some kill for honor. I kill because sometimes, there’s no other choice."
 ### Log
 1. Entered world.
 ```text
@@ -137,21 +220,50 @@ She dips a finger into the drink, swirling it slowly before pulling it free, a w
 *A clean escape. For now.*
 ```
 
-### People I have met:
+## People I have met:
  * Agrona
-	 * Does not drink booze?
+	 * Does not like the noise of the Astral Oasis, or alcohol drinks.
+	 * Does not drink booze? (flavor or effect, not sure, assuming effect)
 	 * Sites on a roof on main-street
+	 * Accepted my (second) introduction as a changeling
+	 * Likes milkshakes?
+	 * I gave them the gift of a Tankard of Sobriarity.
  * Jade
  * Saylor
+	 * Electro-man
+	 * Has control issues with his skills
+	 * Watched him fry some green (lady?)
 	 * I am still waiting on my Cider
  * Pykzh
 	 * Shifter?
+	 * Super strong, saw them down a drink that would have killed me, without even a blink
  * Bevora
 	 * The honey flavored paper
 	 * The milkshake incident
  * Pancake Faneheart
 	 * Likes to force people to eat, I think they are trying to fatten them up for eating.
  * Salem Coco Bloodborne
+	 * Friends with Pykzh
+	 * Suggested looking for a Changeling named Bianca, as they may be able to offer guidance.
  * Mae
 	 * Got lost, found themselves here
+ * (Solo) Solomon Talan'dor
+	 * Half-elf
+	 * Met in second session as Nyelle
+	 * Game me 50k gold
+	 * Knows Bianca, said they were lovely
+	 * Friends with Elmer
+	 * Mentioned another Changeling named Aurora, said they were very kind
+ * Elmer Rodney
+	 * Last name Nix
+	 * Changeling like me
+	 * Grew up with statics like me
+	 * Looks a lot like me
+	 * Rogue multi-class
+	 * Grew up with static Mother and Half-Sister (how did that work? is she half changeling?)
+	 * Knows some other Changelings like Bianca and Aurora
+	 * Lives in a city in the Feywild, there are changelings there (NPC)
+	 * Got frozen by an ice dragon?
+ * Athena Befrielse
+	 * Friend of Solo
 
