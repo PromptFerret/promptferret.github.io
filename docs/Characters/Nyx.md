@@ -184,8 +184,6 @@ Lirin doesn’t fight for glory, wealth, or power—**she fights to live.** Ther
 She prefers **odd jobs over bloodshed**, fixing what needs fixing, delivering what needs delivering. But when coin runs dry, or danger finds her, she falls back on the trade that’s always been there. The blade is reliable. The blade doesn’t lie. **And when the blade is needed, it finishes the job quickly.**
 
 Lirin doesn’t stand out, and that’s exactly how she wants it.
-
-
 ![[nys_persona_lirin_vey.png]]
 ![[nys_persona_lirin_vey_small.png]]
 #### Visual Description
@@ -224,11 +222,18 @@ But when trouble comes—and it always does—she handles it **fast and clean.**
  * Agrona
 	 * Does not like the noise of the Astral Oasis, or alcohol drinks.
 	 * Does not drink booze? (flavor or effect, not sure, assuming effect)
-	 * Sites on a roof on main-street
+	 * Sits on a roof on main-street
 	 * Accepted my (second) introduction as a changeling
 	 * Likes milkshakes?
-	 * I gave them the gift of a Tankard of Sobriarity.
+	 * I gave them the gift of a Tankard of Sobriety.
  * Jade
+	 * Changeling
+	 * Friendly and helpful
+	 * Human foster father
+	 * Bio-parents unknown
+	 * Like me, is not big on nature
+	 * Found their uniqueness at about age 9
+	 * The foster father was gentle with them, helping to guide them despite not fully understanding
  * Saylor
 	 * Electro-man
 	 * Has control issues with his skills
@@ -237,6 +242,7 @@ But when trouble comes—and it always does—she handles it **fast and clean.**
  * Pykzh
 	 * Shifter?
 	 * Super strong, saw them down a drink that would have killed me, without even a blink
+	 * Talked at length with Nyelle, told them they were safe here, this is why Nyx now uses her base in the shores
  * Bevora
 	 * The honey flavored paper
 	 * The milkshake incident
@@ -264,6 +270,17 @@ But when trouble comes—and it always does—she handles it **fast and clean.**
 	 * Knows some other Changelings like Bianca and Aurora
 	 * Lives in a city in the Feywild, there are changelings there (NPC)
 	 * Got frozen by an ice dragon?
+	 * Is one of Pykzh's partners? Blew a kiss to them?
  * Athena Befrielse
 	 * Friend of Solo
+ * Luna Rugaru
+	 * Hates Strahd
+	 * Alergic to silver
+	 * Has a sister who had issues with Strahd
+ * Draven Gloomshaper
+	 * New here
+	 * Musical salesman
+	 * Shop was looted
+	 * Got transported here in a portal
+	 * 
 

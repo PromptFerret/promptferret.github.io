@@ -12,6 +12,7 @@ This will be where I host my Obsidian notebook with all my personal projects on 
 ---
 ### Projects
 * [Arcanum Mechanica](Arcanum Mechanica/Welcome.md)
+* The hitch
 
 ---
 ### Characters
