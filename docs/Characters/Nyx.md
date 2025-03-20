@@ -261,7 +261,11 @@ But when trouble comes—and it always does—she handles it **fast and clean.**
 	 * Friends with Elmer
 	 * Mentioned another Changeling named Aurora, said they were very kind
  * Elmer Rodney
+	 * Arteminese Wendrick Norman nix
+	 * Mother died when young
+	 * Had an affair
 	 * Last name Nix
+	 * Sisters name (lost) natalia belmont, she has beautiful dark blue eyes, she was an orange tabaxi.
 	 * Changeling like me
 	 * Grew up with statics like me
 	 * Looks a lot like me
