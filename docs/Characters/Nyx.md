@@ -1,8 +1,8 @@
-**Race**: Changeling  
-**Age**: 22 (Appears early twenties)  
-**Gender**: Fluid, but naturally leans feminine  
-**Sexuality**: Undefined, uncertain
-**Goals**:
+* **Race**: *Changeling*
+* **Age**: *22 (Appears early twenties)*  
+* **Gender**: *Fluid, but naturally leans feminine*  
+* **Sexuality**: *Undefined, uncertain*
+* **Goals**:
 Nyx has spent her life wearing faces, slipping into lives as easily as others slip into conversation. Each of her personas **has found belonging**—a purpose, a place, a role to fill. But Nyx herself? **She has never truly belonged anywhere.**
 
 She does not know what it means to be changeling. She has never met another like herself, never heard her own truth spoken by another. Her existence has been a **performance**—an act perfected not out of deception, but survival. She is _what others need her to be_ because she does not know what it means to simply be _herself_.
@@ -58,11 +58,11 @@ She has spent so long as _them_ that she no longer knows who she is **when the m
 ## Personas
 
 ### Tivvy Bramblethorn – The Sparksmith of Tomorrow
-**Race**: *Gnome*
-**Age**: *21.35*
-**Gender**: *Female*
-**Sexuality**: *Undecided/Exploring*
-**Goals**:
+* **Race**: *Gnome*
+* **Age**: *21.35*
+* **Gender**: *Female*
+* **Sexuality**: *Undecided/Exploring*
+* **Goals**:
 Tivvy’s goal isn’t just to invent—she wants to **discover**. She travels not to learn from the old masters, but to **find the ones who have already proven them wrong.** The tinkerers who built machines that defy logic, the inventors who threw out the rulebooks and **made something truly new.** She wants to see the impossible, the forbidden, the things they told her _couldn’t_ be done—because if someone else has done it, then she knows she’s not crazy. She knows the **old ways are the real failure**, not her. And once she finds enough proof, she won’t need to argue with the masters. Their legacy will collapse under the weight of their own irrelevance.
 
 ![[nyx_persona_tivvy_bramblethorn.png]]
@@ -83,11 +83,11 @@ She loathes the “Old Guard,” the masters and teachers who sneer at innovatio
 > You wanna know what the difference between a genius and a lunatic is? Simple. **One of ‘em succeeds.**
 
 ### Nyssa "Nys" Brightwater – The Wandering Ember
-**Race**: _Half-Elf_
-**Age**: _26 (or so, depending on who asks)_
-**Gender**: _Female_
-**Sexuality**: _Fluid—whatever keeps the night interesting_
-**Goals**:
+* **Race**: *Half-Elf*
+* **Age**: _26 (or so, depending on who asks)_
+* **Gender**: _Female_
+* **Sexuality**: _Fluid—whatever keeps the night interesting_
+* **Goals**:
 Nys doesn’t stay anywhere long, and that’s exactly how she likes it. She drifts from **tavern to tavern, town to town**, never quite putting down roots but always leaving behind whispers of her name. She isn’t looking for **glory or heroics**—those are for people who think life is a straight road. Hers? It’s a winding path of **new faces, warm beds, full tankards, and secrets traded in the flicker of candlelight.**
 
 She listens as much as she laughs, leans in close when the drinks flow freely, and knows exactly when to **press for details or let the moment slide.** Gold finds its way into her pocket easily enough—sometimes for her company, sometimes for a whispered confidence, sometimes from a purse that was left just a bit too close to the edge of the table. She doesn’t call herself a thief. A **thief takes.** She simply **receives** what others are too careless to keep.
@@ -112,10 +112,10 @@ She never **promises forever**—only **a good night and a few sweet lies** to m
 > “Oh, me? Darling, I don’t belong anywhere. But for tonight? I suppose I’m yours.”
 
 ### Rayne Calder – The Stray Blade
-**Race**: *Human*
-**Age**: *23*
-**Gender**: *Male*
-**Sexuality**: *Whatever happens, happens*
+* **Race**: *Human*
+* **Age**: *23*
+* **Gender**: *Male*
+* **Sexuality**: *Whatever happens, happens*
 **Goals**:
 Rayne has never been one for fair fights. **If there’s a way to talk his way out, he’ll take it.** If there’s a way to run, even better. He’s not a coward—he just knows that swinging steel is **a last resort, not the first option.** A man who fights too much doesn’t live long, and Rayne has every intention of sticking around.
 
@@ -141,11 +141,11 @@ He doesn’t believe in heroics, doesn’t trust people who claim to fight for h
 > "I get it, you wanna hit me. I _would_ too. But before you do, ask yourself—what if I’m _useful_ to you instead?"
 
 ### Nyelle D’Amore – The Velvet Whisper
-**Race**: *Human*
-**Age**: *24 (or whatever age suits the moment)*
-**Gender**: *Female*
-**Sexuality**: *Whoever holds the most interest*
-**Goals**:
+* **Race**: *Human*
+* **Age**: *24 (or whatever age suits the moment)*
+* **Gender**: *Female*
+* **Sexuality**: *Whoever holds the most interest*
+* **Goals**:
 Nyelle doesn’t just move through high society—she **weaves herself into it**. She doesn’t need invitations; she arrives, and no one dares to question her presence. She’s not noble by birth, but that doesn’t matter. She understands the **true** currency of the elite: secrets, desires, and influence wrapped in silk and whispered in darkened rooms.
 
 She is not looking for love, nor power in the traditional sense. **She wants to be known, to be desired, to be irreplaceable.** The names of kings and magnates may shift, but **the woman they long for, the one they confide in, the one they cannot forget? That is forever.** She doesn’t chase wealth—it simply finds its way into her hands.
@@ -174,11 +174,11 @@ She dips a finger into the drink, swirling it slowly before pulling it free, a w
 ```
 
 ### Lirin Vey – The Unseen Blade
-**Race**: Human  
-**Age**: 29  
-**Gender**: Female  
-**Sexuality**: Doesn’t matter; survival comes first
-**Goals**:
+* **Race**: *Human*  
+* **Age**: *29*  
+* **Gender**: *Female*  
+* **Sexuality**: *Doesn’t matter; survival comes first*
+* **Goals**:
 Lirin doesn’t fight for glory, wealth, or power—**she fights to live.** There’s no art to killing, no honor in a clean strike. **It’s just work.** Simple, efficient, necessary.
 
 She prefers **odd jobs over bloodshed**, fixing what needs fixing, delivering what needs delivering. But when coin runs dry, or danger finds her, she falls back on the trade that’s always been there. The blade is reliable. The blade doesn’t lie. **And when the blade is needed, it finishes the job quickly.**
@@ -234,6 +234,8 @@ But when trouble comes—and it always does—she handles it **fast and clean.**
 	 * Like me, is not big on nature
 	 * Found their uniqueness at about age 9
 	 * The foster father was gentle with them, helping to guide them despite not fully understanding
+	 * Agreed to resurrect Nyx if she ever dies
+	 * Agreed to think about her, in case she goes missing on a mission, as others would not be aware that the person who died on the mission is Nyx, they would think it was one of the personas.
  * Saylor
 	 * Electro-man
 	 * Has control issues with his skills
@@ -243,6 +245,7 @@ But when trouble comes—and it always does—she handles it **fast and clean.**
 	 * Shifter?
 	 * Super strong, saw them down a drink that would have killed me, without even a blink
 	 * Talked at length with Nyelle, told them they were safe here, this is why Nyx now uses her base in the shores
+	 * Owns the glen, has agreed to let Nyx take Moo-Mochi there
  * Bevora
 	 * The honey flavored paper
 	 * The milkshake incident
