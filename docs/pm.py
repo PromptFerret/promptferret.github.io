@@ -5,6 +5,9 @@ TITLE = "Pet Handler"
 DESCRIPTION = "A **pet manager** made by **PromptFerret**. I accept gifts of gp, karma, dtp, magic items and sessions 🙃🌟🐕"
 OUTPUT = "" #f"No action taken. Use `{COMMAND} help` for command details."
 COLOR = "white"
+THUMBNAIL = "https://promptferret.github.io/assets//promptferret_small.jpg"
+
+#!------------------------- start maps --------------------------#
 
 color_map = {
     "beige": "#F5F5DC",
@@ -79,7 +82,39 @@ subscript_map = {
     "!": "﹗", "?": "﹖"
 }
 
+check_map = {
+    "acrobatics": "dex",
+    "animal_handling": "wis",
+    "arcana": "int",
+    "athletics": "str",
+    "deception": "cha",
+    "history": "int",
+    "insight": "wis",
+    "intimidation": "cha",
+    "investigation": "int",
+    "medicine": "wis",
+    "nature": "int",
+    "perception": "wis",
+    "performance": "cha",
+    "persuasion": "cha",
+    "religion": "int",
+    "sleight_of_hand": "dex",
+    "stealth": "dex",
+    "survival": "wis"
+}
 
+save_map = {
+    "strength": "str",
+    "dexterity": "dex",
+    "constitution": "con",
+    "intelligence": "int",
+    "wisdom": "wis",
+    "charisma": "cha"
+}
+#!------------------------- end maps --------------------------#
+
+
+#!------------------------- start schemas --------------------------#
 pet_schema = {
     "name": None,
     "species": None,
@@ -185,6 +220,7 @@ item_schema = {
     "attuned": False,
     "description": None
 }
+#!------------------------- start schemas --------------------------#
 
 
 # -----------------------------------------------------------------------#
@@ -476,6 +512,7 @@ def handle_attack(arg_data):
 
     # Format attack output
     attack_output = (
+        f"🎯 {to_proper(attack_name)} Attack\n"
         f"🎲 **Attack Roll:** {attack_result}\n"
         f"💥 **Damage:** {damage_result} {attack.get('damage_type', '')}\n"
         f"🎯 **Range:** {attack.get('range', 'Melee')}\n"
@@ -483,7 +520,7 @@ def handle_attack(arg_data):
         f"📜 **Description:** {attack.get('description', 'No description.')}"
     )
 
-    return {"TITLE": f"🗡️ {to_proper(attack_name)} Attack", "DESCRIPTION": attack_output, "COLOR": color_map["red"]}
+    return {"TITLE": f"🗡️ {pet['name']} Attacks!", "DESCRIPTION": attack_output, "COLOR": color_map["orange"]}
 
 #!------------------------- start handle_attack --------------------------#
 
@@ -733,6 +770,129 @@ def handle_set(arg_data):
 #!------------------------- end handle_set --------------------------#
 
 
+#!------------------------- end handle_show --------------------------#
+def handle_show(arg_data):
+    # Get current pet
+    ch, error = get_character_or_error()
+    if error:
+        return error  # Return error if no active character
+
+    current_pet_key = ch.get_cvar("current_pet")
+    if not current_pet_key:
+        return {"DESCRIPTION": "⚠️ Error: No pet selected. Use `!pm select <key>` first.", "COLOR": color_map["red"]}
+
+    pet, error = get_pet_or_error(current_pet_key)
+    if error:
+        return error  # Return error if pet data is missing or corrupted
+
+    # Auto-calculate stat modifiers
+    def calc_mod(score):
+        """ Returns the correct ability modifier based on score. Defaults to 10 if None. """
+        try:
+            score = int(score) if score is not None else 10  # Default to 10 if missing
+        except ValueError:
+            score = 10  # Fallback if parsing fails
+        return (score - 10) // 2
+
+
+    # Basic Info
+    size = pet.get("size", "Unknown")
+    type_ = pet.get("type", "Unknown")
+    alignment = pet.get("alignment", "Unaligned")
+    species = pet.get("species", "Unknown")
+
+    # Defensive Stats
+    ac = pet.get("ac", "?")
+    initiative = pet.get("initiative", "0")
+    ac_source = f" ({pet.get('ac_source')})" if pet.get("ac_source") else ""
+    hp_max = pet["hp"].get("max", "?")
+    hp_current = pet["hp"].get("current", "?")
+    hp_temp = pet["hp"].get("temp", "0")
+    hp_display = f"{hp_current}/{hp_max} ({hp_temp})"
+
+    # Speed & Senses
+    speed = ", ".join(pet["speed"]) if pet["speed"] else "None"
+    senses = ", ".join(pet["senses"]) if pet["senses"] else "None"
+
+    # Stats
+    stats = pet.get("stats", {})
+    stats_display = f"```STR {stats.get('str', 10):>2} ({calc_mod(stats.get('str', 10)):+d}), " \
+                    f"DEX {stats.get('dex', 10):>2} ({calc_mod(stats.get('dex', 10)):+d}), " \
+                    f"CON {stats.get('con', 10):>2} ({calc_mod(stats.get('con', 10)):+d})\n" \
+                    f"INT {stats.get('int', 10):>2} ({calc_mod(stats.get('int', 10)):+d}), " \
+                    f"WIS {stats.get('wis', 10):>2} ({calc_mod(stats.get('wis', 10)):+d}), " \
+                    f"CHA {stats.get('cha', 10):>2} ({calc_mod(stats.get('cha', 10)):+d})```"
+
+    # Saving Throws
+    saves_display = ", ".join(
+        f"{stat.upper()} {calc_mod(stats.get(stat, 10)):+d}"
+        for stat in ["str", "dex", "con", "int", "wis", "cha"]
+    )
+
+    # Ability Checks (same as raw stat modifiers)
+    ability_checks_display = saves_display
+
+    # Skills
+    skills_display = ", ".join(
+        f"{to_proper(skill)} {bonus:+d}" for skill, bonus in pet["skills"].items()
+    ) if pet["skills"] else "None"
+
+    # Conditions, Resistances, Immunities
+    conditions_display = ", ".join(to_proper(cond) for cond in pet["condition"]) if pet["condition"] else "None"
+    resistances_display = ", ".join(to_proper(res) for res in pet["resist"]) if pet["resist"] else "None"
+    immunities_display = ", ".join(to_proper(imm) for imm in pet["immune"]) if pet["immune"] else "None"
+
+    # Traits
+    traits_display = "\n".join(
+        f"**{to_proper(trait)}:** {desc}" for trait, desc in pet["traits"].items()
+    ) if pet["traits"] else "(FUTURE USE)"
+
+    # Actions
+    actions_display = "\n".join(
+        f" * **{to_proper(name)}**\n"
+        f"   * *Melee Weapon Attack:* {action.get('hit_roll', '1d20')}{action.get('hit_modifier', '+0')} "
+        f"   * to hit, {action.get('range', 'Melee')}, one target.\n"
+        f"   * *Hit:* {action.get('damage_roll', '0')}{action.get('damage_modifier', '+0')} {action.get('damage_type', 'Undefined')}. "
+        for name, action in pet["actions"].items()
+    ) if pet["actions"] else "None"
+
+    DESCRIPTION = ""
+
+    # Construct Description
+    DESCRIPTION += f"**Type:** {species}\n"
+    DESCRIPTION += f"{size} {type_}, {alignment}\n"
+    DESCRIPTION += f"**Armor Class:** {ac}{ac_source}  \n"
+    DESCRIPTION += f"**Initiative:** {initiative}  \n"
+    DESCRIPTION += f"**Current HP:** {hp_display}  \n"
+    # DESCRIPTION += f"**Speed:** {speed}\n"
+    DESCRIPTION += f"**Stats:**\n{stats_display}\n"
+    DESCRIPTION += f"**Saving Throws:** {saves_display}\n"
+    DESCRIPTION += f"**Ability Checks:** {ability_checks_display}\n"
+    # DESCRIPTION += f"**Skills:** {skills_display}\n"
+    # DESCRIPTION += f"**Senses:** {senses}\n"
+    DESCRIPTION += f"**Conditions:** {conditions_display}\n"
+    DESCRIPTION += f"**Resistances:** {resistances_display}\n"
+    DESCRIPTION += f"**Immunities:** {immunities_display}\n"
+    # DESCRIPTION += f"**Traits:**\n{traits_display}\n"
+    DESCRIPTION += f"**Actions:**\n{actions_display}\n"
+
+    # Embed Data
+    embed_data = {
+        "TITLE": f"🧸 {pet['name']}",
+        "DESCRIPTION": DESCRIPTION,
+        "COLOR": color_map["rebeccapurple"]
+    }
+
+    # If a thumbnail exists, include it
+    if pet.get("thumbnail"):
+        embed_data["THUMBNAIL"] = pet["thumbnail"]
+
+    return embed_data
+
+
+#!------------------------- end handle_show --------------------------#
+
+
 #!------------------------- start handle_toggle_list --------------------------#
 def handle_toggle_list(arg_data):
     list_map = {
@@ -842,7 +1002,7 @@ commands = {
     "resist": handle_toggle_list,
     "select": handle_select,
     "set": handle_set,
-    "show": tbd,
+    "show": handle_show,
     "status": tbd,
 }
 
@@ -853,6 +1013,9 @@ command = arg_data.get("command")
 
 result = commands[command](arg_data) if command in commands else tbd(arg_data)
 
+# OUTPUT = f"{arg_data}"
+
+
 # Merge result with the pre-existing variables
 if isinstance(result, dict):
     TITLE = result.get("TITLE", TITLE)
@@ -860,11 +1023,25 @@ if isinstance(result, dict):
     OUTPUT = result.get("OUTPUT", OUTPUT)
     COLOR = result.get("COLOR", COLOR)
 else:
-    OUTPUT = result[1]["DESCRIPTION"]
-    COLOR = result[1]["COLOR"]
+    # Ensure result is a tuple with at least one valid dictionary
+    result_dict = result[1] if isinstance(result, tuple) and len(result) > 1 and isinstance(result[1], dict) else {}
+
+    DESCRIPTION = result_dict.get("DESCRIPTION", DESCRIPTION)
+    OUTPUT = result_dict.get("OUTPUT", OUTPUT)
+    COLOR = result_dict.get("COLOR", COLOR)
+
+# Check if a pet is selected and has a thumbnail
+ch, error = get_character_or_error()
+if not error:
+    current_pet_key = ch.get_cvar("current_pet")
+    if current_pet_key:
+        pet, pet_error = get_pet_or_error(current_pet_key)
+        if not pet_error and pet.get("thumbnail"):
+            THUMBNAIL = pet["thumbnail"]
 
 </drac2>
 -title "{{TITLE}}"
 -desc "{{DESCRIPTION}}"
 -f "{{OUTPUT}}"
 -color "{{COLOR}}"
+-thumb "{{THUMBNAIL}}"

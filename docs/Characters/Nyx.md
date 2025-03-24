@@ -14,8 +14,8 @@ She searches not just for knowledge of her kind, but for **people who will accep
 * [[Nyx Mission Log]]
 * [D&D Beyond](https://www.dndbeyond.com/characters/142863253/cxzBdE)
 
-![[nyx_v2.png]]
-![[nyx_v2_small.png]]
+![[nyx_v3.jpeg]]
+![[nyx_v3_small.jpeg]]
 ## Early Life
 
 She was raised among statics, surrounded by faces that never shifted, names that never changed. From the moment she could remember, she was **Nyellee**, the noble-born misfit, the too-clever child with laughter that danced between charm and trouble. She learned early that she was different—too quick, too fluid, too _wrong_ in ways she didn’t understand.
@@ -290,4 +290,31 @@ But when trouble comes—and it always does—she handles it **fast and clean.**
 	 * Shop was looted
 	 * Got transported here in a portal
 	 * 
+
+## Emote Images:
+![[nyx_v3_angry.jpeg]]
+![[nyx_v3_crying.jpeg]]
+![[nyx_v3_fearful.jpeg]]
+![[nyx_v3_laughing.jpeg]]
+![[nyx_v3_sad.jpeg]]
+![[nyx_v3_serious.jpeg]]
+![[nyx_v3_smiling.jpeg]]
+![[lfg.jpeg]]
+![[nix_doorkick.jpeg]]![[loot.jpeg]]
+![[dead.jpeg]]
+![[sneak.jpeg]]
+![[jump.jpeg]]
+![[fail.jpeg]]
+![[success.jpeg]]
+![[lie.jpeg]]
+![[truth.jpeg]]
+![[stab.jpeg]]
+![[flee.jpeg]]
+![[plan.jpeg]]![[snack.jpeg]]
+![[disguise.jpeg]]
+![[lolfail.jpeg]]
+![[ohno.jpeg]]
+
+
+
 
