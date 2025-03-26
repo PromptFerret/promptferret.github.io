@@ -83,25 +83,52 @@ subscript_map = {
 }
 
 check_map = {
-    "acrobatics": "dex",
-    "animal_handling": "wis",
-    "arcana": "int",
+    # Raw Ability Checks (short)
+    "str": "str",
+    "dex": "dex",
+    "con": "con",
+    "int": "int",
+    "wis": "wis",
+    "cha": "cha",
+
+    # Raw Ability Checks (long)
+    "strength": "str",
+    "dexterity": "dex",
+    "constitution": "con",
+    "intelligence": "int",
+    "wisdom": "wis",
+    "charisma": "cha",
+
+
+    # Strength-based Skills
     "athletics": "str",
-    "deception": "cha",
-    "history": "int",
-    "insight": "wis",
-    "intimidation": "cha",
-    "investigation": "int",
-    "medicine": "wis",
-    "nature": "int",
-    "perception": "wis",
-    "performance": "cha",
-    "persuasion": "cha",
-    "religion": "int",
+
+    # Dexterity-based Skills
+    "acrobatics": "dex",
     "sleight_of_hand": "dex",
     "stealth": "dex",
-    "survival": "wis"
+
+    # Intelligence-based Skills
+    "arcana": "int",
+    "history": "int",
+    "investigation": "int",
+    "nature": "int",
+    "religion": "int",
+
+    # Wisdom-based Skills
+    "animal_handling": "wis",
+    "insight": "wis",
+    "medicine": "wis",
+    "perception": "wis",
+    "survival": "wis",
+
+    # Charisma-based Skills
+    "deception": "cha",
+    "intimidation": "cha",
+    "performance": "cha",
+    "persuasion": "cha",
 }
+
 
 save_map = {
     "strength": "str",
@@ -139,6 +166,8 @@ pet_schema = {
         "wis": None,
         "cha": None
     },
+    "proficiency": [],
+    "expertise": [],
     "speed": [],
     "senses": [],
     "traits": [],
@@ -186,7 +215,6 @@ item_stat_schema = {
     "passive_insight": None,
     "passive_investigation": None,
     "luck_bonus": None,
-    "initiative": None,
     # "ignore_nonmagical_damage": False # !! FUTURE PERHAPS !!
 }
 
@@ -216,6 +244,7 @@ item_schema = {
         "stats": {}, # Such as stats.dex +1 when attuned
         "extra_effects": [] # Stuff that does not effect any values or roles, such as "you gain advantage on perception checks"
     },
+    "active": False,
     "worn": False,
     "attuned": False,
     "description": None
@@ -271,6 +300,121 @@ def sanitize_string_or_error(value, max_length=15):
 
 def to_proper(value):
     return " ".join(word.capitalize() for word in value.split("_"))
+
+
+def get_modifiers(attr, pet):
+    """
+    Returns a list of dictionaries for modifiers affecting a given attribute.
+    Each modifier includes a source and value.
+    """
+    mods = []
+    for item_key, item in pet.get("items", {}).items():
+        if not item.get("active") and not item.get("worn") and not item.get("attuned"):
+            continue  # Skip inactive items
+
+        effect = item.get("effect", {})
+        stats = effect.get("stats", {})
+
+        if attr in stats and stats[attr] is not None:
+            mods.append({
+                "source": f"item.{item_key}",
+                "value": stats[attr]
+            })
+
+    return mods
+
+
+def roll_modifier(attr, pet):
+    """
+    Calculates the total modifier for a given attribute.
+    Returns (total, [modifiers])
+    """
+    mods = get_modifiers(attr, pet)
+    total = sum(m["value"] for m in mods)
+
+    return total, mods
+
+
+def explain_modifiers(mods):
+    return ", ".join(f"{m['value']:+d} from {to_proper(m['source'])}" for m in mods)
+
+
+def effective_stat(attr, base_value, pet):
+    """
+    Calculates the effective stat value from base and items,
+    and returns the modifier and a readable breakdown.
+    """
+    mods = get_modifiers(attr, pet)
+
+    # Check for overrides (e.g., item sets STR to 19)
+    overrides = [m["value"] for m in mods if isinstance(m["value"], int) and m["value"] >= 15 and base_value < m["value"]]
+    effective_value = max(overrides) if overrides else base_value
+
+    mod = (effective_value - 10) // 2
+    breakdown = f"{to_proper(attr)} ({effective_value}) → {mod:+d} modifier"
+
+    return mod, breakdown
+
+
+def get_stat_info(attr, pet, check_key=None):
+    base = pet.get("stats", {}).get(attr, 10)
+    mods = get_modifiers(attr, pet)
+
+    # Check for stat override (like item sets DEX to 19)
+    overrides = [m["value"] for m in mods if isinstance(m["value"], int) and m["value"] >= 15 and base < m["value"]]
+    effective = max(overrides) if overrides else base
+
+    base_mod = (effective - 10) // 2
+    item_bonus, item_mods = roll_modifier(attr, pet)
+
+    prof_bonus = 2
+    is_proficient = False
+    is_expert = False
+    prof_applied = 0
+    override_value = None
+    breakdown_lines = []
+
+    if check_key:
+        # Check for manual override in skills
+        override_value = pet.get("skills", {}).get(check_key)
+
+        if override_value is None:
+            # Check for proficiency/expertise if no override
+            if check_key in pet.get("expertise", []):
+                is_expert = True
+                prof_applied = prof_bonus * 2
+            elif check_key in pet.get("proficiency", []):
+                is_proficient = True
+                prof_applied = prof_bonus
+
+    total_modifier = override_value if override_value is not None else base_mod + prof_applied
+    breakdown = f"{to_proper(attr)} ({effective}) → {total_modifier:+d} modifier"
+
+    if override_value is not None:
+        breakdown_lines.append(f"- {override_value:+d} manual override")
+    else:
+        breakdown_lines.append(f"- {base_mod:+d} base")
+        if prof_applied:
+            prof_source = "Expertise" if is_expert else "Proficiency"
+            breakdown_lines.append(f"- {prof_applied:+d} from {prof_source}")
+        if item_bonus:
+            breakdown_lines.append(f"- {item_bonus:+d} from Items")
+
+    display = breakdown + ("\n" + "\n".join(breakdown_lines) if breakdown_lines else "")
+
+    return {
+        "attr": attr,
+        "base": base,
+        "effective": effective,
+        "modifier": total_modifier,
+        "mods": item_mods,
+        "prof_bonus": prof_bonus,
+        "is_proficient": is_proficient,
+        "is_expert": is_expert,
+        "override": override_value,
+        "display": display
+    }
+
 
 
 def get_character_or_error():
@@ -357,25 +501,12 @@ def tbd(arg_data):
 
 #!------------------------- start handle_action --------------------------#
 def handle_action(arg_data):
-    # Ensure an action type is provided (add, delete, edit)
     action_type = arg_data.get("1")
-    if action_type not in {"add", "delete", "edit"}:
-        return {"DESCRIPTION": "⚠️ Error: Invalid action type. Use `add`, `delete`, or `edit`.", "COLOR": color_map["red"]}
-
-    # Ensure an action name is provided
-    action_name = arg_data.get("2")
-    if not action_name:
-        return {"DESCRIPTION": "⚠️ Error: Action name is required. Example: `!pm action add Bite`", "COLOR": color_map["red"]}
-
-    # Sanitize the action name
-    action_name, error = sanitize_string_or_error(action_name)
-    if error:
-        return error  # Return sanitization error if invalid
 
     # Get current pet
     ch, error = get_character_or_error()
     if error:
-        return error  # Return error if no active character
+        return error
 
     current_pet_key = ch.get_cvar("current_pet")
     if not current_pet_key:
@@ -383,22 +514,52 @@ def handle_action(arg_data):
 
     pet, error = get_pet_or_error(current_pet_key)
     if error:
-        return error  # Return error if pet data is missing or corrupted
+        return error
 
-    # Ensure the actions dictionary exists
+    # Show help/info page if no action_type provided
+    if not action_type:
+        actions = pet.get("actions", {})
+        actions_display = (
+            "\n".join(
+                f"- **{to_proper(a)}**: {details.get('description', 'No description.')}"
+                for a, details in actions.items()
+            ) if actions else "No actions available."
+        )
+
+        usage = (
+            f"**Usage:**\n"
+            f"- `{COMMAND} action add <name>`\n"
+            f"- `{COMMAND} action edit <name> <field> <value>`\n"
+            f"- `{COMMAND} action delete <name>`"
+        )
+
+        return {
+            "TITLE": f"⚔️ Actions for {pet['name']}",
+            "DESCRIPTION": f"{actions_display}\n\n{usage}",
+            "COLOR": color_map["blue"]
+        }
+
+    # Existing Logic continues unchanged below here
+    if action_type not in {"add", "delete", "edit"}:
+        return {"DESCRIPTION": "⚠️ Error: Invalid action type. Use `add`, `delete`, or `edit`.", "COLOR": color_map["red"]}
+
+    action_name = arg_data.get("2")
+    if not action_name:
+        return {"DESCRIPTION": "⚠️ Error: Action name is required. Example: `!pm action add Bite`", "COLOR": color_map["red"]}
+
+    action_name, error = sanitize_string_or_error(action_name)
+    if error:
+        return error
+
     if "actions" not in pet:
         pet["actions"] = {}
 
-    # Handle "add" action
     if action_type == "add":
         if action_name in pet["actions"]:
             return {"DESCRIPTION": f"⚠️ Error: Action `{action_name}` already exists.", "COLOR": color_map["orange"]}
 
-        # Create new action from schema
         pet["actions"][action_name] = deepcopy(action_schema)
         pet["actions"][action_name]["name"] = action_name
-
-        # return debug(pet)
 
         result = save_pet(current_pet_key, pet)
         if result.get("DESCRIPTION") == "🧸 Pets saved successfully.":
@@ -406,12 +567,10 @@ def handle_action(arg_data):
         else:
             return result
 
-    # Handle "delete" action
     elif action_type == "delete":
         if action_name not in pet["actions"]:
             return {"DESCRIPTION": f"⚠️ Error: Action `{action_name}` not found.", "COLOR": color_map["orange"]}
 
-        # Remove the action
         pet["actions"] = delete(pet["actions"], action_name)
 
         result = save_pet(current_pet_key, pet)
@@ -420,32 +579,25 @@ def handle_action(arg_data):
         else:
             return result
 
-    # Handle "edit" action
     elif action_type == "edit":
         if action_name not in pet["actions"]:
             return {"DESCRIPTION": f"⚠️ Error: Action `{action_name}` not found.", "COLOR": color_map["orange"]}
 
-        # Ensure an attribute and value are provided
         action_attr = arg_data.get("3")
         value = " ".join(arg_data.get(str(i), "") for i in range(4, len(arg_data))).strip()
 
         if not action_attr or not value:
             return {"DESCRIPTION": "⚠️ Error: You must specify an attribute and value. Example: `!pm action edit Bite damage_roll 2d8+3`", "COLOR": color_map["red"]}
 
-        # Validate attribute against action_schema
         if action_attr not in action_schema:
             return {"DESCRIPTION": f"⚠️ Error: `{action_attr}` is not a valid action attribute.", "COLOR": color_map["red"]}
 
-        # Assign the value
-        # Ensure proper formatting for numeric modifiers
         if action_attr in {"hit_modifier", "damage_modifier"}:
             if not (value.lstrip("+-").isdigit() and (value.startswith("+") or value.startswith("-"))):
                 return {"DESCRIPTION": f"⚠️ Error: `{action_attr}` must be a number with a `+` or `-` sign (e.g., `+2`, `-1`, `+0`).", "COLOR": color_map["red"]}
-            value = f"{int(value):+d}"  # Ensure proper sign formatting
+            value = f"{int(value):+d}"
 
-        # Assign the value
         pet["actions"][action_name][action_attr] = value
-
 
         result = save_pet(current_pet_key, pet)
         if result.get("DESCRIPTION") == "🧸 Pets saved successfully.":
@@ -459,14 +611,9 @@ def handle_action(arg_data):
 def handle_attack(arg_data):
     attack_name = arg_data.get("1")
 
-    # Ensure an attack name is provided
-    if not attack_name:
-        return {"DESCRIPTION": "⚠️ Error: You must specify an attack name. Example: `!pm attack claw`", "COLOR": color_map["red"]}
-
-    # Get current pet
     ch, error = get_character_or_error()
     if error:
-        return error  # Return error if no active character
+        return error
 
     current_pet_key = ch.get_cvar("current_pet")
     if not current_pet_key:
@@ -474,9 +621,35 @@ def handle_attack(arg_data):
 
     pet, error = get_pet_or_error(current_pet_key)
     if error:
-        return error  # Return error if pet data is missing or corrupted
+        return error
 
-    # Ensure attack exists
+    # Info/help display if no attack_name given
+    if not attack_name:
+        actions = pet.get("actions", {})
+        attacks_display = (
+            "\n".join(
+                f"- **{to_proper(a)}** (Damage: {details.get('damage_roll', 'None')}, Type: {details.get('damage_type', 'Unknown')})"
+                for a, details in actions.items()
+            ) if actions else "No attacks available."
+
+        )
+
+        usage = (
+            f"**Usage:**\n"
+            f"- `{COMMAND} attack <name>` (Normal roll)\n"
+            f"- `{COMMAND} attack <name> adv` (Advantage)\n"
+            f"- `{COMMAND} attack <name> dis` (Disadvantage)\n"
+            f"- `{COMMAND} attack <name> <custom roll>` (Custom roll, e.g. `1d20+5`)\n\n"
+            f"**Available Attacks:**\n{attacks_display}"
+        )
+
+        return {
+            "TITLE": f"⚔️ Attacks for {pet['name']}",
+            "DESCRIPTION": usage,
+            "COLOR": color_map["blue"]
+        }
+
+    # Existing logic continues here, no changes to current functionality
     attack_name, sanitize_error = sanitize_string_or_error(attack_name)
     if sanitize_error:
         return sanitize_error
@@ -486,31 +659,26 @@ def handle_attack(arg_data):
 
     attack = pet["actions"][attack_name]
 
-    # Get roll type (default is normal attack roll)
     roll_type = arg_data.get("2", "").lower()
+    hit_modifier = attack.get("hit_modifier", "+0")
 
-    # Determine attack roll formula
-    hit_modifier = attack.get("hit_modifier", "+0")  # Ensure it's always a string
-
+    # Handle normal, advantage, disadvantage, and custom rolls correctly
     if roll_type == "adv":
         attack_roll = f"2d20kh1{hit_modifier}"
     elif roll_type == "dis":
         attack_roll = f"2d20kl1{hit_modifier}"
-    elif roll_type:  # If a roll is provided, assume it's a custom roll
+    elif roll_type:  # Custom rolls
         attack_roll = roll_type
-    else:  # Default to normal attack roll
+    else:  # Default roll
         attack_roll = f"1d20{hit_modifier}"
 
     attack_result = vroll(attack_roll)
 
-    # Get damage roll
     damage_roll = attack.get("damage_roll", "0")
-    damage_modifier = attack.get("damage_modifier", "+0")  # Ensure correct sign
+    damage_modifier = attack.get("damage_modifier", "+0")
     total_damage_roll = f"{damage_roll}{damage_modifier}" if damage_roll != "0" else "0"
-
     damage_result = vroll(total_damage_roll)
 
-    # Format attack output
     attack_output = (
         f"🎯 {to_proper(attack_name)} Attack\n"
         f"🎲 **Attack Roll:** {attack_result}\n"
@@ -521,7 +689,6 @@ def handle_attack(arg_data):
     )
 
     return {"TITLE": f"🗡️ {pet['name']} Attacks!", "DESCRIPTION": attack_output, "COLOR": color_map["orange"]}
-
 #!------------------------- start handle_attack --------------------------#
 
 
@@ -543,6 +710,76 @@ def handle_adopt(arg_data):
 
     return create_pet(pet_key, pet_name)
 #!------------------------- end handle_adopt --------------------------#
+
+
+#!------------------------- start handle_check --------------------------#
+def handle_check(arg_data):
+    check_key = arg_data.get("1")
+    roll_type = arg_data.get("2", "").lower()
+
+    ch, error = get_character_or_error()
+    if error:
+        return error
+
+    current_pet_key = ch.get_cvar("current_pet")
+    if not current_pet_key:
+        return {"DESCRIPTION": "⚠️ Error: No pet selected. Use `!pm select <key>` first.", "COLOR": color_map["red"]}
+
+    pet, error = get_pet_or_error(current_pet_key)
+    if error:
+        return error
+
+    # If no check_key provided, display available checks and usage
+    if not check_key:
+        available_checks = ", ".join(check_map.keys())
+        usage = (
+            f"**Usage:**\n"
+            f"- `{COMMAND} check <check>` (Normal roll)\n"
+            f"- `{COMMAND} check <check> adv` (Advantage)\n"
+            f"- `{COMMAND} check <check> dis` (Disadvantage)\n"
+            f"- `{COMMAND} check <check> <custom roll>` (Custom roll)\n\n"
+            f"**Available Checks:**\n{available_checks}"
+        )
+
+        return {
+            "TITLE": f"🧪 Checks for {pet['name']}",
+            "DESCRIPTION": usage,
+            "COLOR": color_map["blue"]
+        }
+
+    if check_key not in check_map:
+        return {"DESCRIPTION": f"⚠️ Error: `{check_key}` is not a recognized check.", "COLOR": color_map["red"]}
+
+    attr = check_map[check_key]
+    stat_info = get_stat_info(attr, pet, check_key=check_key)
+    mod = stat_info["modifier"]
+
+    if roll_type == "adv":
+        roll_expr = f"2d20kh1{mod:+d}"
+    elif roll_type == "dis":
+        roll_expr = f"2d20kl1{mod:+d}"
+    elif roll_type:  # Custom roll
+        roll_expr = roll_type
+    else:
+        roll_expr = f"1d20{mod:+d}"
+
+    roll_result = vroll(roll_expr)
+
+    title = f"🧪 Check: {to_proper(check_key)}"
+    desc = f"Rolling {to_proper(check_key)} check: `{roll_expr}`\n{roll_result}\n\n**Effective Stat:** {stat_info['display']}"
+
+    result = {
+        "TITLE": title,
+        "DESCRIPTION": desc,
+        "COLOR": color_map["green"]
+    }
+
+    if pet.get("thumbnail"):
+        result["THUMBNAIL"] = pet["thumbnail"]
+
+    return result
+
+#!------------------------- end handle_check --------------------------#
 
 
 #!------------------------- end handle_help --------------------------#
@@ -888,46 +1125,68 @@ def handle_show(arg_data):
         embed_data["THUMBNAIL"] = pet["thumbnail"]
 
     return embed_data
-
-
 #!------------------------- end handle_show --------------------------#
 
 
-#!------------------------- start handle_toggle_list --------------------------#
-def handle_toggle_list(arg_data):
-    list_map = {
-        "condition": "condition",
-        "resist": "resist",
-        "immune": "immune"
-    }
+#!------------------------- start handle_skills --------------------------#
+def handle_skills(arg_data):
+    # Combine check and save maps for validation
+    valid_skills = set(check_map.keys()) | set(save_map.keys())
 
-    # Ensure a valid command type
-    list_type = arg_data.get("command")
-    if list_type not in list_map:
-        return {"DESCRIPTION": "⚠️ Error: Invalid command. Use `condition`, `resist`, or `immune`.", "COLOR": color_map["red"]}
+    # Get subcommand: add, edit, delete
+    subcommand = arg_data.get("1", "").lower()
 
-    # Get operation and name
-    raw_name = arg_data.get("1")
+    if subcommand not in {"add", "edit", "delete"}:
+        # If no subcommand or invalid, show current skills and usage
+        ch, error = get_character_or_error()
+        if error:
+            return error
 
-    # Ensure a name is provided
-    if not raw_name:
-        return {"DESCRIPTION": "⚠️ Error: You must specify a name. Example: `!pm condition +Prone`", "COLOR": color_map["red"]}
+        current_pet_key = ch.get_cvar("current_pet")
+        if not current_pet_key:
+            return {"DESCRIPTION": "⚠️ Error: No pet selected. Use `!pm select <key>` first.", "COLOR": color_map["red"]}
 
-    # Determine operation: extract `+` or `-`, or toggle if missing
-    operation = None
-    if raw_name[0] in {"+", "-"}:
-        operation = raw_name[0]  # Get "+" or "-"
-        raw_name = raw_name[1:].strip()  # Remove the symbol from the name
+        pet, error = get_pet_or_error(current_pet_key)
+        if error:
+            return error
 
-    # Sanitize the name
-    sanitized_name, error = sanitize_string_or_error(raw_name)
+        skills = pet.get("skills", {})
+        if not skills:
+            skills_display = "None"
+        else:
+            skills_display = ", ".join(f"**{to_proper(skill)}** {bonus:+d}" for skill, bonus in skills.items())
+
+        usage = (
+            "**Usage:**\n"
+            "`!pm skills add <skill> <bonus>`\n"
+            "`!pm skills edit <skill> <new bonus>`\n"
+            "`!pm skills delete <skill>`"
+        )
+
+        return {
+            "TITLE": "📘 Current Skills",
+            "DESCRIPTION": f"{skills_display}\n\n{usage}",
+            "COLOR": color_map["blue"]
+        }
+
+    # Sanitize skill name
+    skill_name = arg_data.get("2")
+    if not skill_name:
+        return {"DESCRIPTION": f"⚠️ Error: You must specify a skill name.", "COLOR": color_map["red"]}
+
+    sanitized_name, error = sanitize_string_or_error(skill_name)
     if error:
-        return error  # Return sanitization error if invalid
+        return error
+
+    if sanitized_name not in valid_skills:
+        return {"DESCRIPTION": f"⚠️ Error: `{sanitized_name}` is not a valid skill or ability.\n"
+                f"Valid options: `{', '.join(sorted(valid_skills))}`",
+                "COLOR": color_map["red"]}
 
     # Get current pet
     ch, error = get_character_or_error()
     if error:
-        return error  # Return error if no active character
+        return error
 
     current_pet_key = ch.get_cvar("current_pet")
     if not current_pet_key:
@@ -935,16 +1194,128 @@ def handle_toggle_list(arg_data):
 
     pet, error = get_pet_or_error(current_pet_key)
     if error:
-        return error  # Return error if pet data is missing or corrupted
+        return error
 
-    # Ensure the list exists in pet data
+    if "skills" not in pet:
+        pet["skills"] = {}
+
+    # ADD
+    if subcommand == "add":
+        if sanitized_name in pet["skills"]:
+            return {"DESCRIPTION": f"⚠️ Error: `{sanitized_name}` already exists. Use `edit` to change it.", "COLOR": color_map["orange"]}
+
+        try:
+            bonus = int(arg_data.get("3"))
+        except:
+            return {"DESCRIPTION": "⚠️ Error: You must provide a numeric bonus value.", "COLOR": color_map["red"]}
+
+        pet["skills"][sanitized_name] = bonus
+        result = save_pet(current_pet_key, pet)
+        return {"TITLE": "Success!", "DESCRIPTION": f"✨ Skill `{to_proper(sanitized_name)}` added with bonus `{bonus:+d}`.", "COLOR": color_map["green"]}
+
+    # EDIT
+    elif subcommand == "edit":
+        if sanitized_name not in pet["skills"]:
+            return {"DESCRIPTION": f"⚠️ Error: `{sanitized_name}` does not exist. Use `add` first.", "COLOR": color_map["orange"]}
+
+        try:
+            bonus = int(arg_data.get("3"))
+        except:
+            return {"DESCRIPTION": "⚠️ Error: You must provide a numeric bonus value.", "COLOR": color_map["red"]}
+
+        pet["skills"][sanitized_name] = bonus
+        result = save_pet(current_pet_key, pet)
+        return {"TITLE": "Success!", "DESCRIPTION": f"✍️ Skill `{to_proper(sanitized_name)}` updated to `{bonus:+d}`.", "COLOR": color_map["green"]}
+
+    # DELETE
+    elif subcommand == "delete":
+        if sanitized_name not in pet["skills"]:
+            return {"DESCRIPTION": f"⚠️ Error: `{sanitized_name}` not found.", "COLOR": color_map["orange"]}
+
+        pet["skills"] = delete(pet["skills"], sanitized_name)
+        result = save_pet(current_pet_key, pet)
+        return {"TITLE": "Success!", "DESCRIPTION": f"🗑️ Skill `{to_proper(sanitized_name)}` removed.", "COLOR": color_map["green"]}
+#!------------------------- end handle_skill --------------------------#
+
+
+#!------------------------- start handle_toggle_list --------------------------#
+def handle_toggle_list(arg_data):
+    list_map = {
+        "condition": "condition",
+        "resist": "resist",
+        "immune": "immune",
+        "prof": "proficiency",
+        "proficiency": "proficiency",
+        "exp": "expertise",
+        "expertise": "expertise"
+    }
+
+    # Ensure a valid command type
+    list_type = arg_data.get("command")
+    if list_type not in list_map:
+        return {"DESCRIPTION": "⚠️ Error: Invalid command. Use `condition`, `resist`, `immune`, `prof`, or `expertise`.", "COLOR": color_map["red"]}
+
+    # Get current pet
+    ch, error = get_character_or_error()
+    if error:
+        return error
+
+    current_pet_key = ch.get_cvar("current_pet")
+    if not current_pet_key:
+        return {"DESCRIPTION": "⚠️ Error: No pet selected. Use `!pm select <key>` first.", "COLOR": color_map["red"]}
+
+    pet, error = get_pet_or_error(current_pet_key)
+    if error:
+        return error
+
+    # If no argument provided, display current list and usage
+    raw_name = arg_data.get("1")
+    if not raw_name:
+        current_list = pet.get(list_type, [])
+        current_display = ", ".join(to_proper(name) for name in current_list) if current_list else "None active."
+
+        usage = (
+            f"**Usage:**\n"
+            f"- `{COMMAND} {list_type} +<name>` (Add)\n"
+            f"- `{COMMAND} {list_type} -<name>` (Remove)\n"
+            f"- `{COMMAND} {list_type} <name>` (Toggle)\n"
+            f"\n**Currently active:** {current_display}"
+        )
+
+        return {
+            "TITLE": f"📋 {to_proper(list_type)} for {pet['name']}",
+            "DESCRIPTION": usage,
+            "COLOR": color_map["blue"]
+        }
+
+    # Detect + / - operator
+    operation = None
+    if raw_name[0] in {"+", "-"}:
+        operation = raw_name[0]
+        raw_name = raw_name[1:].strip()
+
+    # Sanitize input
+    sanitized_name, error = sanitize_string_or_error(raw_name)
+    if error:
+        return error
+
+    # Validate input if prof/expertise
+    if list_type in {"prof", "proficiency", "exp", "expertise"}:
+        valid_keys = set(check_map.keys()) | set(save_map.keys())
+        if sanitized_name not in valid_keys:
+            return {
+                "DESCRIPTION": f"⚠️ Error: `{sanitized_name}` is not a valid skill or ability.\n"
+                f"Valid options: `{', '.join(sorted(valid_keys))}`",
+                "COLOR": color_map["red"]
+            }
+
+    # Get the actual list and apply operation
     list_key = list_map[list_type]
     if list_key not in pet:
-        pet[list_key] = []  # Initialize if missing
+        pet[list_key] = []
 
     pet_list = pet[list_key]
 
-    # Determine if we're adding, removing, or toggling
     if operation == "+":
         if sanitized_name not in pet_list:
             pet_list.append(sanitized_name)
@@ -959,7 +1330,7 @@ def handle_toggle_list(arg_data):
         else:
             return {"DESCRIPTION": f"⚠️ `{sanitized_name}` is not in `{list_type}`.", "COLOR": color_map["orange"]}
 
-    else:  # Toggle mode (no + or - provided)
+    else:
         if sanitized_name in pet_list:
             pet_list.remove(sanitized_name)
             action = "removed from"
@@ -967,13 +1338,15 @@ def handle_toggle_list(arg_data):
             pet_list.append(sanitized_name)
             action = "added to"
 
-    # Save updated pet
     result = save_pet(current_pet_key, pet)
     if result.get("DESCRIPTION") == "🧸 Pets saved successfully.":
-        return {"TITLE": "Success!", "DESCRIPTION": f"🧸 `{sanitized_name}` {action} `{list_type}`.", "COLOR": color_map["green"]}
+        return {
+            "TITLE": "Success!",
+            "DESCRIPTION": f"🧸 `{sanitized_name}` {action} `{list_type}`.",
+            "COLOR": color_map["green"]
+        }
     else:
         return result
-
 #!------------------------- end handle_toggle_list --------------------------#
 
 
@@ -987,22 +1360,28 @@ def handle_toggle_list(arg_data):
 
 commands = {
     "action": handle_action,
-    "attack": handle_attack,
     "add": tbd,
     "adopt": handle_adopt,
+    "attack": handle_attack,
+    "check": handle_check,
     "condition": handle_toggle_list,
     "debug": tbd,
+    "exp": handle_toggle_list,
+    "expertise": handle_toggle_list,
     "export": tbd,
     "help": handle_help,
     "immune": handle_toggle_list,
     "import": tbd,
     "list": handle_list,
+    "prof": handle_toggle_list,
+    "proficiency": handle_toggle_list,
     "purge": handle_purge,
     "release": handle_release,
     "resist": handle_toggle_list,
     "select": handle_select,
     "set": handle_set,
     "show": handle_show,
+    "skills": handle_skills,
     "status": tbd,
 }
 
