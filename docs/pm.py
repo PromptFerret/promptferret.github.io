@@ -1271,15 +1271,17 @@ def handle_toggle_list(arg_data):
     # If no argument provided, display current list and usage
     raw_name = arg_data.get("1")
     if not raw_name:
-        current_list = pet.get(list_type, [])
+        key = list_map[list_type]
+        current_list = pet.get(key, [])
+
         current_display = ", ".join(to_proper(name) for name in current_list) if current_list else "None active."
 
         usage = (
             f"**Usage:**\n"
-            f"- `{COMMAND} {list_type} +<name>` (Add)\n"
-            f"- `{COMMAND} {list_type} -<name>` (Remove)\n"
-            f"- `{COMMAND} {list_type} <name>` (Toggle)\n"
-            f"\n**Currently active:** {current_display}"
+            f"• `{COMMAND} {list_type} +<name>` (Add)\n"
+            f"• `{COMMAND} {list_type} -<name>` (Remove)\n"
+            f"• `{COMMAND} {list_type} <name>` (Toggle)\n\n"
+            f"**Currently active:** {current_display if current_list else 'None active.'}"
         )
 
         return {
@@ -1311,10 +1313,10 @@ def handle_toggle_list(arg_data):
 
     # Get the actual list and apply operation
     list_key = list_map[list_type]
-    if list_key not in pet:
-        pet[list_key] = []
+    if key not in pet:
+        pet[key] = []
 
-    pet_list = pet[list_key]
+    pet_list = pet[key]
 
     if operation == "+":
         if sanitized_name not in pet_list:
