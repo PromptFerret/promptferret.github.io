@@ -248,7 +248,11 @@ item_schema = {
     "active": False,
     "worn": False,
     "attuned": False,
-    "description": None
+    "description": None,
+    "charges": {
+        "max": 0,
+        "current": 0
+    }
 }
 
 effect_schema = {
@@ -1043,6 +1047,154 @@ def handle_help(arg_data):
 #!------------------------- end handle_help --------------------------#
 
 
+#!------------------------- start handle_items --------------------------#
+def handle_items(arg_data):
+    subcommand = arg_data.get("1", "").lower()
+    item_name = arg_data.get("2")
+    pet, error = get_pet_or_error(character().get_cvar("current_pet"))
+    if error:
+        return error
+
+    if "items" not in pet:
+        pet["items"] = {}
+
+    # Helper to find next valid key
+    def generate_item_key(base_key):
+        key = base_key
+        counter = 1
+        while key in pet["items"]:
+            key = f"{base_key}_{counter}"
+            counter += 1
+        return key
+
+    # List items
+    if not subcommand or subcommand == "list":
+        if not pet["items"]:
+            return {"DESCRIPTION": "📦 No items found.", "COLOR": color_map["blue"]}
+        lines = []
+        for key, item in pet["items"].items():
+            name = item.get("name", to_proper(key))
+            active = "🟢" if item.get("active") else "⚪"
+            attuned = "🔗" if item.get("attuned") else ""
+            charge_info = ""
+            charges = item.get("charges", {})
+            if charges and charges.get("max", 0) > 0:
+                charge_info = f" ({charges.get('current', 0)}/{charges.get('max')})"
+            lines.append(f"{active} **{name}** {attuned}{charge_info}")
+        return {
+            "TITLE": f"🛠️ Items for {pet['name']}",
+            "DESCRIPTION": "\n".join(lines),
+            "COLOR": color_map["blue"]
+        }
+
+    # Add item
+    if subcommand == "add":
+        if not item_name:
+            return {"DESCRIPTION": "⚠️ You must provide an item name.", "COLOR": color_map["red"]}
+        key, error = sanitize_string_or_error(item_name, 100)
+        if error:
+            return error
+        key = generate_item_key(key)
+
+        item = deepcopy(item_schema)
+        item["name"] = to_proper(item_name)
+        pet["items"][key] = item
+        result = save_pet(character().get_cvar("current_pet"), pet)
+        return {
+            "TITLE": "Item Added",
+            "DESCRIPTION": f"➕ `{item['name']}` added as `{key}`.",
+            "COLOR": color_map["green"]
+        }
+
+    # Delete item
+    if subcommand == "delete":
+        key, error = sanitize_string_or_error(item_name, 100)
+        if error:
+            return error
+        if key not in pet["items"]:
+            return {"DESCRIPTION": f"⚠️ Item `{key}` not found.", "COLOR": color_map["red"]}
+        pet["items"] = delete(pet["items"], key)
+        result = save_pet(character().get_cvar("current_pet"), pet)
+        return {
+            "TITLE": "Item Deleted",
+            "DESCRIPTION": f"🗑️ `{key}` removed.",
+            "COLOR": color_map["green"]
+        }
+
+    # Edit item field
+    if subcommand == "edit":
+        field = arg_data.get("3")
+        value = " ".join(arg_data.get(str(i), "") for i in range(4, len(arg_data))).strip()
+        key, error = sanitize_string_or_error(item_name, 100)
+        if error:
+            return error
+        if key not in pet["items"]:
+            return {"DESCRIPTION": f"⚠️ Item `{key}` not found.", "COLOR": color_map["red"]}
+        if field not in item_schema:
+            return {"DESCRIPTION": f"⚠️ Invalid field `{field}`.", "COLOR": color_map["red"]}
+        # Handle boolean fields
+        if item_schema[field] is True or item_schema[field] is False:
+            value = str(value).lower() in {"true", "yes", "1"}
+        # Handle charges
+        elif field == "charges":
+            parts = value.split("/")
+            if len(parts) == 2:
+                try:
+                    pet["items"][key]["charges"]["current"] = int(parts[0])
+                    pet["items"][key]["charges"]["max"] = int(parts[1])
+                except:
+                    return {"DESCRIPTION": "⚠️ Invalid charges format. Use `current/max`.", "COLOR": color_map["red"]}
+        else:
+            pet["items"][key][field] = value
+        result = save_pet(character().get_cvar("current_pet"), pet)
+        return {
+            "TITLE": "Item Updated",
+            "DESCRIPTION": f"✍️ `{key}`.{field} updated.",
+            "COLOR": color_map["green"]
+        }
+
+    # Toggle attunement
+    if subcommand == "attune":
+        key, error = sanitize_string_or_error(item_name, 100)
+        if error:
+            return error
+        if key not in pet["items"]:
+            return {"DESCRIPTION": f"⚠️ Item `{key}` not found.", "COLOR": color_map["red"]}
+        item = pet["items"][key]
+        item["attuned"] = not item.get("attuned", False)
+        result = save_pet(character().get_cvar("current_pet"), pet)
+        return {
+            "TITLE": "Item Attunement",
+            "DESCRIPTION": f"🔗 `{item['name']}` attunement set to `{item['attuned']}`.",
+            "COLOR": color_map["green"]
+        }
+
+    # Use item (spend one charge)
+    if subcommand == "use":
+        key, error = sanitize_string_or_error(item_name, 100)
+        if error:
+            return error
+        item = pet["items"].get(key)
+        if not item:
+            return {"DESCRIPTION": f"⚠️ Item `{key}` not found.", "COLOR": color_map["red"]}
+        charges = item.get("charges", {})
+        if charges.get("current", 0) < 1:
+            return {"DESCRIPTION": f"⚠️ `{item['name']}` has no charges remaining.", "COLOR": color_map["orange"]}
+        item["charges"]["current"] -= 1
+        result = save_pet(character().get_cvar("current_pet"), pet)
+        return {
+            "TITLE": "Item Used",
+            "DESCRIPTION": f"🔋 `{item['name']}` used. Remaining charges: {item['charges']['current']}/{item['charges']['max']}",
+            "COLOR": color_map["green"]
+        }
+
+    return {
+        "DESCRIPTION": "⚠️ Invalid subcommand. Use `add`, `delete`, `list`, `edit`, `attune`, or `use`.",
+        "COLOR": color_map["red"]
+    }
+#!------------------------- end handle_items --------------------------#
+
+
 #!------------------------- start handle_list --------------------------#
 def handle_list(arg_data):
     pets, error = get_pets_or_error()
@@ -1349,7 +1501,7 @@ def handle_show(arg_data):
     DESCRIPTION = ""
 
     # Construct Description
-    DESCRIPTION += f"**Type:** {species}\n"
+    DESCRIPTION += f"**Species:** {species}\n"
     DESCRIPTION += f"{size} {type_}, {alignment}\n"
     DESCRIPTION += f"**Armor Class:** {ac}{ac_source}  \n"
     DESCRIPTION += f"**Initiative:** {initiative}  \n"
@@ -1630,6 +1782,8 @@ commands = {
     "help": handle_help,
     "immune": handle_toggle_list,
     "import": tbd,
+    "item": handle_items,
+    "items": handle_items,
     "list": handle_list,
     "prof": handle_toggle_list,
     "proficiency": handle_toggle_list,
