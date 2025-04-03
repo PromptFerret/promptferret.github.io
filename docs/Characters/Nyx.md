@@ -226,6 +226,50 @@ But when trouble comes—and it always does—she handles it **fast and clean.**
 	 * Accepted my (second) introduction as a changeling
 	 * Likes milkshakes?
 	 * I gave them the gift of a Tankard of Sobriety.
+	- Origin: Talos, a war-torn world where conflict is common
+	- Race/Lineage: From a blood-cursed family, possibly cursed by a god; the curse affects her entire bloodline
+	- Class: Archdruid		
+	- Also training as a monk
+	- Current deity: Keranos (god of storms and inspiration), chosen for practical reasons
+	- Open to the teachings of Sune, especially themes of love, beauty, and divine pleasure
+	- Specializes in Osteomancy and Reincarnation; not a traditional necromancer
+	- Will only assist with bringing someone back if the spirit consents and no innocents are harmed
+	- Has recommended science-based resurrection paths like the Morgue or Tempering Starlight in some situations
+	- Warns against Ba'Straata, a scientist who may be interested in changeling DNA
+	- Does not drink alcohol, due to its effects and a personal sense of control and awareness
+	- Enjoys milkshakes
+	- Has a strong reaction to Nyx offering to cook for her, implying fear of Nyx’s cooking (not the Oasis food)
+	- Was originally housed by Valerie upon arrival to the Astral Oasis
+	- Does not usually stay in rooms at the Oasis; prefers rooftops and solitude
+	- Wears a mask from a young age; for her people, masks are emotional and cultural anchors
+	- Believes masks are a practical face—something others see you as
+	- Entrusted Nyx with a bet to design a personal mask if Nyx wins
+	- People on Talos (including non-cursed ones like the Sarkaz) often hold onto items (masks, weapons) to retain identity
+	- Family was not affectionate; they trained and raised her while projecting anger onto her
+	- Despite their pain, Agrona acknowledges her family did right by her and did not hate her
+	- Admits she struggles with connecting to people but is trying to improve
+	- Has formed a close and intimate bond with Nyx
+		- Accepted Nyx’s second introduction as a changeling without hesitation
+		- Shows both faces to Nyx; removes her mask in Nyx’s presence
+		- Cares deeply for Nyx’s safety and comfort
+		- Kissed Nyx with passion and told them, “Hey Nyx? Thank you for being you.”
+		- Teases Nyx affectionately but expresses clear emotional investment
+		- Joins Nyx to keep them company during work and helps clean and move things
+		- Encourages Nyx to rest and avoid overworking
+		- Expressed desire, saying she would chase and claim Nyx as they want
+		- Reassures Nyx she has no intention of taking away their freedom
+		- Comfortable sharing a bed or closeness with Nyx; has snuggled and rested her head on their shoulder
+	- Nyx refers to Agrona as “my future hero” after Agrona jokes about having to play hero occasionally
+	- Gave Nyx a Mind Flayer’s Skull for protection in the Astral Sea
+	- Received a Tankard of Sobriety from Nyx as a gift
+	- Comfortable spending time aboard the Crimson Mirage with Nyx
+	- Expresses support for Nyx’s path as a follower of Sune and offers to help gather people or assist with ship-building if needed
+	- Nyx traveled to Agrona’s world, explored a mine, and helped kill a boss
+	- After touching the defeated enemy, Nyx burned their hand and now has red crystals embedded in it that match the color of Agrona’s eyes
+ * Valerie
+	 * Friend/so-worker to Agrona
+	 * Heard about me from them
+	 * Is fighting a war along side them?
  * Jade
 	 * Changeling
 	 * Friendly and helpful
@@ -278,18 +322,35 @@ But when trouble comes—and it always does—she handles it **fast and clean.**
 	 * Lives in a city in the Feywild, there are changelings there (NPC)
 	 * Got frozen by an ice dragon?
 	 * Is one of Pykzh's partners? Blew a kiss to them?
+	 * The morgue incident
  * Athena Befrielse
 	 * Friend of Solo
  * Luna Rugaru
+	 * damphir/warewolf hybrid?
 	 * Hates Strahd
 	 * Alergic to silver
 	 * Has a sister who had issues with Strahd
+	 * The morgue incident
  * Draven Gloomshaper
 	 * New here
 	 * Musical salesman
 	 * Shop was looted
 	 * Got transported here in a portal
-	 * 
+	 * Flirt
+	 * Tried to make a song for Moo, was not good.
+ * Grush, Dove of Death
+	 * Zombie? Frankenstine?
+	 * Heard them say they needed a new body, that most the time they take dead ones.. most of the time....
+	 * The morgue incident
+	 * Watches them turn to dust
+ * Bianca and Osku (you'llcant')
+	 * Couple, married?
+	 * Bianca took their spelljammer and came here (crashed? They said it need repairs)
+	 * Osku paid for a teleport
+	 * They are looking for their daughters murderers (Hunter and Smoke)
+	 * Hunter is human, Smoke is a Drow
+	 * ![[roland_other_form.jpg]]
+	 * ![[roland_other_formlogan.jpg]]
 
 ## Emote Images:
 ![[nyx_v3_angry.jpeg]]
@@ -314,6 +375,19 @@ But when trouble comes—and it always does—she handles it **fast and clean.**
 ![[disguise.jpeg]]
 ![[lolfail.jpeg]]
 ![[ohno.jpeg]]
+![[axolotl.jpg]]
+![[creep_tax.jpg]]
+![[i_would_help_but.jpg]]
+![[just_a_bunny.jpg]]
+![[lfg_bad_rp.jpg]]
+![[lfg_need_game.jpg]]
+![[lfg_will_roll.jpg]]
+![[none_shall_pass.jpg]]
+![[personal_issue.jpg]]
+![[you_can_do_the_thing.jpg]]
+
+
+
 
 
 

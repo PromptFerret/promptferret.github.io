@@ -17,6 +17,9 @@ This will be where I host my Obsidian notebook with all my personal projects on 
 ---
 ### Characters
 * [[Nyx]]
+* [[R.E.I.N.A.]]
+* [[The Crimson Mirage]]
+* [[Nyelle, the Stolen Rose]]
 
 ---
 
