@@ -166,17 +166,18 @@ pet_schema = {
         "wis": None,
         "cha": None
     },
-    "proficiency": [],
-    "expertise": [],
-    "speed": [],
-    "senses": [],
-    "traits": [],
     "condition": [],
-    "resist": [],
+    "effects": [],
+    "expertise": [],
     "immune": [],
-    "skills": {},
+    "proficiency": [],
+    "resist": [],
+    "senses": [],
+    "speed": [],
+    "traits": [],
     "actions": {},
     "items": {},
+    "skills": {},
     "thumbnail": None,
     "source": None
 }
@@ -249,6 +250,16 @@ item_schema = {
     "attuned": False,
     "description": None
 }
+
+effect_schema = {
+    "name": None,
+    "bonus": "",
+    "uses": 1,
+    "max_uses": 1,
+    "duration": "",
+    "description": ""
+}
+
 #!------------------------- start schemas --------------------------#
 
 
@@ -300,6 +311,12 @@ def sanitize_string_or_error(value, max_length=15):
 
 def to_proper(value):
     return " ".join(word.capitalize() for word in value.split("_"))
+
+
+def format_tracker(max_uses, remaining):
+    filled = "⬢" * remaining
+    empty = "⬡" * (max_uses - remaining)
+    return f"{filled}{empty} ({remaining}/{max_uses})"
 
 
 def get_modifiers(attr, pet):
@@ -778,8 +795,222 @@ def handle_check(arg_data):
         result["THUMBNAIL"] = pet["thumbnail"]
 
     return result
-
 #!------------------------- end handle_check --------------------------#
+
+
+#!------------------------- start handle_effects --------------------------#
+def handle_effects(arg_data):
+    subcommand = arg_data.get("1", "").lower()
+    effect_key = arg_data.get("2")
+    pet, error = get_pet_or_error(character().get_cvar("current_pet"))
+    if error:
+        return error
+
+    # Ensure effects dict exists
+    if "effects" not in pet:
+        pet["effects"] = {}
+
+    # Display effects
+    if not subcommand:
+        if not pet["effects"]:
+            return {
+                "TITLE": f"✨ Effects for {pet['name']}",
+                "DESCRIPTION": "No effects active.",
+                "COLOR": color_map["blue"]
+            }
+
+        desc = ""
+        for k, v in pet["effects"].items():
+            name = to_proper(v.get("name", k))
+            bonus = v.get("bonus", "")
+            uses = v.get("uses", 0)
+            duration = v.get("duration", "")
+            description = v.get("description", "")
+            max_uses = v.get("max_uses", uses)
+            tracker = format_tracker(max_uses, uses) if max_uses > 0 else ""
+
+
+            line = f"**{name}**"
+            if bonus:
+                line += f" ({bonus})"
+            if tracker:
+                line += f", {tracker}"
+            if duration:
+                line += f", {duration}"
+            if description:
+                line += f"\n📜 *{description}*"
+            desc += f"{line}\n\n"
+
+        return {
+            "TITLE": f"✨ Effects for {pet['name']}",
+            "DESCRIPTION": desc.strip(),
+            "COLOR": color_map["blue"]
+        }
+
+    if subcommand in {"usage", "help"}:
+        usage = (
+            "**✨ Effect System Usage:**\n"
+            f"• `{COMMAND} effects` — Show all current effects.\n"
+            f"• `{COMMAND} effects add <name> [uses] [bonus] [duration] [description]` — Add a new effect.\n"
+            f"   - Ex: `{COMMAND} effects add Rage 3` or `{COMMAND} effects add Shield_of_Faith 1 '+2 AC' '10 minutes' 'Glowing shield of faith'`\n"
+            f"• `{COMMAND} effects use <name>` — Use one charge of an effect.\n"
+            f"• `{COMMAND} effects edit <name> <field> <value>` — Change a field (name, bonus, uses, duration, description).\n"
+            f"• `{COMMAND} effects delete <name>` — Remove an effect.\n"
+            f"• `{COMMAND} effects clear inactive` — Remove all effects with 0 uses.\n"
+            f"• `{COMMAND} effects clear all` — Remove **all** effects.\n"
+        )
+        return {
+            "TITLE": "🧪 Using Effects",
+            "DESCRIPTION": usage,
+            "COLOR": color_map["blue"]
+        }
+
+    # Clear inactive
+    if subcommand == "clear" and effect_key == "inactive":
+        removed = []
+        for k, v in list(pet["effects"].items()):
+            if v.get("uses", 1) == 0:
+                pet["effects"] = delete(pet["effects"], k)
+                removed.append(to_proper(k))
+        result = save_pet(character().get_cvar("current_pet"), pet)
+        if removed:
+            return {
+                "TITLE": "Success!",
+                "DESCRIPTION": f"🗑️ Removed inactive effects: {', '.join(removed)}",
+                "COLOR": color_map["green"]
+            }
+        else:
+            return {
+                "DESCRIPTION": "⚠️ No inactive effects to remove.",
+                "COLOR": color_map["orange"]
+            }
+
+    # Use an effect
+    if subcommand == "use":
+        key, error = sanitize_string_or_error(effect_key, 50)
+        if error:
+            return error
+        effect = pet["effects"].get(key)
+        if not effect:
+            return {"DESCRIPTION": f"⚠️ Effect `{key}` not found.", "COLOR": color_map["red"]}
+
+        if effect.get("uses", 0) < 1:
+            return {"DESCRIPTION": f"⚠️ Effect `{to_proper(key)}` has no uses remaining.", "COLOR": color_map["orange"]}
+
+        effect["uses"] -= 1
+        result = save_pet(character().get_cvar("current_pet"), pet)
+        tracker = "⬢" * effect["uses"] + "⬡" * (effect["uses"] < 0 and 0 or effect["uses"])
+        return {
+            "TITLE": f"✨ Used {to_proper(key)}",
+            "DESCRIPTION": f"{effect['name']} used. {effect['uses']} uses remaining.",
+            "COLOR": color_map["green"]
+        }
+
+    # Add effect
+    if subcommand == "add":
+        if not effect_key:
+            return {"DESCRIPTION": "⚠️ You must provide a name for the effect.", "COLOR": color_map["red"]}
+
+        key, error = sanitize_string_or_error(effect_key, 50)
+        if error:
+            return error
+
+        if key in pet["effects"]:
+            return {"DESCRIPTION": f"⚠️ Effect `{key}` already exists. Use `edit` to change it.", "COLOR": color_map["orange"]}
+
+        # Gather arguments
+        raw_uses = arg_data.get("3")
+        if raw_uses == None or raw_uses.strip() == "":
+            uses = 1
+        else:
+            try:
+                uses = int(raw_uses)
+            except:
+                return {"DESCRIPTION": "⚠️ Uses must be a number.", "COLOR": color_map["red"]}
+
+        bonus = arg_data.get("4", "")
+        duration = arg_data.get("5", "")
+        description = " ".join(arg_data.get(str(i), "") for i in range(6, len(arg_data))).strip()
+
+        pet["effects"][key] = {
+            "name": to_proper(effect_key),
+            "bonus": bonus,
+            "uses": uses,
+            "max_uses": uses,
+            "duration": duration,
+            "description": description
+        }
+
+
+        result = save_pet(character().get_cvar("current_pet"), pet)
+        return {
+            "TITLE": "Success!",
+            "DESCRIPTION": f"✨ Added effect `{to_proper(effect_key)}` with {uses} use(s).",
+            "COLOR": color_map["green"]
+        }
+
+    # Delete effect
+    if subcommand == "delete":
+        key, error = sanitize_string_or_error(effect_key, 50)
+        if error:
+            return error
+        if key not in pet["effects"]:
+            return {"DESCRIPTION": f"⚠️ Effect `{key}` not found.", "COLOR": color_map["orange"]}
+        pet["effects"] = delete(pet["effects"], key)
+        result = save_pet(character().get_cvar("current_pet"), pet)
+        return {
+            "TITLE": "Success!",
+            "DESCRIPTION": f"🗑️ Deleted effect `{to_proper(key)}`.",
+            "COLOR": color_map["green"]
+        }
+
+    # Edit field
+    if subcommand == "edit":
+        field = arg_data.get("3")
+        value = " ".join(arg_data.get(str(i), "") for i in range(4, len(arg_data))).strip()
+        key, error = sanitize_string_or_error(effect_key, 50)
+        if error:
+            return error
+
+        if key not in pet["effects"]:
+            return {"DESCRIPTION": f"⚠️ Effect `{key}` not found.", "COLOR": color_map["orange"]}
+        if field not in {"name", "bonus", "uses", "duration", "description"}:
+            return {"DESCRIPTION": f"⚠️ Invalid field `{field}`. Valid: name, bonus, uses, duration, description.", "COLOR": color_map["red"]}
+
+        if field == "uses":
+            try:
+                value = int(value)
+            except:
+                return {"DESCRIPTION": f"⚠️ Uses must be a number.", "COLOR": color_map["red"]}
+
+        pet["effects"][key][field] = value
+        result = save_pet(character().get_cvar("current_pet"), pet)
+        return {
+            "TITLE": "Success!",
+            "DESCRIPTION": f"✍️ `{key}`.{field} updated.",
+            "COLOR": color_map["green"]
+        }
+
+    # Clear all effects
+    if subcommand == "clear" and effect_key == "all":
+        cleared = list(pet["effects"].keys())
+        pet["effects"] = {}
+        result = save_pet(character().get_cvar("current_pet"), pet)
+
+        return {
+            "TITLE": "Success!",
+            "DESCRIPTION": f"🧹 Cleared all effects: {', '.join(to_proper(k) for k in cleared)}",
+            "COLOR": color_map["green"]
+        }
+
+
+    # Invalid command fallback
+    return {
+        "DESCRIPTION": "⚠️ Invalid subcommand for `effects`. Use `add`, `edit`, `delete`, `use`, or `clear inactive`.",
+        "COLOR": color_map["red"]
+    }
+#!------------------------- end handle_effects --------------------------#
+
 
 
 #!------------------------- end handle_help --------------------------#
@@ -1093,6 +1324,28 @@ def handle_show(arg_data):
         for name, action in pet["actions"].items()
     ) if pet["actions"] else "None"
 
+    # Effects
+    effects = pet.get("effects", {})
+    if effects:
+        effects_display = ""
+        for k, v in effects.items():
+            name = to_proper(v.get("name", k))
+            bonus = v.get("bonus", "")
+            uses = v.get("uses", 0)
+            max_uses = v.get("max_uses", uses)
+            duration = v.get("duration", "")
+            tracker = format_tracker(max_uses, uses) if max_uses > 0 else ""
+            effect_line = f"   * **{name}**"
+            if bonus:
+                effect_line += f" ({bonus})"
+            if tracker:
+                effect_line += f" {tracker}"
+            if duration:
+                effect_line += f", {duration}"
+            effects_display += effect_line + "\n"
+    else:
+        effects_display = "None"
+
     DESCRIPTION = ""
 
     # Construct Description
@@ -1110,6 +1363,7 @@ def handle_show(arg_data):
     DESCRIPTION += f"**Conditions:** {conditions_display}\n"
     DESCRIPTION += f"**Resistances:** {resistances_display}\n"
     DESCRIPTION += f"**Immunities:** {immunities_display}\n"
+    DESCRIPTION += f"**Effects:**\n{effects_display}\n"
     # DESCRIPTION += f"**Traits:**\n{traits_display}\n"
     DESCRIPTION += f"**Actions:**\n{actions_display}\n"
 
@@ -1313,10 +1567,10 @@ def handle_toggle_list(arg_data):
 
     # Get the actual list and apply operation
     list_key = list_map[list_type]
-    if key not in pet:
+    if list_key not in pet:
         pet[key] = []
 
-    pet_list = pet[key]
+    pet_list = pet[list_key]
 
     if operation == "+":
         if sanitized_name not in pet_list:
@@ -1368,6 +1622,8 @@ commands = {
     "check": handle_check,
     "condition": handle_toggle_list,
     "debug": tbd,
+    "effect": handle_effects,
+    "effects": handle_effects,
     "exp": handle_toggle_list,
     "expertise": handle_toggle_list,
     "export": tbd,
