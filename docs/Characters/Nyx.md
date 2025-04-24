@@ -11,7 +11,6 @@ But she wants to. **She needs to.**
 
 She searches not just for knowledge of her kind, but for **people who will accept her as she is**, without a mask, without expectation, without judgment.
 
-* [[Nyx Mission Log]]
 * [D&D Beyond](https://www.dndbeyond.com/characters/142863253/cxzBdE)
 * [[People Nyx has met]]
 
@@ -233,7 +232,7 @@ But when trouble comes—and it always does—she handles it **fast and clean.**
 ![[nyx_v3_small.jpeg]]
 
 ## Other Images
-![[docs/assets/character_images/nyx/friends/pykzh/necklace_undeaddetection.webp]]
+![[necklace_undeaddetection.webp]]
 ![[moo_mochi.png]]
 ![[hot_pocket.png]]
 ![[crystal_rose.png]]
