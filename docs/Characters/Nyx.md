@@ -5,6 +5,8 @@
 * **Goals**:
 Nyx has spent her life wearing faces, slipping into lives as easily as others slip into conversation. Each of her personas **has found belonging**—a purpose, a place, a role to fill. But Nyx herself? **She has never truly belonged anywhere.**
 
+` This is a test `
+
 She does not know what it means to be changeling. She has never met another like herself, never heard her own truth spoken by another. Her existence has been a **performance**—an act perfected not out of deception, but survival. She is _what others need her to be_ because she does not know what it means to simply be _herself_.
 
 But she wants to. **She needs to.**
@@ -282,9 +284,7 @@ But when trouble comes—and it always does—she handles it **fast and clean.**
 
 
 
-
-
-
-
-
-
+> [!question]- Curious minds
+> What happens when you mix MkDocs with Obsidian?
+>
+> A beautiful hybrid of collapsible magic.

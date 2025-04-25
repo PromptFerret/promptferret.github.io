@@ -80,6 +80,9 @@ markdown_extensions:
     - pymdownx.tilde
     - wikilinks
     - pymdownx.superfences
+    - admonition
+    - pymdownx.details
+    - pymdownx.superfences
       # custom_fences:
       #     - name: mermaid
       #       class: mermaid
@@ -92,15 +95,17 @@ plugins:
     - roamlinks
     - blog
     - rss:
-          match_path: blog/posts/.*
-          date_from_meta:
-              as_creation: date
-          categories:
-              - categories
-              - tags
+        match_path: blog/posts/.*
+        date_from_meta:
+            as_creation: date
+        categories:
+            - categories
+            - tags
 
 extra_css:
+    - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css
     - assets/stylesheet/custom.css
+    - assets/stylesheet/obsidian-style-callouts.css
 
 extra_javascript:
     - assets/javascript/mathjax.js
@@ -109,6 +114,7 @@ extra_javascript:
     - https://unpkg.com/mermaid/dist/mermaid.min.js
     - https://code.jquery.com/jquery-3.7.1.min.js
     - assets/javascript/random-story.js
+    - assets/javascript/obsidian-style-callouts.js
     - assets/javascript/copy-inline-code.js
     - assets/javascript/copy-code.js
     - assets/javascript/copy-image-url.js
