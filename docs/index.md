@@ -37,3 +37,8 @@ This will be where I host my Obsidian notebook with all my personal projects on 
 * [Visual Studio Code](https://code.visualstudio.com/)
 * [GitHub Copilot](https://github.com/features/copilot)
 * [OpenAI/ChatGPT](https://openai.com/chatgpt/overview/)
+
+
+Ignore this....
+
+[[Untitled]]
