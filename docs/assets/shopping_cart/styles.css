@@ -1,0 +1,294 @@
+/* Remove all custom theme variables and backgrounds. Use Bootstrap's variables and utilities. */
+
+/* Minimal, flat, clean look. Only custom tweaks below. */
+
+.checkbox-matrix {
+    display: flex;
+    flex-direction: column;
+    gap: 0.08rem;
+    font-size: 0.82rem;
+    max-width: 110px;
+    width: 100%;
+}
+
+.checkbox-matrix label {
+    white-space: nowrap;
+    font-weight: 400;
+    font-size: 0.85rem;
+    margin-bottom: 0.1rem;
+}
+
+.item-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+    color: var(--bs-warning-text-emphasis, #7a3c00);
+    border-top: 3px solid #ffc107;
+    padding-top: 0.25rem;
+}
+
+[data-bs-theme="dark"] .item-title {
+    color: #f4b942;
+    border-top-color: #f4b942;
+}
+[data-bs-theme="light"] .item-title {
+    color: #7a3c00;
+    border-top-color: #ffc107;
+}
+
+.item-source {
+    color: var(--bs-info-text-emphasis, #4c2c91);
+    font-size: 0.95rem;
+}
+[data-bs-theme="dark"] .item-source {
+    color: #d1b2ff;
+}
+[data-bs-theme="light"] .item-source {
+    color: #4c2c91;
+}
+
+.item-type {
+    font-style: italic;
+    margin-bottom: 0.5rem;
+    color: var(--bs-secondary-color, #666);
+}
+
+.item-desc {
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    padding: 0.5rem 1rem;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-bottom: 3px solid #ffc107;
+    border-radius: 0.25rem;
+}
+
+.copyable {
+    cursor: pointer;
+    border-bottom: 1px dashed var(--bs-link-color, #0d6efd);
+    display: inline-block;
+    transition: background 0.2s;
+    padding: 0 2px;
+}
+.copyable:hover {
+    background: var(--bs-border-color, #dee2e6);
+}
+
+.copy-toast {
+    position: absolute;
+    background: #222;
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    z-index: 10000;
+}
+
+#details {
+    min-width: 340px;
+    max-width: 600px;
+    margin-right: 1rem;
+    padding: 1rem;
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    border-left: 1px solid var(--bs-border-color, #dee2e6);
+    height: fit-content;
+    position: sticky;
+    top: 15.625rem; /* 250px / 16 = 15.625rem */
+    max-height: 100vh;
+    overflow-y: auto;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    display: block;
+}
+
+@media (min-width: 992px) {
+    .row {
+        display: flex;
+        flex-wrap: nowrap;
+    }
+    #tableWrapper {
+        flex: 1 1 0%;
+        min-width: 0;
+    }
+    #details {
+        flex: 0 0 370px;
+        min-width: 340px;
+        max-width: 600px;
+        margin-left: 1.5rem;
+        margin-top: 0;
+        position: sticky;
+        top: 15.625rem;
+    }
+}
+
+@media (max-width: 1200px) {
+    #details {
+        min-width: 280px;
+    }
+}
+
+@media (max-width: 991px) {
+    #details {
+        min-width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0;
+        border-left: none;
+        border-top: 1px solid var(--bs-border-color, #dee2e6);
+        margin-top: 1rem;
+        position: relative;
+        top: auto;
+    }
+}
+
+.filters .col-md-2 {
+    max-width: 170px;
+    min-width: 120px;
+    flex: 0 0 14.2857%;
+    padding-right: 0.5rem;
+}
+
+@media (max-width: 991px) {
+    .filters .col-md-2 {
+        max-width: 100%;
+        min-width: 0;
+        flex: 1 1 100%;
+    }
+    .checkbox-matrix {
+        max-width: 100%;
+    }
+}
+
+.table {
+    font-size: 0.75rem;
+}
+
+.table th,
+.table td {
+    padding: 0.18rem 0.3rem;
+    vertical-align: middle;
+}
+
+.table > :not(caption) > * > * {
+    background: none;
+    border-bottom-width: 1px;
+}
+
+tr.item-row {
+    cursor: pointer;
+    transition: background 0.15s;
+}
+tr.item-row:hover {
+    background: var(--bs-secondary-bg, #f1f3f5);
+    color: var(--bs-body-color, #111);
+}
+
+a {
+    color: var(--bs-link-color, #0d6efd);
+    text-decoration: underline;
+}
+
+input.form-control,
+select.form-select {
+    min-height: 2.25rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    background: var(--bs-body-bg, #fff);
+    color: var(--bs-body-color, #111);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    box-shadow: none;
+    transition: border-color 0.2s;
+}
+
+input.form-control:focus,
+select.form-select:focus {
+    border-color: var(--bs-primary, #0d6efd);
+    outline: none;
+    box-shadow: none;
+}
+
+label.form-label {
+    font-weight: 500;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.filters {
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    padding: 0.5rem 0.25rem 0.25rem 0.25rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    font-size: 0.92rem;
+}
+
+.filters .form-label,
+.filters label {
+    font-size: 0.85rem;
+    margin-bottom: 0.1rem;
+}
+
+.filters .form-control,
+.filters .form-select {
+    font-size: 0.85rem;
+    padding: 0.12rem 0.4rem;
+    min-height: 1.4rem;
+}
+
+.checkbox-matrix {
+    font-size: 0.9rem;
+    max-width: 100%;
+    gap: 0.1rem 0.3rem;
+}
+
+.table thead th {
+    transition: background 0.2s, color 0.2s;
+}
+
+[data-bs-theme="dark"] .table thead th,
+[data-bs-theme="dark"] .table-light th {
+    background-color: #23272b !important;
+    color: #f8f9fa !important;
+    border-color: #343a40 !important;
+}
+
+[data-bs-theme="light"] .table thead th,
+[data-bs-theme="light"] .table-light th {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+    border-color: #dee2e6 !important;
+}
+
+#cart-count {
+    font-size: 0.65rem !important;
+    min-width: 1.1em !important;
+    padding: 0.15em 0.4em !important;
+    line-height: 1;
+}
+
+#cartModal .modal-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.cart-qty,
+.cart-base,
+.cart-custom-name {
+    max-width: 60px;
+    min-width: 40px;
+    display: inline-block;
+}
+.cart-custom-name {
+    max-width: 100px;
+    min-width: 60px;
+}

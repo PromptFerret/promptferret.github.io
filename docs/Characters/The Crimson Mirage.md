@@ -336,4 +336,7 @@ This is not a space of performance. It is not for masks. Here, Nyx is simply Nyx
 🌙 Those granted entry find that their presence alone shapes the space around them. But none may enter uninvited, and the Sanctum always remembers who belongs.
 
 -# *comes in and moves to one of the shelves that look out over the room, they clean an area and put their new gift up there, along with a little carved sign that says 'Do not touch! This was a gift from Zylar!'* 
-![_**The fabled Ciel Plush, Poster Boy of the Starry Shores, and cute to boot. They say that the first time you hug him, you feel a sense of safety and warmth overcome you. (Disclaimer: Not affiliated with Ciel the adventurer.)**_](OIG4.png)
+
+-** fabled Ciel Plush, Poster Boy of the Starry Shores, and cute to boot. They say that the first time you hug him, you feel a sense of safety and warmth overcome you. (Disclaimer: Not affiliated with Ciel the adventurer.)**_ 
+
+![[OIG4.png]]
