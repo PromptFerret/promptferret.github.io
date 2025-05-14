@@ -1,7 +1,7 @@
 const ENCRYPTED_CSV_URL = "U2FsdGVkX1/7NiSx7Ugsj0XsHxvxjGZJBq/yVSy1T/+bNDHbGnORMUcQpa9AXMVautQ1Gn+8NGt0pdrwsWa3mxuW0yMSo/zV9Q/9hEsfrO5QKbDg13Kd8n1Ka+VUL6TxT+Y+50KCmf47vOqkmfSAqp9+R0H6Kf9fUm98LHmB4D1kKhFlboN6kkpIbhbn3bqhT3TeXyFvYlZJd7wityCOR24ZAjXNhdjwgfff5zVLf6VABmny28jCng0L5XLm5r1g";
 
 async function getDecryptedCsvUrl() {
-    let password = "";
+    let password = typeof window.SHOP_PASSWORD === "string" ? window.SHOP_PASSWORD : "";
     while (!password) {
         password = prompt("Enter password to access the item shop:");
         if (password === null) throw new Error("No password entered.");
@@ -261,16 +261,21 @@ function renderDetails(rowData) {
     // Add to Cart button
     updateAddToCartBtn(name);
 
+    // Helper to wrap any value as copyable
+    const copy = v => `<span class="copyable">${v ?? ''}</span>`;
+
     let html = `
         <div class="item-title">
-            ${name}
-            <span class="item-source">${book || ''}</span>
+            ${copy(name)}
+            <span class="item-source">${copy(book)}</span>
         </div>
-        <div class="item-type">${itemType || ''}</div>
-        <div><b>Tier:</b> ${tier || ''} <b>Type:</b> ${type || ''}</div>
-        <div><b>Rarity:</b> ${rarity || ''} <b>Cost:</b> <span class="copyable">${cost || ''}</span></div>
-        <div><b>Requires Attunement:</b> ${atnVal ? 'Yes' : 'No'}</div>
-        <div><b>Session Required:</b> ${sessVal ? 'Yes' : 'No'}</div>
+        <div class="item-type">${copy(itemType)}</div>
+        <div><b>Tier:</b> ${copy(tier)}</div>
+        <div><b>Type:</b> ${copy(type)}</div>
+        <div><b>Rarity:</b> ${copy(rarity)}</div>
+        <div><b>Cost:</b> ${copy(cost)}</div>
+        <div><b>Requires Attunement:</b> ${copy(atnVal ? 'Yes' : 'No')}</div>
+        <div><b>Session Required:</b> ${copy(sessVal ? 'Yes' : 'No')}</div>
     `;
 
     html += `<div class="item-desc">${notes ? format5eToolsTags(notes) : ''}</div>`;
@@ -280,6 +285,17 @@ function renderDetails(rowData) {
     }
     $('#itemDetail').innerHTML = html;
 }
+
+// Enhance copyable: show "Copied to clipboard" as a tip
+document.addEventListener('click', e => {
+    if (e.target.classList.contains('copyable')) {
+        const text = e.target.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const rect = e.target.getBoundingClientRect();
+            showCopyToast('Copied to clipboard', rect.left + rect.width / 2, rect.top - 20 + window.scrollY);
+        });
+    }
+});
 
 function showCopyToast(text, x, y) {
     let toast = $('#copyToast');

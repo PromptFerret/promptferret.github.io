@@ -2,3 +2,4 @@ site/
 .venv/
 .obsidian/
 **/.DS_Store
+docs/assets/shopping_cart/password.js
