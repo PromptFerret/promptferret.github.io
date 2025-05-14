@@ -137,17 +137,6 @@ async function loadData() {
         populateFilters();
         setupEvents();
         applyFilters();
-
-        // --- Check for ?v=BASE64 in URL ---
-        const params = new URLSearchParams(window.location.search);
-        const vParam = params.get('v');
-        if (vParam) {
-            const decodedName = fromBase64(vParam);
-            const row = allData.find(r => r[2] === decodedName);
-            if (row) {
-                renderDetails(row);
-            }
-        }
     } catch (err) {
         console.error("Failed to load data:", err);
     }
@@ -869,6 +858,17 @@ async function initialLoad() {
     await loadData(); // loads CSV and sets up allData, filters, etc.
     await loadAllBatchedJsonData(); // loads all JSON files into itemsData
     applyFilters(); // now safe to use itemsData
+
+    // --- Check for ?v=BASE64 in URL (after all data is loaded) ---
+    const params = new URLSearchParams(window.location.search);
+    const vParam = params.get('v');
+    if (vParam) {
+        const decodedName = fromBase64(vParam);
+        const row = allData.find(r => r[2] === decodedName);
+        if (row) {
+            renderDetails(row);
+        }
+    }
     // Any other initialization that needs itemsData
 }
 
