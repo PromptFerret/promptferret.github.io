@@ -740,3 +740,14 @@ function renderCart() {
 
 // Initial load
 loadData();
+
+document.addEventListener('DOMContentLoaded', () => {
+    const topBtn = document.getElementById('return-to-top-btn');
+    if (!topBtn) return;
+    window.addEventListener('scroll', () => {
+        topBtn.style.display = window.scrollY > 80 ? 'block' : 'none';
+    });
+    topBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+});
