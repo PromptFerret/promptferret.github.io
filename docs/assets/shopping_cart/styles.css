@@ -106,7 +106,7 @@
     position: sticky;
     top: .625rem;
     /* 250px / 16 = 15.625rem */
-    max-height: 100vh;
+    max-height: calc(65vh - 250px); /* Adjust 32px if you have a header/footer */
     overflow-y: auto;
     border-radius: 0.5rem;
     box-sizing: border-box;
@@ -425,4 +425,48 @@ tr.item-row:hover.selected-row,
 tr.selected-row:hover {
     background: grey !important; /* slightly darker on hover */
     /* color: #222 !important; */
+}
+
+#details .item-desc {
+    /* Ensure the content fills the panel and allows scrolling */
+    max-height: none;
+    overflow: visible;
+}
+
+#details .item-desc table {
+    width: 100%;
+    table-layout: fixed;
+    /* No scrolling or max-height here */
+}
+
+#details .item-desc table th,
+#details .item-desc table td {
+    white-space: normal !important;
+    word-break: break-word;
+}
+
+/* --- Item Details Modal Tweaks --- */
+#itemDetailsModal .modal-body {
+    padding: 1rem !important; /* Add padding around content */
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+#itemDetailsModal .item-desc {
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 0.5rem 0.75rem;
+}
+
+#itemDetailsModal table {
+    width: 100% !important;
+    table-layout: fixed;
+    word-break: break-word;
+}
+
+#itemDetailsModal th,
+#itemDetailsModal td {
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }

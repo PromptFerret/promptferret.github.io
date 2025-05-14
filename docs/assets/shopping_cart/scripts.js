@@ -348,7 +348,19 @@ function formatEntry(entry) {
         if (entry.name) {
             html += `<b>${entry.name}:</b> `;
         }
-        if (Array.isArray(entry.entries)) {
+        if (entry.type === "list" && Array.isArray(entry.items)) {
+            html += "<ul>" + entry.items.map(item => `<li>${formatEntry(item)}</li>`).join("") + "</ul>";
+        } else if (entry.type === "table" && Array.isArray(entry.rows)) {
+            html += "<table class='table table-sm mb-2'>";
+            if (entry.colLabels) {
+                html += "<thead><tr>" + entry.colLabels.map(label => `<th>${formatBatchedJsonTags(label)}</th>`).join("") + "</tr></thead>";
+            }
+            html += "<tbody>";
+            for (const row of entry.rows) {
+                html += "<tr>" + row.map(cell => `<td>${formatEntry(cell)}</td>`).join("") + "</tr>";
+            }
+            html += "</tbody></table>";
+        } else if (Array.isArray(entry.entries)) {
             html += entry.entries.map(formatEntry).join(" ");
         }
         return html;
@@ -367,47 +379,12 @@ function fromBase64(str) {
     }
 }
 
+// ...existing code...
+
+// Replace the entire renderDetails function with this:
 function renderDetails(rowData) {
     const [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes, link] = rowData;
     const item = itemsData.find(i => normalizeItemName(i.name) === normalizeItemName(name));
-
-    // Set the link and share icons in the header
-    const linkBtn = $('#item-link-btn');
-    if (linkBtn) {
-        // --- Always show Share button ---
-        let shareHtml = `
-            <button id="item-share-btn" class="btn btn-outline-secondary btn-sm ms-2" title="Share item">
-                <i class="fa-solid fa-share-nodes"></i>
-            </button>
-        `;
-        // --- Link button (only if link exists) ---
-        let linkHtml = "";
-        if (link && link.trim() !== "") {
-            linkHtml = `
-                <a href="${link}" target="_blank" rel="noopener" class="ms-2 btn btn-outline-secondary btn-sm" title="Open item link">
-                    <i class="fa-solid fa-up-right-from-square"></i>
-                </a>
-            `;
-        }
-        linkBtn.innerHTML = shareHtml + linkHtml;
-
-        // Add share button event
-        const shareBtn = document.getElementById('item-share-btn');
-        if (shareBtn) {
-            shareBtn.onclick = () => {
-                const url = new URL(window.location.href);
-                url.search = `?v=${toBase64(name)}`;
-                url.hash = ""; // Remove hash
-                navigator.clipboard.writeText(url.toString()).then(() => {
-                    const rect = shareBtn.getBoundingClientRect();
-                    showCopyToast('Share URL copied!', rect.left + rect.width / 2, rect.top - 20 + window.scrollY);
-                });
-            };
-        }
-    }
-
-    // Add to Cart button
-    updateAddToCartBtn(name);
 
     // Helper to wrap any value as copyable
     const copy = v => `<span class="copyable">${v ?? ''}</span>`;
@@ -434,7 +411,78 @@ function renderDetails(rowData) {
     if (item && item.entries) {
         html += `<div class="item-desc">${item.entries.map(formatEntry).join(" ")}</div>`;
     }
-    $('#itemDetail').innerHTML = html;
+
+    // Render into modal content
+    const modalContent = document.getElementById('itemDetailModalContent');
+    if (modalContent) modalContent.innerHTML = html;
+
+    // Update modal Add to Cart button
+    updateAddToCartBtnModal(name);
+
+    // Update modal link/share buttons
+    updateItemLinkBtnModal(name, link);
+
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('itemDetailsModal'));
+    modal.show();
+}
+
+// Add these helper functions:
+function updateAddToCartBtnModal(name) {
+    const btn = document.getElementById('add-to-cart-btn-modal');
+    if (!btn) return;
+    if (isInCart(name)) {
+        btn.innerHTML = `
+            <span title="Already in Cart">
+                <button class="btn btn-secondary btn-sm" tabindex="-1" style="pointer-events:none; opacity:0.65;">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </button>
+            </span>
+        `;
+    } else {
+        btn.innerHTML = `
+            <button class="btn btn-primary btn-sm" title="Add to Cart">
+                <i class="fa-solid fa-cart-plus"></i>
+            </button>
+        `;
+        btn.querySelector('button').onclick = () => {
+            addToCart(name);
+            updateAddToCartBtnModal(name);
+        };
+    }
+}
+
+function updateItemLinkBtnModal(name, link) {
+    const linkBtn = document.getElementById('item-link-btn-modal');
+    if (!linkBtn) return;
+    let shareHtml = `
+        <button id="item-share-btn-modal" class="btn btn-outline-secondary btn-sm ms-2" title="Share item">
+            <i class="fa-solid fa-share-nodes"></i>
+        </button>
+    `;
+    let linkHtml = "";
+    if (link && link.trim() !== "") {
+        linkHtml = `
+            <a href="${link}" target="_blank" rel="noopener" class="ms-2 btn btn-outline-secondary btn-sm" title="Open item link">
+                <i class="fa-solid fa-up-right-from-square"></i>
+            </a>
+        `;
+    }
+    linkBtn.innerHTML = shareHtml + linkHtml;
+
+    // Add share button event
+    const shareBtn = document.getElementById('item-share-btn-modal');
+    if (shareBtn) {
+        shareBtn.onclick = () => {
+            const url = new URL(window.location.href);
+            url.search = `?v=${toBase64(name)}`;
+            url.hash = "";
+            navigator.clipboard.writeText(url.toString()).then(() => {
+                const rect = shareBtn.getBoundingClientRect();
+                showCopyToast('Share URL copied!', rect.left + rect.width / 2, rect.top - 20 + window.scrollY);
+            });
+        };
+    }
 }
 
 // Enhance copyable: show "Copied to clipboard" as a tip
@@ -492,15 +540,15 @@ function setupEvents() {
         })
     );
     // Row click
-    $('#itemsTable tbody').addEventListener('click', e => {
-        const tr = e.target.closest('tr');
-        if (tr && tr.dataset.row) {
-            const rowData = JSON.parse(tr.dataset.row);
-            selectedRowName = rowData[2]; // Use the Name column as unique identifier
-            renderDetails(rowData);
-            applyFilters(); // Re-render table to update selected row highlight
-        }
-    });
+$('#itemsTable tbody').addEventListener('click', e => {
+    const tr = e.target.closest('tr');
+    if (tr && tr.dataset.row) {
+        const rowData = JSON.parse(tr.dataset.row);
+        selectedRowName = rowData[2]; // Use the Name column as unique identifier
+        renderDetails(rowData); // Now opens modal
+        applyFilters(); // Re-render table to update selected row highlight
+    }
+});
     // Theme toggle
     const themeBtn = document.querySelector('.toggle-theme');
     let dark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
