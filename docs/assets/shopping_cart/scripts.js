@@ -70,6 +70,49 @@ async function fetchJSON(url) {
     return res.json();
 }
 
+async function tryFetchJSON(url) {
+    try {
+        return await fetchJSON(url);
+    } catch (e) {
+        // Optionally log: console.warn(`Could not load ${url}:`, e);
+        return null;
+    }
+}
+
+const ITEM_JSON_FILES = [
+    'items.json',
+    'items-base.json',
+    // Add more file names here as needed
+];
+
+const KNOWN_ARRAY_KEYS = ['item', 'baseitem'];
+
+async function loadAllBatchedJsonData() {
+    let loadedCount = 0;
+    for (const file of ITEM_JSON_FILES) {
+        const data = await tryFetchJSON(`assets/shopping_cart/${file}`);
+        let arr = [];
+        if (Array.isArray(data)) {
+            arr = data;
+        } else if (data && typeof data === 'object') {
+            for (const key of KNOWN_ARRAY_KEYS) {
+                if (Array.isArray(data[key])) {
+                    arr = data[key];
+                    break;
+                }
+            }
+        }
+        if (arr.length) {
+            itemsData.push(...arr);
+            loadedCount += arr.length;
+            console.log(`Loaded ${file}: ${arr.length} items`);
+        } else {
+            console.log(`${file} not loaded or not an array`);
+        }
+    }
+    console.log(`Total loaded items: ${loadedCount}`);
+}
+
 async function loadData() {
     try {
         const CSV_URL = await getDecryptedCsvUrl();
@@ -282,15 +325,13 @@ function renderTable(data) {
     });
 }
 
-function format5eToolsTags(text) {
-    return (text || "")
-        .replace(/\{@dc (\d+)\}/g, 'DC $1')
-        .replace(/\{@damage ([^}]+)\}/g, '$1 damage')
-        .replace(/\{@item ([^|}]+)\|[^}]+\}/g, '<em>$1</em>')
-        .replace(/\{@condition ([^}]+)\}/g, '<em>$1</em>')
-        .replace(/\{@spell ([^}]+)\}/g, '<em>$1</em>')
-        .replace(/\{@dice ([^}]+)\}/g, '$1')
-        .replace(/\{@quickref ([^|}]+)\|[^}]+\}/g, '<em>$1</em>');
+function formatBatchedJsonTags(text) {
+    if (!text) return "";
+    // Match both {@tag ...} and {#tag ...}
+    return text.replace(/\{[@#]\w+\s+([^}]+)\}/g, (match, content) => {
+        const parsed = content.split('|')[0].trim();
+        return `<span class="parsed-BatchedJson-tag">${parsed}</span>`;
+    });
 }
 
 function toBase64(str) {
@@ -306,7 +347,7 @@ function fromBase64(str) {
 
 function renderDetails(rowData) {
     const [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes, link] = rowData;
-    const item = itemsData.find(i => i.name === name);
+    const item = itemsData.find(i => normalizeItemName(i.name) === normalizeItemName(name));
 
     // Set the link and share icons in the header
     const linkBtn = $('#item-link-btn');
@@ -365,11 +406,11 @@ function renderDetails(rowData) {
 
     // Only include notes if present
     if (notes && notes.trim()) {
-        html += `<div class="item-desc">${format5eToolsTags(notes)}</div>`;
+        html += `<div class="item-desc">${formatBatchedJsonTags(notes)}</div>`;
     }
 
     if (item && item.entries) {
-        html += `<div class="item-desc">${format5eToolsTags(item.entries.join(' '))}</div>`;
+        html += `<div class="item-desc">${formatBatchedJsonTags(item.entries.join(' '))}</div>`;
     }
     $('#itemDetail').innerHTML = html;
 }
@@ -751,7 +792,14 @@ function renderCart() {
 }
 
 // Initial load
-loadData();
+async function initialLoad() {
+    await loadData(); // loads CSV and sets up allData, filters, etc.
+    await loadAllBatchedJsonData(); // loads all JSON files into itemsData
+    applyFilters(); // now safe to use itemsData
+    // Any other initialization that needs itemsData
+}
+
+initialLoad();
 
 document.addEventListener('DOMContentLoaded', () => {
     const topBtn = document.getElementById('return-to-top-btn');
@@ -768,4 +816,9 @@ function displayTier(tier) {
     if (tier === "-1" || tier === -1) return "Mundane";
     if (!isNaN(tier)) return `Tier ${tier}`;
     return tier;
+}
+
+function normalizeItemName(name) {
+    // Remove all trailing parenthetical groups and convert to lowercase
+    return name.replace(/(\s*\([^)]+\))+$/g, '').trim().toLowerCase();
 }
