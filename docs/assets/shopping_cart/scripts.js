@@ -210,10 +210,16 @@ function renderTable(data) {
         const showBase = typeof cost === "string" && cost.includes('+');
         let btnHtml = '';
         if (inCart) {
-            btnHtml = `<button class="btn btn-secondary btn-sm w-100" disabled title="Already in Cart"><i class="fa fa-cart-plus"></i></button>`;
+            btnHtml = `<button class="btn btn-secondary btn-sm" disabled title="Already in Cart"><i class="fa fa-cart-plus"></i></button>`;
         } else {
-            btnHtml = `<button class="btn btn-primary btn-sm w-100 add-table-cart" data-name="${encodeURIComponent(name)}" data-base="${showBase ? 1 : 0}" title="Add to Cart"><i class="fa fa-cart-plus"></i></button>`;
+            btnHtml = `<button class="btn btn-primary btn-sm add-table-cart" data-name="${encodeURIComponent(name)}" data-base="${showBase ? 1 : 0}" title="Add to Cart"><i class="fa fa-cart-plus"></i></button>`;
         }
+        btnHtml += `
+            <button class="btn btn-outline-secondary btn-sm ms-1 table-share-btn" data-name="${encodeURIComponent(name)}" title="Share item">
+                <i class="fa-solid fa-share-nodes"></i>
+            </button>
+        `;
+
         const tdBtn = document.createElement('td');
         tdBtn.innerHTML = btnHtml;
         tr.appendChild(tdBtn);
@@ -236,6 +242,21 @@ function renderTable(data) {
             cart.push({ name, quantity: 1, base: 0 });
             updateCartCount();
             renderTable(data); // Refresh to disable the button
+        });
+    });
+
+    // --- Share button event listener ---
+    tbody.querySelectorAll('.table-share-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+            e.stopPropagation();
+            const name = decodeURIComponent(btn.getAttribute('data-name'));
+            const url = new URL(window.location.href);
+            url.search = `?v=${toBase64(name)}`;
+            url.hash = "";
+            navigator.clipboard.writeText(url.toString()).then(() => {
+                const rect = btn.getBoundingClientRect();
+                showCopyToast('Share URL copied!', rect.left + rect.width / 2, rect.top - 20 + window.scrollY);
+            });
         });
     });
 }
