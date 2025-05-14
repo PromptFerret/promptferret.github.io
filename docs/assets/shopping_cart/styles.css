@@ -106,7 +106,8 @@
     position: sticky;
     top: .625rem;
     /* 250px / 16 = 15.625rem */
-    max-height: calc(65vh - 250px); /* Adjust 32px if you have a header/footer */
+    max-height: calc(65vh - 250px);
+    /* Adjust 32px if you have a header/footer */
     overflow-y: auto;
     border-radius: 0.5rem;
     box-sizing: border-box;
@@ -217,6 +218,17 @@
     .table td {
         font-size: 0.68rem;
     }
+
+    .table-responsive-custom {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-responsive-custom table {
+        min-width: 600px;
+        /* or whatever your table's natural width is */
+    }
 }
 
 .filters .col-md-2 {
@@ -243,6 +255,71 @@
     .checkbox-matrix {
         max-width: 100%;
         width: 100%;
+    }
+
+    .table-responsive-custom {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        /* Remove position: fixed and related properties */
+        /* position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1050;
+        background: var(--bs-body-bg, #fff);
+        box-shadow: 0 -2px 8px rgba(0,0,0,0.07);
+        padding-bottom: env(safe-area-inset-bottom, 0);
+        margin: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important; */
+    }
+    .table-responsive-custom table {
+        margin-bottom: 0 !important;
+    }
+    #tableWrapper {
+        padding-bottom: 0 !important; /* Remove extra padding */
+    }
+    /* Only on mobile: remove container/row padding/margin to avoid horizontal scroll */
+    .container,
+    .container-fluid,
+    .row,
+    #tableWrapper {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+    }
+}
+
+@media (min-width: 992px) {
+    /* On desktop, restore normal container/row behavior */
+    .table-responsive-custom {
+        position: static !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        background: none !important;
+        box-shadow: none !important;
+        padding-bottom: 0 !important;
+    }
+    #tableWrapper {
+        padding-bottom: 0 !important;
+    }
+    .container,
+    .container-fluid,
+    .row,
+    #tableWrapper {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
     }
 }
 
@@ -407,23 +484,38 @@ label.form-label {
     white-space: nowrap;
 }
 
+.table-responsive-custom {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive-custom table {
+    min-width: 600px;
+}
+
 .parsed-5etools-tag {
-    color: #ff9800; /* or any color you like */
+    color: #ff9800;
+    /* or any color you like */
     font-weight: bold;
 }
 
 .parsed-BatchedJson-tag {
-    color: #ff9800; /* or any color you like */
+    color: #ff9800;
+    /* or any color you like */
     font-weight: bold;
 }
 
 .selected-row {
-    background: grey !important; /* or any highlight color you like */
+    background: grey !important;
+    /* or any highlight color you like */
     /* color: #222 !important; */
 }
+
 tr.item-row:hover.selected-row,
 tr.selected-row:hover {
-    background: grey !important; /* slightly darker on hover */
+    background: grey !important;
+    /* slightly darker on hover */
     /* color: #222 !important; */
 }
 
@@ -447,7 +539,8 @@ tr.selected-row:hover {
 
 /* --- Item Details Modal Tweaks --- */
 #itemDetailsModal .modal-body {
-    padding: 1rem !important; /* Add padding around content */
+    padding: 1rem !important;
+    /* Add padding around content */
     max-height: 70vh;
     overflow-y: auto;
 }
@@ -469,4 +562,66 @@ tr.selected-row:hover {
     white-space: normal !important;
     word-break: break-word;
     overflow-wrap: break-word;
+}
+
+@media (max-width: 575.98px) {
+
+    html,
+    body {
+        overflow-x: hidden !important;
+    }
+
+    .filters,
+    .navbar {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+        /* CHANGED from 100vw */
+        max-width: 100% !important;
+        /* CHANGED from 100vw */
+        box-sizing: border-box;
+    }
+
+    .filters {
+        border-radius: 0 !important;
+    }
+
+    .container,
+    .container-fluid,
+    .row,
+    #tableWrapper {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+    }
+}
+
+@media (max-width: 991px) {
+  .sticky-table-scrollbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 22px;
+    background: var(--bs-body-bg, #fff);
+    z-index: 1050;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.07);
+    display: block;
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100vw;
+  }
+  .sticky-table-scrollbar > div {
+    height: 1px;
+    min-width: 600px; /* match your table min-width */
+  }
+  .table-responsive-custom {
+    margin-bottom: 22px; /* space for sticky scrollbar */
+  }
 }

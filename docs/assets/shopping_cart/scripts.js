@@ -875,15 +875,33 @@ async function initialLoad() {
 initialLoad();
 
 document.addEventListener('DOMContentLoaded', () => {
-    const topBtn = document.getElementById('return-to-top-btn');
-    if (!topBtn) return;
-    window.addEventListener('scroll', () => {
-        topBtn.style.display = window.scrollY > 80 ? 'block' : 'none';
-    });
-    topBtn.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+  const tableWrapper = document.querySelector('.table-responsive-custom');
+  const stickyScrollbar = document.querySelector('.sticky-table-scrollbar');
+  if (!tableWrapper || !stickyScrollbar) return;
+
+  // Set width of fake scrollbar to match table
+  function updateScrollbarWidth() {
+    const table = tableWrapper.querySelector('table');
+    if (table) {
+      stickyScrollbar.firstElementChild.style.width = table.scrollWidth + 'px';
+    }
+  }
+
+  // Sync scroll positions
+  stickyScrollbar.addEventListener('scroll', () => {
+    tableWrapper.scrollLeft = stickyScrollbar.scrollLeft;
+  });
+  tableWrapper.addEventListener('scroll', () => {
+    stickyScrollbar.scrollLeft = tableWrapper.scrollLeft;
+  });
+
+  // Update on resize/content change
+  window.addEventListener('resize', updateScrollbarWidth);
+  new MutationObserver(updateScrollbarWidth).observe(tableWrapper, { childList: true, subtree: true });
+
+  updateScrollbarWidth();
 });
+
 
 function displayTier(tier) {
     if (tier === "-1" || tier === -1) return "Mundane";
