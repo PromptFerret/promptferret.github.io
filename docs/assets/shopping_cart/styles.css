@@ -416,3 +416,13 @@ label.form-label {
     color: #ff9800; /* or any color you like */
     font-weight: bold;
 }
+
+.selected-row {
+    background: grey !important; /* or any highlight color you like */
+    /* color: #222 !important; */
+}
+tr.item-row:hover.selected-row,
+tr.selected-row:hover {
+    background: grey !important; /* slightly darker on hover */
+    /* color: #222 !important; */
+}

@@ -22,6 +22,7 @@ let itemsData = [];
 let sortCol = null;
 let sortAsc = true;
 let cart = [];
+let selectedRowName = null;
 
 const $ = (selector, ctx = document) => ctx.querySelector(selector);
 const $$ = (selector, ctx = document) => Array.from(ctx.querySelectorAll(selector));
@@ -266,6 +267,11 @@ function renderTable(data) {
         tr.className = 'item-row';
         tr.dataset.row = JSON.stringify(row);
 
+        // Highlight if selected
+        if (selectedRowName && row[2] === selectedRowName) {
+            tr.classList.add('selected-row');
+        }
+
         const [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes] = row;
         const inCart = isInCart(name);
 
@@ -473,7 +479,10 @@ function setupEvents() {
     $('#itemsTable tbody').addEventListener('click', e => {
         const tr = e.target.closest('tr');
         if (tr && tr.dataset.row) {
-            renderDetails(JSON.parse(tr.dataset.row));
+            const rowData = JSON.parse(tr.dataset.row);
+            selectedRowName = rowData[2]; // Use the Name column as unique identifier
+            renderDetails(rowData);
+            applyFilters(); // Re-render table to update selected row highlight
         }
     });
     // Theme toggle
