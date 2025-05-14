@@ -75,6 +75,20 @@ async function loadData() {
         const CSV_URL = await getDecryptedCsvUrl();
         const csvRows = await fetchCSV(CSV_URL);
         allData = csvRows.slice(1);
+
+        // --- Sort by tier: -1 first, then 0, then ascending ---
+        allData.sort((a, b) => {
+            const ta = parseInt(a[0], 10);
+            const tb = parseInt(b[0], 10);
+            // -1 always first
+            if (ta === -1 && tb !== -1) return -1;
+            if (tb === -1 && ta !== -1) return 1;
+            // then 0, then ascending
+            if (ta === 0 && tb !== 0) return -1;
+            if (tb === 0 && ta !== 0) return 1;
+            return ta - tb;
+        });
+
         itemsData = [];
         populateFilters();
         setupEvents();
@@ -115,7 +129,14 @@ function populateCheckboxMatrix(containerId, values) {
         input.value = val;
         input.name = containerId.replace('#filter-', '');
         label.appendChild(input);
-        label.append(' ' + val);
+        // Use displayTier for tier filter, "None" for blank rarity, otherwise show raw value
+        if (containerId === '#filter-tier') {
+            label.append(' ' + displayTier(val));
+        } else if (containerId === '#filter-rarity') {
+            label.append(' ' + (val === "" ? "None" : val));
+        } else {
+            label.append(' ' + val);
+        }
         container.appendChild(label);
     });
 }
@@ -222,9 +243,13 @@ function renderTable(data) {
         tdBtn.innerHTML = btnHtml;
         tr.appendChild(tdBtn);
 
-        row.slice(0, 10).forEach(col => {
+        row.slice(0, 10).forEach((col, i) => {
             const td = document.createElement('td');
-            td.textContent = col || '';
+            if (i === 0) {
+                td.textContent = displayTier(col);
+            } else {
+                td.textContent = col || '';
+            }
             tr.appendChild(td);
         });
         tbody.appendChild(tr);
@@ -330,7 +355,7 @@ function renderDetails(rowData) {
             <span class="item-source">${copy(book)}</span>
         </div>
         <div class="item-type">${copy(itemType)}</div>
-        <div><b>Tier:</b> ${copy(tier)}</div>
+        <div><b>Tier:</b> ${copy(displayTier(tier))}</div>
         <div><b>Type:</b> ${copy(type)}</div>
         <div><b>Rarity:</b> ${copy(rarity)}</div>
         <div><b>Cost:</b> ${copy(cost)}</div>
@@ -735,3 +760,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 });
+
+function displayTier(tier) {
+    if (tier === "-1" || tier === -1) return "Mundane";
+    if (!isNaN(tier)) return `Tier ${tier}`;
+    return tier;
+}
