@@ -340,6 +340,22 @@ function formatBatchedJsonTags(text) {
     });
 }
 
+function formatEntry(entry) {
+    if (typeof entry === "string") {
+        return formatBatchedJsonTags(entry);
+    } else if (entry && typeof entry === "object") {
+        let html = "";
+        if (entry.name) {
+            html += `<b>${entry.name}:</b> `;
+        }
+        if (Array.isArray(entry.entries)) {
+            html += entry.entries.map(formatEntry).join(" ");
+        }
+        return html;
+    }
+    return "";
+}
+
 function toBase64(str) {
     return btoa(unescape(encodeURIComponent(str)));
 }
@@ -416,7 +432,7 @@ function renderDetails(rowData) {
     }
 
     if (item && item.entries) {
-        html += `<div class="item-desc">${formatBatchedJsonTags(item.entries.join(' '))}</div>`;
+        html += `<div class="item-desc">${item.entries.map(formatEntry).join(" ")}</div>`;
     }
     $('#itemDetail').innerHTML = html;
 }
