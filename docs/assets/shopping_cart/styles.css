@@ -34,6 +34,7 @@
     color: #f4b942;
     border-top-color: #f4b942;
 }
+
 [data-bs-theme="light"] .item-title {
     color: #7a3c00;
     border-top-color: #ffc107;
@@ -43,9 +44,11 @@
     color: var(--bs-info-text-emphasis, #4c2c91);
     font-size: 0.95rem;
 }
+
 [data-bs-theme="dark"] .item-source {
     color: #d1b2ff;
 }
+
 [data-bs-theme="light"] .item-source {
     color: #4c2c91;
 }
@@ -73,6 +76,7 @@
     transition: background 0.2s;
     padding: 0 2px;
 }
+
 .copyable:hover {
     background: var(--bs-border-color, #dee2e6);
 }
@@ -100,7 +104,8 @@
     border-left: 1px solid var(--bs-border-color, #dee2e6);
     height: fit-content;
     position: sticky;
-    top: .625rem; /* 250px / 16 = 15.625rem */
+    top: .625rem;
+    /* 250px / 16 = 15.625rem */
     max-height: 100vh;
     overflow-y: auto;
     border-radius: 0.5rem;
@@ -113,10 +118,12 @@
         display: flex;
         flex-wrap: nowrap;
     }
+
     #tableWrapper {
         flex: 1 1 0%;
         min-width: 0;
     }
+
     #details {
         flex: 0 0 370px;
         min-width: 340px;
@@ -145,6 +152,71 @@
         position: relative;
         top: auto;
     }
+
+    .filters {
+        flex-direction: column !important;
+        display: flex !important;
+        align-items: stretch !important;
+        /* Make children fill width */
+    }
+
+    .filters .col-md-2 {
+        max-width: 100%;
+        min-width: 0;
+        flex: 1 1 100%;
+        width: 100%;
+        margin-bottom: 0.5rem;
+        padding-right: 0;
+        /* Remove right padding */
+    }
+
+    .checkbox-matrix {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .checkbox-matrix label {
+        width: 100%;
+        white-space: normal;
+        text-align: left;
+    }
+
+    .filters .form-label {
+        display: block;
+        text-align: center;
+        width: 100%;
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+    }
+
+    .checkbox-matrix {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        align-items: flex-start;
+    }
+
+    .checkbox-matrix label {
+        display: flex;
+        align-items: center;
+        width: auto;
+        white-space: normal;
+        text-align: left;
+        font-weight: 400;
+        gap: 0.5em;
+        margin-bottom: 0;
+    }
+
+    .checkbox-matrix input[type="checkbox"] {
+        margin-right: 0.5em;
+        margin-left: 0;
+    }
+
+    .table,
+    .table th,
+    .table td {
+        font-size: 0.68rem;
+    }
 }
 
 .filters .col-md-2 {
@@ -159,9 +231,18 @@
         max-width: 100%;
         min-width: 0;
         flex: 1 1 100%;
+        width: 100%;
+        margin-bottom: 0.5rem;
     }
+
+    .filters {
+        flex-direction: column !important;
+        display: flex !important;
+    }
+
     .checkbox-matrix {
         max-width: 100%;
+        width: 100%;
     }
 }
 
@@ -175,7 +256,7 @@
     vertical-align: middle;
 }
 
-.table > :not(caption) > * > * {
+.table> :not(caption)>*>* {
     background: none;
     border-bottom-width: 1px;
 }
@@ -184,6 +265,7 @@ tr.item-row {
     cursor: pointer;
     transition: background 0.15s;
 }
+
 tr.item-row:hover {
     background: var(--bs-secondary-bg, #f1f3f5);
     color: var(--bs-body-color, #111);
@@ -285,13 +367,15 @@ label.form-label {
     min-width: 40px;
     display: inline-block;
 }
+
 .cart-custom-name {
     max-width: 100px;
     min-width: 60px;
 }
 
 .action-col {
-    width: 5.2rem; /* or whatever width fits your buttons */
+    width: 5.2rem;
+    /* or whatever width fits your buttons */
     min-width: 5.2rem;
     max-width: 10rem;
 }
@@ -302,14 +386,23 @@ label.form-label {
     right: 2rem;
     z-index: 1050;
     display: none;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
     border-radius: 2rem;
     font-size: 1rem;
     padding: 0.5rem 1.2rem;
     opacity: 0.92;
     transition: opacity 0.2s, background 0.2s;
 }
+
 #return-to-top-btn:hover {
     opacity: 1;
     background: var(--bs-primary-dark, #0a58ca);
+}
+
+.table th[data-col="0"],
+.table td:nth-child(2),
+.table th[data-col="1"],
+.table td:nth-child(3) {
+
+    white-space: nowrap;
 }

@@ -363,7 +363,10 @@ function renderDetails(rowData) {
         <div><b>Session Required:</b> ${copy(sessVal ? 'Yes' : 'No')}</div>
     `;
 
-    html += `<div class="item-desc">${notes ? format5eToolsTags(notes) : ''}</div>`;
+    // Only include notes if present
+    if (notes && notes.trim()) {
+        html += `<div class="item-desc">${format5eToolsTags(notes)}</div>`;
+    }
 
     if (item && item.entries) {
         html += `<div class="item-desc">${format5eToolsTags(item.entries.join(' '))}</div>`;
