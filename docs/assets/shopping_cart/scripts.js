@@ -202,11 +202,9 @@ function renderTable(data) {
         tr.className = 'item-row';
         tr.dataset.row = JSON.stringify(row);
 
-        // Add "Add to Cart" button cell
         const [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes] = row;
         const inCart = isInCart(name);
 
-        // Plus/base logic: show base input if cost contains '+'
         const showBase = typeof cost === "string" && cost.includes('+');
         let btnHtml = '';
         if (inCart) {
@@ -224,7 +222,6 @@ function renderTable(data) {
         tdBtn.innerHTML = btnHtml;
         tr.appendChild(tdBtn);
 
-        // Add the rest of the columns
         row.slice(0, 10).forEach(col => {
             const td = document.createElement('td');
             td.textContent = col || '';
@@ -239,9 +236,8 @@ function renderTable(data) {
             e.stopPropagation();
             const name = decodeURIComponent(btn.getAttribute('data-name'));
             // Always add with base = 0; user can edit in cart modal
-            cart.push({ name, quantity: 1, base: 0 });
-            updateCartCount();
-            renderTable(data); // Refresh to disable the button
+            addToCart(name); // Use addToCart so it updates both buttons
+            applyFilters(); // Re-filter and re-render table to update buttons
         });
     });
 
@@ -419,16 +415,6 @@ function setupEvents() {
         setBootstrapTheme(dark);
     });
     setBootstrapTheme(dark);
-    // Copyable
-    document.addEventListener('click', e => {
-        if (e.target.classList.contains('copyable')) {
-            const text = e.target.innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                const rect = e.target.getBoundingClientRect();
-                showCopyToast('Copied!', rect.left + rect.width / 2, rect.top - 20 + window.scrollY);
-            });
-        }
-    });
     document.getElementById('cart-btn').addEventListener('click', () => {
         if (cart.length === 0) return;
         renderCart();
@@ -502,12 +488,6 @@ function setupEvents() {
                 orderBtn.textContent = "Order";
             }, 1500);
         });
-
-        // // Optionally clear cart and update UI
-        // cart = [];
-        // updateCartCount();
-        // const modal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
-        // if (modal) modal.hide();
     });
     document.getElementById('clear-cart-btn').addEventListener('click', () => {
         if (cart.length === 0) return;
@@ -515,7 +495,7 @@ function setupEvents() {
             cart = [];
             updateCartCount();
             renderCart();
-            applyFilters(); // <-- Add this line to refresh the table buttons
+            applyFilters();
         }
     });
 }
@@ -538,6 +518,7 @@ function addToCart(name) {
         });
         updateAddToCartBtn(name);
         updateCartCount();
+        applyFilters(); // Re-render table to update buttons
     }
 }
 
@@ -707,9 +688,12 @@ function renderCart() {
     container.querySelectorAll('.cart-delete').forEach(btn => {
         btn.addEventListener('click', e => {
             const idx = +btn.dataset.idx;
+            const removed = cart[idx];
             cart.splice(idx, 1);
             renderCart();
             updateCartCount();
+            updateAddToCartBtn(removed.name); // Update item details button
+            applyFilters(); // Re-render table to update buttons
             // Hide modal if cart is empty
             if (cart.length === 0) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
