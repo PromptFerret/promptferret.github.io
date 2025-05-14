@@ -75,10 +75,21 @@ async function loadData() {
         const CSV_URL = await getDecryptedCsvUrl();
         const csvRows = await fetchCSV(CSV_URL);
         allData = csvRows.slice(1);
-        itemsData = []; // No .json data loaded
+        itemsData = [];
         populateFilters();
         setupEvents();
         applyFilters();
+
+        // --- Check for ?v=BASE64 in URL ---
+        const params = new URLSearchParams(window.location.search);
+        const vParam = params.get('v');
+        if (vParam) {
+            const decodedName = fromBase64(vParam);
+            const row = allData.find(r => r[2] === decodedName);
+            if (row) {
+                renderDetails(row);
+            }
+        }
     } catch (err) {
         console.error("Failed to load data:", err);
     }
@@ -240,21 +251,53 @@ function format5eToolsTags(text) {
         .replace(/\{@quickref ([^|}]+)\|[^}]+\}/g, '<em>$1</em>');
 }
 
+function toBase64(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+}
+function fromBase64(str) {
+    try {
+        return decodeURIComponent(escape(atob(str)));
+    } catch {
+        return "";
+    }
+}
+
 function renderDetails(rowData) {
     const [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes, link] = rowData;
     const item = itemsData.find(i => i.name === name);
 
-    // Set the link icon in the header if a link exists
+    // Set the link and share icons in the header
     const linkBtn = $('#item-link-btn');
     if (linkBtn) {
+        // --- Always show Share button ---
+        let shareHtml = `
+            <button id="item-share-btn" class="btn btn-outline-secondary btn-sm ms-2" title="Share item">
+                <i class="fa-solid fa-share-nodes"></i>
+            </button>
+        `;
+        // --- Link button (only if link exists) ---
+        let linkHtml = "";
         if (link && link.trim() !== "") {
-            linkBtn.innerHTML = `
-                <a href="${link}" target="_blank" rel="noopener" class="ms-2" title="Open item link">
+            linkHtml = `
+                <a href="${link}" target="_blank" rel="noopener" class="ms-2 btn btn-outline-secondary btn-sm" title="Open item link">
                     <i class="fa-solid fa-up-right-from-square"></i>
                 </a>
             `;
-        } else {
-            linkBtn.innerHTML = "";
+        }
+        linkBtn.innerHTML = shareHtml + linkHtml;
+
+        // Add share button event
+        const shareBtn = document.getElementById('item-share-btn');
+        if (shareBtn) {
+            shareBtn.onclick = () => {
+                const url = new URL(window.location.href);
+                url.search = `?v=${toBase64(name)}`;
+                url.hash = ""; // Remove hash
+                navigator.clipboard.writeText(url.toString()).then(() => {
+                    const rect = shareBtn.getBoundingClientRect();
+                    showCopyToast('Share URL copied!', rect.left + rect.width / 2, rect.top - 20 + window.scrollY);
+                });
+            };
         }
     }
 
@@ -481,9 +524,19 @@ function updateAddToCartBtn(name) {
     const btn = document.getElementById('add-to-cart-btn');
     if (!btn) return;
     if (isInCart(name)) {
-        btn.innerHTML = `<button class="btn btn-secondary btn-sm" disabled>Already in Cart</button>`;
+        btn.innerHTML = `
+            <span title="Already in Cart">
+                <button class="btn btn-secondary btn-sm" tabindex="-1" style="pointer-events:none; opacity:0.65;">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </button>
+            </span>
+        `;
     } else {
-        btn.innerHTML = `<button class="btn btn-primary btn-sm">Add to Cart</button>`;
+        btn.innerHTML = `
+            <button class="btn btn-primary btn-sm" title="Add to Cart">
+                <i class="fa-solid fa-cart-plus"></i>
+            </button>
+        `;
         btn.querySelector('button').onclick = () => addToCart(name);
     }
 }
