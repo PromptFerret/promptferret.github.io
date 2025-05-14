@@ -171,7 +171,7 @@ Copy image url to clipboard (hover and look at right top corner)
 ![[razzle_dazzle.png]]
 
 ## Code Blocks
-Hover over for a copy button in top left for full blocks, or to the left for simple code blocks
+Hover over for a copy button in top right for full blocks, or to the right for simple code blocks
 
 ```
 Example
