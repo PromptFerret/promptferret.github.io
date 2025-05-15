@@ -155,12 +155,8 @@ async function loadAllBatchedJsonData() {
         if (arr.length) {
             itemsData.push(...arr);
             loadedCount += arr.length;
-            console.log(`Loaded ${file}: ${arr.length} items`);
-        } else {
-            console.log(`${file} not loaded or not an array`);
         }
     }
-    console.log(`Total loaded items: ${loadedCount}`);
 }
 
 async function loadData() {
@@ -433,6 +429,7 @@ function fromBase64(str) {
 
 // Replace the entire renderDetails function with this:
 function renderDetails(rowData) {
+    if (isAnyModalOpen()) return;
     const [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes, link] = rowData;
     const item = itemsData.find(i => normalizeItemName(i.name) === normalizeItemName(name));
 
@@ -629,6 +626,7 @@ function setupEvents() {
     setBootstrapTheme(dark);
     document.getElementById('cart-btn').addEventListener('click', () => {
         if (cart.length === 0) return;
+        if (isAnyModalOpen()) return;
         renderCart();
         const modal = new bootstrap.Modal(document.getElementById('cartModal'));
         modal.show();
@@ -722,7 +720,7 @@ function setupEvents() {
 
     if (importExportBtn && importExportModal) {
         importExportBtn.addEventListener('click', () => {
-            // If cart is not empty, show encrypted+base64 JSON
+            if (isAnyModalOpen()) return;
             if (cart.length) {
                 importExportTextarea.value = encryptCart(cart);
             } else {
@@ -1080,7 +1078,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (importExportBtn && importExportModal) {
         importExportBtn.addEventListener('click', () => {
-            // If cart is not empty, show encrypted+base64 JSON
+            if (isAnyModalOpen()) return;
             if (cart.length) {
                 importExportTextarea.value = encryptCart(cart);
             } else {
@@ -1150,4 +1148,8 @@ function displayTier(tier) {
 function normalizeItemName(name) {
     // Remove all trailing parenthetical groups and convert to lowercase
     return name.replace(/(\s*\([^)]+\))+$/g, '').trim().toLowerCase();
+}
+
+function isAnyModalOpen() {
+    return document.querySelector('.modal.show') !== null;
 }
