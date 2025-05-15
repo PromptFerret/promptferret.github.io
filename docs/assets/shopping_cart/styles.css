@@ -1,3 +1,25 @@
+[data-bs-theme="light"] {
+  --bs-primary: #ffc107; /* Gold/yellow */
+  --bs-btn-primary-bg: #ffc107;
+  --bs-btn-primary-border-color: #ffc107;
+  --bs-btn-primary-hover-bg: #ffcd39;
+  --bs-btn-primary-hover-border-color: #ffcd39;
+  --bs-btn-primary-active-bg: #ffcd39;
+  --bs-btn-primary-active-border-color: #ffcd39;
+  --bs-btn-primary-color: #222; /* Button text color */
+}
+
+[data-bs-theme="dark"] {
+  --bs-primary: #f4b942; /* Lighter gold for dark mode */
+  --bs-btn-primary-bg: #f4b942;
+  --bs-btn-primary-border-color: #f4b942;
+  --bs-btn-primary-hover-bg: #ffd666;
+  --bs-btn-primary-hover-border-color: #ffd666;
+  --bs-btn-primary-active-bg: #ffd666;
+  --bs-btn-primary-active-border-color: #ffd666;
+  --bs-btn-primary-color: #222; /* Button text color */
+}
+
 /* Remove all custom theme variables and backgrounds. Use Bootstrap's variables and utilities. */
 
 /* Minimal, flat, clean look. Only custom tweaks below. */
@@ -451,10 +473,7 @@ label.form-label {
 }
 
 .action-col {
-    width: 5.2rem;
-    /* or whatever width fits your buttons */
-    min-width: 5.2rem;
-    max-width: 10rem;
+    width: 7.8rem;
 }
 
 #return-to-top-btn {
@@ -625,3 +644,40 @@ tr.selected-row:hover {
     margin-bottom: 22px; /* space for sticky scrollbar */
   }
 }
+
+.cart-btn,
+.theme-btn {
+    font-size: 1.5rem;
+}
+
+.cart-count {
+    font-size: 0.8rem;
+    min-width: 1.5em;
+}
+
+.btn-primary, .btn-primary:active, .btn-primary:focus, .btn-primary:visited {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+  color: #222 !important;
+}
+.btn-primary:hover, .btn-primary:active:hover, .btn-primary:focus:hover {
+  background-color: #ffcd39 !important;
+  border-color: #ffcd39 !important;
+  color: #222 !important;
+}
+[data-bs-theme="dark"] .btn-primary, 
+[data-bs-theme="dark"] .btn-primary:active, 
+[data-bs-theme="dark"] .btn-primary:focus, 
+[data-bs-theme="dark"] .btn-primary:visited {
+  background-color: #f4b942 !important;
+  border-color: #f4b942 !important;
+  color: #222 !important;
+}
+[data-bs-theme="dark"] .btn-primary:hover, 
+[data-bs-theme="dark"] .btn-primary:active:hover, 
+[data-bs-theme="dark"] .btn-primary:focus:hover {
+  background-color: #ffd666 !important;
+  border-color: #ffd666 !important;
+  color: #222 !important;
+}
+

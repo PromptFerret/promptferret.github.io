@@ -256,12 +256,11 @@ function renderTable(data) {
         tr.className = 'item-row';
         tr.dataset.row = JSON.stringify(row);
 
-        // Highlight if selected
         if (selectedRowName && row[2] === selectedRowName) {
             tr.classList.add('selected-row');
         }
 
-        const [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes] = row;
+        const [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes, link] = row;
         const inCart = isInCart(name);
 
         const showBase = typeof cost === "string" && cost.includes('+');
@@ -272,12 +271,20 @@ function renderTable(data) {
             btnHtml = `<button class="btn btn-primary btn-sm add-table-cart" data-name="${encodeURIComponent(name)}" data-base="${showBase ? 1 : 0}" title="Add to Cart"><i class="fa fa-cart-plus"></i></button>`;
         }
         btnHtml += `
-            <button class="btn btn-outline-secondary btn-sm ms-1 table-share-btn" data-name="${encodeURIComponent(name)}" title="Share item">
+            <button class="btn btn-primary btn-sm ms-1 table-share-btn" data-name="${encodeURIComponent(name)}" title="Share item">
                 <i class="fa-solid fa-share-nodes"></i>
             </button>
         `;
+        if (link && link.trim() !== "") {
+            btnHtml += `
+                <a href="${link}" target="_blank" rel="noopener" class="btn btn-primary btn-sm ms-1 table-link-btn" title="Open item link">
+                    <i class="fa-solid fa-up-right-from-square"></i>
+                </a>
+            `;
+        }
 
         const tdBtn = document.createElement('td');
+        tdBtn.className = 'action-col';
         tdBtn.innerHTML = btnHtml;
         tr.appendChild(tdBtn);
 
@@ -298,13 +305,12 @@ function renderTable(data) {
         btn.addEventListener('click', e => {
             e.stopPropagation();
             const name = decodeURIComponent(btn.getAttribute('data-name'));
-            // Always add with base = 0; user can edit in cart modal
-            addToCart(name); // Use addToCart so it updates both buttons
-            applyFilters(); // Re-filter and re-render table to update buttons
+            addToCart(name);
+            applyFilters();
         });
     });
 
-    // --- Share button event listener ---
+    // Share button event listener
     tbody.querySelectorAll('.table-share-btn').forEach(btn => {
         btn.addEventListener('click', e => {
             e.stopPropagation();
@@ -445,14 +451,14 @@ function updateItemLinkBtnModal(name, link) {
     const linkBtn = document.getElementById('item-link-btn-modal');
     if (!linkBtn) return;
     let shareHtml = `
-        <button id="item-share-btn-modal" class="btn btn-outline-secondary btn-sm ms-2" title="Share item">
+        <button id="item-share-btn-modal" class="btn btn-primary btn-sm ms-2" title="Share item">
             <i class="fa-solid fa-share-nodes"></i>
         </button>
     `;
     let linkHtml = "";
     if (link && link.trim() !== "") {
         linkHtml = `
-            <a href="${link}" target="_blank" rel="noopener" class="ms-2 btn btn-outline-secondary btn-sm" title="Open item link">
+            <a href="${link}" target="_blank" rel="noopener" class="ms-2 btn btn-primary btn-sm" title="Open item link">
                 <i class="fa-solid fa-up-right-from-square"></i>
             </a>
         `;
