@@ -2,8 +2,18 @@ const ENCRYPTED_CSV_URL = "U2FsdGVkX1/7NiSx7Ugsj0XsHxvxjGZJBq/yVSy1T/+bNDHbGnORM
 
 const CACHE_BUSTER = Date.now();
 
+function setCookie(name, value, hours) {
+    const d = new Date();
+    d.setTime(d.getTime() + (hours*60*60*1000));
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()};path=/;SameSite=Strict`;
+}
+function getCookie(name) {
+    const v = document.cookie.match('(^|;)\\s*'+name+'\\s*=\\s*([^;]+)');
+    return v ? decodeURIComponent(v.pop()) : "";
+}
+
 async function getDecryptedCsvUrl() {
-    let password = typeof window.SHOP_PASSWORD === "string" ? window.SHOP_PASSWORD : "";
+    let password = getCookie("SHOP_PASSWORD") || (typeof window.SHOP_PASSWORD === "string" ? window.SHOP_PASSWORD : "");
     while (!password) {
         password = prompt("Enter password to access the item shop:");
         if (password === null) throw new Error("No password entered.");
@@ -11,9 +21,11 @@ async function getDecryptedCsvUrl() {
     try {
         const decrypted = CryptoJS.AES.decrypt(ENCRYPTED_CSV_URL, password).toString(CryptoJS.enc.Utf8);
         if (!decrypted.startsWith("http")) throw new Error("Decryption failed");
+        setCookie("SHOP_PASSWORD", password, 6); // Save for 6 hours
         return decrypted;
     } catch {
         alert("Incorrect password or decryption failed.");
+        document.cookie = "SHOP_PASSWORD=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
         location.reload();
         throw new Error("Decryption failed");
     }
