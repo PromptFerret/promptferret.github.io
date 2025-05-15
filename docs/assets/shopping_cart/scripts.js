@@ -1,5 +1,7 @@
 const ENCRYPTED_CSV_URL = "U2FsdGVkX1/7NiSx7Ugsj0XsHxvxjGZJBq/yVSy1T/+bNDHbGnORMUcQpa9AXMVautQ1Gn+8NGt0pdrwsWa3mxuW0yMSo/zV9Q/9hEsfrO5QKbDg13Kd8n1Ka+VUL6TxT+Y+50KCmf47vOqkmfSAqp9+R0H6Kf9fUm98LHmB4D1kKhFlboN6kkpIbhbn3bqhT3TeXyFvYlZJd7wityCOR24ZAjXNhdjwgfff5zVLf6VABmny28jCng0L5XLm5r1g";
 
+const CACHE_BUSTER = Date.now();
+
 async function getDecryptedCsvUrl() {
     let password = typeof window.SHOP_PASSWORD === "string" ? window.SHOP_PASSWORD : "";
     while (!password) {
@@ -61,13 +63,15 @@ function parseCSV(text) {
 }
 
 async function fetchCSV(url) {
-    const res = await fetch(url);
+    const sep = url.includes('?') ? '&' : '?';
+    const res = await fetch(url + sep + 'v=' + CACHE_BUSTER);
     const text = await res.text();
     return parseCSV(text);
 }
 
 async function fetchJSON(url) {
-    const res = await fetch(url);
+    const sep = url.includes('?') ? '&' : '?';
+    const res = await fetch(url + sep + 'v=' + CACHE_BUSTER);
     return res.json();
 }
 

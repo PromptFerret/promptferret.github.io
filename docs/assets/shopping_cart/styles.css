@@ -254,7 +254,7 @@ tr.item-row:hover { background: var(--bs-secondary-bg, #f1f3f5); color: var(--bs
 #cartModal .modal-body { max-height: calc(100vh - 200px); overflow-y: auto; }
 .cart-qty, .cart-base, .cart-custom-name { max-width: 60px; min-width: 40px; display: inline-block; }
 .cart-custom-name { max-width: 100px; min-width: 60px; }
-.action-col { width: 7.8rem; }
+.action-col { width: 7.8rem; min-width: 7.8rem; }
 .cart-btn, .theme-btn { font-size: 1.5rem; }
 .cart-count { font-size: 0.8rem; min-width: 1.5em; }
 .btn-primary, .btn-primary:active, .btn-primary:focus, .btn-primary:visited {
