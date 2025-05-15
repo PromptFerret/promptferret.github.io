@@ -1,200 +1,3 @@
-const ENCRYPTED_CSV_URL = "U2FsdGVkX1/7NiSx7Ugsj0XsHxvxjGZJBq/yVSy1T/+bNDHbGnORMUcQpa9AXMVautQ1Gn+8NGt0pdrwsWa3mxuW0yMSo/zV9Q/9hEsfrO5QKbDg13Kd8n1Ka+VUL6TxT+Y+50KCmf47vOqkmfSAqp9+R0H6Kf9fUm98LHmB4D1kKhFlboN6kkpIbhbn3bqhT3TeXyFvYlZJd7wityCOR24ZAjXNhdjwgfff5zVLf6VABmny28jCng0L5XLm5r1g";
-
-const CACHE_BUSTER = Date.now();
-const CART_EXPORT_PASSWORD = "cart-export-2024";
-
-function setCookie(name, value, hours) {
-    const d = new Date();
-    d.setTime(d.getTime() + (hours * 60 * 60 * 1000));
-    document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()};path=/;SameSite=Strict`;
-}
-function getCookie(name) {
-    const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-    return v ? decodeURIComponent(v.pop()) : "";
-}
-
-// Helper to encrypt and encode cart JSON
-function encryptCart(cartObj) {
-    const json = JSON.stringify(cartObj);
-    const encrypted = CryptoJS.AES.encrypt(json, CART_EXPORT_PASSWORD).toString();
-    return btoa(encrypted);
-}
-
-// Helper to decode and decrypt cart JSON
-function decryptCart(str) {
-    try {
-        const encrypted = atob(str);
-        const decrypted = CryptoJS.AES.decrypt(encrypted, CART_EXPORT_PASSWORD).toString(CryptoJS.enc.Utf8);
-        return JSON.parse(decrypted);
-    } catch {
-        return null;
-    }
-}
-
-async function getDecryptedCsvUrl() {
-    let tries = 0;
-    let password = getCookie("SHOP_PASSWORD") || (typeof window.SHOP_PASSWORD === "string" ? window.SHOP_PASSWORD : "");
-    while (tries < 6) {
-        if (!password) {
-            password = prompt("Enter password to access the item shop:");
-            if (password === null) throw new Error("No password entered.");
-        }
-        try {
-            const decrypted = CryptoJS.AES.decrypt(ENCRYPTED_CSV_URL, password).toString(CryptoJS.enc.Utf8);
-            if (!decrypted.startsWith("http")) throw new Error("Decryption failed");
-            setCookie("SHOP_PASSWORD", password, 6); // Save for 6 hours
-            return decrypted;
-        } catch {
-            tries++;
-            password = "";
-            document.cookie = "SHOP_PASSWORD=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
-            // No alert here, just loop and ask again
-        }
-    }
-    // 6th failure: wipe DOM and show error
-    document.body.innerHTML = `
-        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;">
-            <div style="font-size:2rem;color:#c00;margin-bottom:1rem;">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <div style="font-size:1.5rem;font-weight:bold;margin-bottom:0.5rem;">Too many failed attempts</div>
-            <div style="font-size:1.1rem;">Access denied. Please reload the page to try again.</div>
-        </div>
-    `;
-    throw new Error("Too many failed password attempts");
-}
-
-let allData = [];
-let itemsData = [];
-let sortCol = null;
-let sortAsc = true;
-let cart = [];
-let selectedRowName = null;
-
-const $ = (selector, ctx = document) => ctx.querySelector(selector);
-const $$ = (selector, ctx = document) => Array.from(ctx.querySelectorAll(selector));
-
-// Robust CSV parser for quoted fields
-function parseCSV(text) {
-    const rows = [];
-    let row = [];
-    let cell = '';
-    let inQuotes = false;
-    for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        if (char === '"') {
-            if (inQuotes && text[i + 1] === '"') {
-                cell += '"';
-                i++;
-            } else {
-                inQuotes = !inQuotes;
-            }
-        } else if (char === ',' && !inQuotes) {
-            row.push(cell);
-            cell = '';
-        } else if ((char === '\n' || char === '\r') && !inQuotes) {
-            if (cell !== '' || row.length > 0) row.push(cell);
-            if (row.length) rows.push(row.map(c => c.trim()));
-            row = [];
-            cell = '';
-            if (char === '\r' && text[i + 1] === '\n') i++; // handle \r\n
-        } else {
-            cell += char;
-        }
-    }
-    if (cell !== '' || row.length > 0) row.push(cell);
-    if (row.length) rows.push(row.map(c => c.trim()));
-    return rows;
-}
-
-async function fetchCSV(url) {
-    const sep = url.includes('?') ? '&' : '?';
-    const res = await fetch(url + sep + 'v=' + CACHE_BUSTER);
-    const text = await res.text();
-    return parseCSV(text);
-}
-
-async function fetchJSON(url) {
-    const sep = url.includes('?') ? '&' : '?';
-    const res = await fetch(url + sep + 'v=' + CACHE_BUSTER);
-    return res.json();
-}
-
-async function tryFetchJSON(url) {
-    try {
-        return await fetchJSON(url);
-    } catch (e) {
-        // Optionally log: console.warn(`Could not load ${url}:`, e);
-        return null;
-    }
-}
-
-const ITEM_JSON_FILES = [
-    'https://raw.githubusercontent.com/5etools-mirror-3/5etools-2014-src/refs/heads/main/data/items.json',
-    'https://raw.githubusercontent.com/5etools-mirror-3/5etools-2014-src/refs/heads/main/data/items-base.json',
-    // Add more file names here as needed
-];
-
-const KNOWN_ARRAY_KEYS = ['item', 'baseitem'];
-
-async function loadAllBatchedJsonData() {
-    let loadedCount = 0;
-    for (const file of ITEM_JSON_FILES) {
-        const data = await tryFetchJSON(file);
-        let arr = [];
-        if (Array.isArray(data)) {
-            arr = data;
-        } else if (data && typeof data === 'object') {
-            for (const key of KNOWN_ARRAY_KEYS) {
-                if (Array.isArray(data[key])) {
-                    arr = data[key];
-                    break;
-                }
-            }
-        }
-        if (arr.length) {
-            itemsData.push(...arr);
-            loadedCount += arr.length;
-        }
-    }
-}
-
-async function loadData() {
-    try {
-        const CSV_URL = await getDecryptedCsvUrl();
-        const csvRows = await fetchCSV(CSV_URL);
-        allData = csvRows.slice(1);
-
-        // --- Sort by tier: -1 first, then 0, then ascending ---
-        allData.sort((a, b) => {
-            const ta = parseInt(a[0], 10);
-            const tb = parseInt(b[0], 10);
-            // -1 always first
-            if (ta === -1 && tb !== -1) return -1;
-            if (tb === -1 && ta !== -1) return 1;
-            // then 0, then ascending
-            if (ta === 0 && tb !== 0) return -1;
-            if (tb === 0 && ta !== 0) return 1;
-            return ta - tb;
-        });
-
-        itemsData = [];
-        populateFilters();
-        setupEvents();
-        applyFilters();
-    } catch (err) {
-        console.error("Failed to load data:", err);
-    }
-}
-
-function uniqueSorted(arr) {
-    return Array.from(new Set(arr.flat())).sort((a, b) => {
-        const na = parseInt(a), nb = parseInt(b);
-        if (!isNaN(na) && !isNaN(nb)) return na - nb;
-        return String(a).localeCompare(String(b));
-    });
-}
-
 function populateCheckboxMatrix(containerId, values) {
     const container = $(containerId);
     container.innerHTML = '';
@@ -228,19 +31,6 @@ function populateFilters() {
     populateCheckboxMatrix('#filter-tier', tierSet);
     populateCheckboxMatrix('#filter-type', typeSet);
     populateCheckboxMatrix('#filter-rarity', raritySet);
-}
-
-function normalizeRarity(val) {
-    if (val === "Very Rare (S)") return "Very Rare";
-    if (val === "Very Rare/Rare") return ["Very Rare", "Rare"];
-    return val;
-}
-
-function tokenizeMatch(text, query) {
-    if (!query.trim()) return true;
-    const tokens = query.toLowerCase().split(/\s+/);
-    const field = (text || "").toLowerCase();
-    return tokens.every(t => field.includes(t));
 }
 
 function applyFilters() {
@@ -277,6 +67,18 @@ function applyFilters() {
             tokenizeMatch(notes, notesQ)
         );
     });
+
+    // If no filters are selected and no search fields are filled, show all data
+    const noFilters =
+        tiers.length === 0 &&
+        types.length === 0 &&
+        rarities.length === 0 &&
+        !nameQ && !atn && !session && !itemTypeQ && !bookQ && !notesQ &&
+        (costMin === 0 && costMax === 20000000);
+
+    if (data.length === 0 && noFilters) {
+        data = allData;
+    }
 
     if (sortCol !== null) {
         data.sort((a, b) => {
@@ -329,17 +131,18 @@ function renderTable(data) {
             `;
         }
 
+        // --- FIX: Append action column first ---
         const tdBtn = document.createElement('td');
         tdBtn.className = 'action-col';
         tdBtn.innerHTML = btnHtml;
         tr.appendChild(tdBtn);
 
-        row.slice(0, 10).forEach((col, i) => {
+        // --- FIX: Append exactly 10 data columns to match thead ---
+        [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes].forEach((col, i) => {
             const td = document.createElement('td');
             if (i === 0) {
                 td.textContent = displayTier(col);
             } else if (i === 6) { // Cost column
-                // Remove non-numeric chars, parse, and format with commas if valid
                 const num = parseInt((col || '').replace(/[^0-9]/g, ''));
                 td.textContent = !isNaN(num) && num > 0 ? num.toLocaleString() : (col || '');
             } else {
@@ -348,6 +151,18 @@ function renderTable(data) {
             tr.appendChild(td);
         });
         tbody.appendChild(tr);
+    });
+
+    // --- ADD THIS: Attach row click event after rendering ---
+    tbody.querySelectorAll('tr').forEach(tr => {
+        tr.addEventListener('click', e => {
+            // Prevent button clicks from triggering row click
+            if (e.target.closest('button, a')) return;
+            const rowData = JSON.parse(tr.dataset.row);
+            selectedRowName = rowData[2];
+            renderDetails(rowData);
+            applyFilters();
+        });
     });
 
     // Add event listeners for the new buttons
@@ -416,16 +231,6 @@ function formatEntry(entry) {
     return "";
 }
 
-function toBase64(str) {
-    return btoa(unescape(encodeURIComponent(str)));
-}
-function fromBase64(str) {
-    try {
-        return decodeURIComponent(escape(atob(str)));
-    } catch {
-        return "";
-    }
-}
 
 // Replace the entire renderDetails function with this:
 function renderDetails(rowData) {
@@ -606,16 +411,6 @@ function setupEvents() {
             applyFilters();
         })
     );
-    // Row click
-    $('#itemsTable tbody').addEventListener('click', e => {
-        const tr = e.target.closest('tr');
-        if (tr && tr.dataset.row) {
-            const rowData = JSON.parse(tr.dataset.row);
-            selectedRowName = rowData[2]; // Use the Name column as unique identifier
-            renderDetails(rowData); // Now opens modal
-            applyFilters(); // Re-render table to update selected row highlight
-        }
-    });
     // Theme toggle
     const themeBtn = document.querySelector('.toggle-theme');
     let dark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
@@ -715,17 +510,12 @@ function setupEvents() {
     const importExportTextarea = document.getElementById('importExportTextarea');
     const copyBtn = document.getElementById('copy-import-export-btn');
     const shareBtn = document.getElementById('share-import-export-btn');
-    const cancelBtn = document.getElementById('cancel-import-export-btn');
     const updateBtn = document.getElementById('update-import-export-btn');
 
-    if (importExportBtn && importExportModal) {
+    if (importExportBtn && importExportModal && importExportTextarea) {
         importExportBtn.addEventListener('click', () => {
             if (isAnyModalOpen()) return;
-            if (cart.length) {
-                importExportTextarea.value = encryptCart(cart);
-            } else {
-                importExportTextarea.value = '';
-            }
+            importExportTextarea.value = cart.length ? encryptCart(cart) : '';
             const modal = new bootstrap.Modal(importExportModal);
             modal.show();
         });
@@ -740,9 +530,20 @@ function setupEvents() {
             setTimeout(() => { copyBtn.textContent = "Copy"; }, 1200);
         });
     }
-    // Cancel button just closes modal (handled by data-bs-dismiss)
 
-    // Update button (for now, just closes modal)
+    // Share button (uses Web Share API if available)
+    if (shareBtn && importExportTextarea) {
+        shareBtn.addEventListener('click', () => {
+            const text = importExportTextarea.value;
+            if (navigator.share) {
+                navigator.share({ text }).catch(() => {});
+            } else {
+                alert("Sharing is not supported in this browser.");
+            }
+        });
+    }
+
+    // Update button (import cart)
     if (updateBtn && importExportModal && importExportTextarea) {
         updateBtn.addEventListener('click', () => {
             const val = importExportTextarea.value.trim();
@@ -768,28 +569,6 @@ function setupEvents() {
     }
 }
 
-function isInCart(name) {
-    return cart.some(item => item.name === name);
-}
-
-function addToCart(name) {
-    if (!isInCart(name)) {
-        // Find the row to check if it needs a base
-        const row = allData.find(row => row[2] === name);
-        let costField = row ? (row[6] || '') : '';
-        let needsBase = costField.includes('+');
-        cart.push({
-            name,
-            quantity: 1,
-            base: 0,
-            ...(needsBase ? { customName: "" } : {})
-        });
-        updateAddToCartBtn(name);
-        updateCartCount();
-        applyFilters(); // Re-render table to update buttons
-    }
-}
-
 function updateAddToCartBtn(name) {
     const btn = document.getElementById('add-to-cart-btn');
     if (!btn) return;
@@ -809,14 +588,6 @@ function updateAddToCartBtn(name) {
         `;
         btn.querySelector('button').onclick = () => addToCart(name);
     }
-}
-
-function updateCartCount() {
-    const count = cart.length;
-    const badge = document.getElementById('cart-count');
-    if (badge) badge.textContent = count;
-    const cartBtn = document.getElementById('cart-btn');
-    if (cartBtn) cartBtn.disabled = count === 0;
 }
 
 function renderCart() {
@@ -1024,9 +795,15 @@ function renderCart() {
 
 // Initial load
 async function initialLoad() {
-    await loadData(); // loads CSV and sets up allData, filters, etc.
-    await loadAllBatchedJsonData(); // loads all JSON files into itemsData
-    applyFilters(); // now safe to use itemsData
+    await loadData();                // Wait for data to load and allData to be populated
+    await loadAllBatchedJsonData();  // Wait for itemsData to be populated
+    populateFilters();               // Populate filter checkboxes
+    setupEvents();                   // Attach event listeners
+
+    // Wait for the DOM to update with new filters before rendering table
+    setTimeout(() => {
+        applyFilters();              // Now allData is ready and filters are in the DOM
+    }, 50);
 
     // --- Check for ?v=BASE64 in URL (after all data is loaded) ---
     const params = new URLSearchParams(window.location.search);
@@ -1038,11 +815,9 @@ async function initialLoad() {
             renderDetails(row);
         }
     }
-    // Any other initialization that needs itemsData
 }
 
-initialLoad();
-
+// --- ADD THIS: Sticky scrollbar for table ---
 function setupStickyScrollbar() {
     const tableWrapper = document.querySelector('.table-responsive-custom');
     const stickyScrollbar = document.querySelector('.sticky-table-scrollbar');
@@ -1066,90 +841,4 @@ function setupStickyScrollbar() {
     };
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Import/Export button opens modal
-    const importExportBtn = document.getElementById('import-export-btn');
-    const importExportModal = document.getElementById('importExportModal');
-    const importExportTextarea = document.getElementById('importExportTextarea');
-    const copyBtn = document.getElementById('copy-import-export-btn');
-    const shareBtn = document.getElementById('share-import-export-btn');
-    const cancelBtn = document.getElementById('cancel-import-export-btn');
-    const updateBtn = document.getElementById('update-import-export-btn');
-
-    if (importExportBtn && importExportModal) {
-        importExportBtn.addEventListener('click', () => {
-            if (isAnyModalOpen()) return;
-            if (cart.length) {
-                importExportTextarea.value = encryptCart(cart);
-            } else {
-                importExportTextarea.value = '';
-            }
-            const modal = new bootstrap.Modal(importExportModal);
-            modal.show();
-        });
-    }
-
-    // Copy button
-    if (copyBtn && importExportTextarea) {
-        copyBtn.addEventListener('click', () => {
-            importExportTextarea.select();
-            document.execCommand('copy');
-            copyBtn.textContent = "Copied!";
-            setTimeout(() => { copyBtn.textContent = "Copy"; }, 1200);
-        });
-    }
-
-    // Share button (uses Web Share API if available)
-    if (shareBtn && importExportTextarea) {
-        shareBtn.addEventListener('click', () => {
-            const text = importExportTextarea.value;
-            if (navigator.share) {
-                navigator.share({ text }).catch(() => {});
-            } else {
-                alert("Sharing is not supported in this browser.");
-            }
-        });
-    }
-
-    // Cancel button just closes modal (handled by data-bs-dismiss)
-
-    // Update button (for now, just closes modal)
-    if (updateBtn && importExportModal && importExportTextarea) {
-        updateBtn.addEventListener('click', () => {
-            const val = importExportTextarea.value.trim();
-            if (val) {
-                const imported = decryptCart(val);
-                if (imported && Array.isArray(imported)) {
-                    cart = imported;
-                    updateCartCount();
-                    renderCart();
-                    applyFilters();
-                    // Close modal
-                    const modal = bootstrap.Modal.getInstance(importExportModal);
-                    if (modal) modal.hide();
-                } else {
-                    alert("Invalid or corrupted import data.");
-                }
-            } else {
-                // Just close modal if textarea is empty
-                const modal = bootstrap.Modal.getInstance(importExportModal);
-                if (modal) modal.hide();
-            }
-        });
-    }
-});
-
-function displayTier(tier) {
-    if (tier === "-1" || tier === -1) return "Mundane";
-    if (!isNaN(tier)) return `Tier ${tier}`;
-    return tier;
-}
-
-function normalizeItemName(name) {
-    // Remove all trailing parenthetical groups and convert to lowercase
-    return name.replace(/(\s*\([^)]+\))+$/g, '').trim().toLowerCase();
-}
-
-function isAnyModalOpen() {
-    return document.querySelector('.modal.show') !== null;
-}
+initialLoad();
