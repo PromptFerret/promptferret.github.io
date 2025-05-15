@@ -515,11 +515,10 @@ select.form-select {
 }
 
 #itemDetailsModal .modal-dialog {
-    margin: 0 auto !important;
+    top: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 475px;
 }
 
 #itemDetailsModal .modal-content {
