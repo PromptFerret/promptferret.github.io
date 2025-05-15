@@ -1,9 +1,9 @@
 /* --- Theme Variables --- */
 :root {
-  --pf-gold: #ffc107;
-  --pf-gold-dark: #f4b942;
-  --pf-gold-hover: #ffcd39;
-  --pf-gold-hover-dark: #ffd666;
+  --pf-gold: #f4874c;
+  --pf-gold-dark: #c96a36;         /* a deeper, muted orange for dark mode */
+  --pf-gold-hover: #ff9b66;        /* lighter, more saturated for hover */
+  --pf-gold-hover-dark: #ffb185;   /* lighter, softer orange for dark hover */
   --pf-title-light: #7a3c00;
   --pf-title-dark: #f4b942;
   --pf-source-light: #4c2c91;
