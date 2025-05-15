@@ -847,6 +847,29 @@ function renderCart() {
         if (totalEl) totalEl.textContent = "Total: 0 GP";
         return;
     }
+
+    // --- Sort cart by per-item cost descending ---
+    const sortedCart = [...cart].sort((a, b) => {
+        // Find item data for price and base
+        const rowA = allData.find(row => row[2] === a.name);
+        const rowB = allData.find(row => row[2] === b.name);
+        let costA = 0, baseA = a.base || 0, showBaseA = false;
+        let costB = 0, baseB = b.base || 0, showBaseB = false;
+        if (rowA) {
+            let costFieldA = rowA[6] || '';
+            showBaseA = costFieldA.includes('+');
+            costA = parseInt((showBaseA ? costFieldA.slice(0, costFieldA.indexOf('+')).trim() : costFieldA.trim()).replace(/[^0-9]/g, '')) || 0;
+        }
+        if (rowB) {
+            let costFieldB = rowB[6] || '';
+            showBaseB = costFieldB.includes('+');
+            costB = parseInt((showBaseB ? costFieldB.slice(0, costFieldB.indexOf('+')).trim() : costFieldB.trim()).replace(/[^0-9]/g, '')) || 0;
+        }
+        const perItemA = costA + (showBaseA ? baseA : 0);
+        const perItemB = costB + (showBaseB ? baseB : 0);
+        return perItemB - perItemA;
+    });
+
     let html = `<table class="table table-sm align-middle mb-0">
         <thead>
             <tr>
@@ -860,7 +883,10 @@ function renderCart() {
         </thead>
         <tbody>`;
     let grandTotal = 0;
-    cart.forEach((item, idx) => {
+    sortedCart.forEach((item, idx) => {
+        // Find the original index in the cart array
+        const originalIdx = cart.findIndex(c => c.name === item.name);
+
         // Find item data for price and link
         const row = allData.find(row => row[2] === item.name);
         let cost = 0, baseCost = item.base || 0, showBase = false, costDisplay = '';
@@ -890,24 +916,24 @@ function renderCart() {
                 <input type="text" inputmode="numeric" pattern="[0-9]*"
                     class="form-control form-control-sm cart-qty"
                     style="max-width: 60px; min-width: 40px; display:inline-block;"
-                    data-idx="${idx}" value="${item.quantity ?? ''}">
+                    data-idx="${originalIdx}" value="${item.quantity ?? ''}">
             </td>
             <td>
-                ${showBase ? `<input type="text" inputmode="numeric" pattern="[0-9]*"
-                    class="form-control form-control-sm cart-base"
-                    style="max-width: 60px; min-width: 40px; display:inline-block;"
-                    data-idx="${idx}" value="${item.base ?? ''}">` : ''}
-            </td>
-            <td>
-                ${showBase ? `<input type="text"
-                    class="form-control form-control-sm cart-custom-name"
-                    style="max-width: 100px; min-width: 60px; display:inline-block;"
-                    data-idx="${idx}" value="${item.customName ?? ''}" placeholder="Type">` : ''}
+                ${showBase ? `
+                    <input type="text" inputmode="numeric" pattern="[0-9]*"
+                        class="form-control form-control-sm cart-base"
+                        style="max-width: 60px; min-width: 40px; display:inline-block; margin-right: 4px;"
+                        data-idx="${originalIdx}" value="${item.base ?? ''}">
+                    <input type="text"
+                        class="form-control form-control-sm cart-custom-name"
+                        style="max-width: 100px; min-width: 60px; display:inline-block;"
+                        data-idx="${originalIdx}" value="${item.customName ?? ''}" placeholder="Type">
+                ` : ''}
             </td>
             <td>${costDisplay ? (parseInt(costDisplay.replace(/[^0-9]/g, '')) || 0).toLocaleString() : perItem.toLocaleString()}</td>
             <td>${total.toLocaleString()}</td>
             <td>
-                <button class="btn btn-danger btn-sm cart-delete" data-idx="${idx}" title="Remove"><i class="fa fa-trash"></i></button>
+                <button class="btn btn-danger btn-sm cart-delete" data-idx="${originalIdx}" title="Remove"><i class="fa fa-trash"></i></button>
             </td>
         </tr>`;
     });
