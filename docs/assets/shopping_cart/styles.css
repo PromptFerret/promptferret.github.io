@@ -320,11 +320,8 @@ tr.selected-row:hover {
 
 /* --- Responsive Table --- */
 .table-responsive-custom {
-    width: 100vw !important;
-    max-width: 100vw !important;
     overflow-x: auto !important;
     overflow-y: visible;
-    display: block !important;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -350,7 +347,7 @@ tr.selected-row:hover {
     padding:0!important;
     box-sizing:border-box;
   }
-  .table-responsive-custom{overflow-x:hidden!important;}
+  /* .table-responsive-custom{overflow-x:hidden!important;} */
   .sticky-table-scrollbar{
     position:fixed;left:0;right:0;bottom:0;height:22px;
     background:var(--bs-body-bg,#fff);z-index:1050;
