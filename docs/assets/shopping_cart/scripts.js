@@ -861,9 +861,10 @@ function renderCart() {
         <tbody>`;
     let grandTotal = 0;
     cart.forEach((item, idx) => {
-        // Find item data for price
+        // Find item data for price and link
         const row = allData.find(row => row[2] === item.name);
         let cost = 0, baseCost = item.base || 0, showBase = false, costDisplay = '';
+        let link = '';
         if (row) {
             let costField = row[6] || '';
             const plusIdx = costField.indexOf('+');
@@ -874,12 +875,17 @@ function renderCart() {
                 costDisplay = costField.trim();
             }
             cost = parseInt(costDisplay.replace(/[^0-9]/g, '')) || 0;
+            link = row[10] || ''; // 11th column is link
         }
         const perItem = cost + (showBase ? baseCost : 0);
         const total = perItem * (parseInt(item.quantity) || 0);
         grandTotal += total;
         html += `<tr>
-            <td>${item.name}</td>
+            <td>${
+                link && link.trim()
+                    ? `<a href="${link}" target="_blank" rel="noopener">${item.name}</a>`
+                    : item.name
+            }</td>
             <td>
                 <input type="text" inputmode="numeric" pattern="[0-9]*"
                     class="form-control form-control-sm cart-qty"
