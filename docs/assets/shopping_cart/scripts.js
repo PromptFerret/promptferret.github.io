@@ -254,6 +254,7 @@ function applyFilters() {
 
 function renderTable(data) {
     const tbody = $('#itemsTable tbody');
+    if (!tbody) return; // Prevent error if table is not in DOM
     tbody.innerHTML = '';
     data.forEach(row => {
         const tr = document.createElement('tr');
@@ -540,6 +541,7 @@ function setBootstrapTheme(dark) {
             } else {
                 parent.appendChild(tableWrapper);
             }
+            setupStickyScrollbar(); // <-- Add this line
         }
     }, 50);
 }
@@ -903,33 +905,33 @@ async function initialLoad() {
 
 initialLoad();
 
-document.addEventListener('DOMContentLoaded', () => {
-  const tableWrapper = document.querySelector('.table-responsive-custom');
-  const stickyScrollbar = document.querySelector('.sticky-table-scrollbar');
-  if (!tableWrapper || !stickyScrollbar) return;
-
-  // Set width of fake scrollbar to match table
-  function updateScrollbarWidth() {
-    const table = tableWrapper.querySelector('table');
-    if (table) {
-      stickyScrollbar.firstElementChild.style.width = table.scrollWidth + 'px';
+function setupStickyScrollbar(){
+  const tableWrapper=document.querySelector('.table-responsive-custom');
+  const stickyScrollbar=document.querySelector('.sticky-table-scrollbar');
+  if(!tableWrapper||!stickyScrollbar)return;
+  function updateScrollbarWidth(){
+    const table=tableWrapper.querySelector('table');
+    if(table)stickyScrollbar.firstElementChild.style.width=table.scrollWidth+'px';
+  }
+  function syncScrollbars(){
+    if(window.innerWidth<992){
+      stickyScrollbar.onscroll=()=>{tableWrapper.scrollLeft=stickyScrollbar.scrollLeft;};
+      tableWrapper.onscroll=()=>{stickyScrollbar.scrollLeft=tableWrapper.scrollLeft;};
+    }else{
+      stickyScrollbar.onscroll=null;
+      tableWrapper.onscroll=null;
     }
   }
-
-  // Sync scroll positions
-  stickyScrollbar.addEventListener('scroll', () => {
-    tableWrapper.scrollLeft = stickyScrollbar.scrollLeft;
+  window.addEventListener('resize',()=>{
+    updateScrollbarWidth();
+    syncScrollbars();
   });
-  tableWrapper.addEventListener('scroll', () => {
-    stickyScrollbar.scrollLeft = tableWrapper.scrollLeft;
-  });
-
-  // Update on resize/content change
-  window.addEventListener('resize', updateScrollbarWidth);
-  new MutationObserver(updateScrollbarWidth).observe(tableWrapper, { childList: true, subtree: true });
-
+  new MutationObserver(updateScrollbarWidth).observe(tableWrapper,{childList:true,subtree:true});
   updateScrollbarWidth();
-});
+  syncScrollbars();
+}
+
+document.addEventListener('DOMContentLoaded',setupStickyScrollbar);
 
 
 function displayTier(tier) {
