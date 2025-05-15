@@ -1,6 +1,7 @@
 const ENCRYPTED_CSV_URL = "U2FsdGVkX1/7NiSx7Ugsj0XsHxvxjGZJBq/yVSy1T/+bNDHbGnORMUcQpa9AXMVautQ1Gn+8NGt0pdrwsWa3mxuW0yMSo/zV9Q/9hEsfrO5QKbDg13Kd8n1Ka+VUL6TxT+Y+50KCmf47vOqkmfSAqp9+R0H6Kf9fUm98LHmB4D1kKhFlboN6kkpIbhbn3bqhT3TeXyFvYlZJd7wityCOR24ZAjXNhdjwgfff5zVLf6VABmny28jCng0L5XLm5r1g";
 
 const CACHE_BUSTER = Date.now();
+const CART_EXPORT_PASSWORD = "cart-export-2024";
 
 function setCookie(name, value, hours) {
     const d = new Date();
@@ -10,6 +11,24 @@ function setCookie(name, value, hours) {
 function getCookie(name) {
     const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
     return v ? decodeURIComponent(v.pop()) : "";
+}
+
+// Helper to encrypt and encode cart JSON
+function encryptCart(cartObj) {
+    const json = JSON.stringify(cartObj);
+    const encrypted = CryptoJS.AES.encrypt(json, CART_EXPORT_PASSWORD).toString();
+    return btoa(encrypted);
+}
+
+// Helper to decode and decrypt cart JSON
+function decryptCart(str) {
+    try {
+        const encrypted = atob(str);
+        const decrypted = CryptoJS.AES.decrypt(encrypted, CART_EXPORT_PASSWORD).toString(CryptoJS.enc.Utf8);
+        return JSON.parse(decrypted);
+    } catch {
+        return null;
+    }
 }
 
 async function getDecryptedCsvUrl() {
@@ -408,8 +427,6 @@ function fromBase64(str) {
     }
 }
 
-// ...existing code...
-
 // Replace the entire renderDetails function with this:
 function renderDetails(rowData) {
     const [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes, link] = rowData;
@@ -689,6 +706,64 @@ function setupEvents() {
             applyFilters();
         }
     });
+
+    // Import/Export button opens modal
+    const importExportBtn = document.getElementById('import-export-btn');
+    const importExportModal = document.getElementById('importExportModal');
+    const importExportTextarea = document.getElementById('importExportTextarea');
+    const copyBtn = document.getElementById('copy-import-export-btn');
+    const shareBtn = document.getElementById('share-import-export-btn');
+    const cancelBtn = document.getElementById('cancel-import-export-btn');
+    const updateBtn = document.getElementById('update-import-export-btn');
+
+    if (importExportBtn && importExportModal) {
+        importExportBtn.addEventListener('click', () => {
+            // If cart is not empty, show encrypted+base64 JSON
+            if (cart.length) {
+                importExportTextarea.value = encryptCart(cart);
+            } else {
+                importExportTextarea.value = '';
+            }
+            const modal = new bootstrap.Modal(importExportModal);
+            modal.show();
+        });
+    }
+
+    // Copy button
+    if (copyBtn && importExportTextarea) {
+        copyBtn.addEventListener('click', () => {
+            importExportTextarea.select();
+            document.execCommand('copy');
+            copyBtn.textContent = "Copied!";
+            setTimeout(() => { copyBtn.textContent = "Copy"; }, 1200);
+        });
+    }
+    // Cancel button just closes modal (handled by data-bs-dismiss)
+
+    // Update button (for now, just closes modal)
+    if (updateBtn && importExportModal && importExportTextarea) {
+        updateBtn.addEventListener('click', () => {
+            const val = importExportTextarea.value.trim();
+            if (val) {
+                const imported = decryptCart(val);
+                if (imported && Array.isArray(imported)) {
+                    cart = imported;
+                    updateCartCount();
+                    renderCart();
+                    applyFilters();
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(importExportModal);
+                    if (modal) modal.hide();
+                } else {
+                    alert("Invalid or corrupted import data.");
+                }
+            } else {
+                // Just close modal if textarea is empty
+                const modal = bootstrap.Modal.getInstance(importExportModal);
+                if (modal) modal.hide();
+            }
+        });
+    }
 }
 
 function isInCart(name) {
@@ -957,8 +1032,78 @@ function setupStickyScrollbar() {
     };
 }
 
-document.addEventListener('DOMContentLoaded', setupStickyScrollbar);
-window.addEventListener('resize', setupStickyScrollbar);
+document.addEventListener('DOMContentLoaded', () => {
+    // Import/Export button opens modal
+    const importExportBtn = document.getElementById('import-export-btn');
+    const importExportModal = document.getElementById('importExportModal');
+    const importExportTextarea = document.getElementById('importExportTextarea');
+    const copyBtn = document.getElementById('copy-import-export-btn');
+    const shareBtn = document.getElementById('share-import-export-btn');
+    const cancelBtn = document.getElementById('cancel-import-export-btn');
+    const updateBtn = document.getElementById('update-import-export-btn');
+
+    if (importExportBtn && importExportModal) {
+        importExportBtn.addEventListener('click', () => {
+            // If cart is not empty, show encrypted+base64 JSON
+            if (cart.length) {
+                importExportTextarea.value = encryptCart(cart);
+            } else {
+                importExportTextarea.value = '';
+            }
+            const modal = new bootstrap.Modal(importExportModal);
+            modal.show();
+        });
+    }
+
+    // Copy button
+    if (copyBtn && importExportTextarea) {
+        copyBtn.addEventListener('click', () => {
+            importExportTextarea.select();
+            document.execCommand('copy');
+            copyBtn.textContent = "Copied!";
+            setTimeout(() => { copyBtn.textContent = "Copy"; }, 1200);
+        });
+    }
+
+    // Share button (uses Web Share API if available)
+    if (shareBtn && importExportTextarea) {
+        shareBtn.addEventListener('click', () => {
+            const text = importExportTextarea.value;
+            if (navigator.share) {
+                navigator.share({ text }).catch(() => {});
+            } else {
+                alert("Sharing is not supported in this browser.");
+            }
+        });
+    }
+
+    // Cancel button just closes modal (handled by data-bs-dismiss)
+
+    // Update button (for now, just closes modal)
+    if (updateBtn && importExportModal && importExportTextarea) {
+        updateBtn.addEventListener('click', () => {
+            const val = importExportTextarea.value.trim();
+            if (val) {
+                const imported = decryptCart(val);
+                if (imported && Array.isArray(imported)) {
+                    cart = imported;
+                    updateCartCount();
+                    renderCart();
+                    applyFilters();
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(importExportModal);
+                    if (modal) modal.hide();
+                } else {
+                    alert("Invalid or corrupted import data.");
+                }
+            } else {
+                // Just close modal if textarea is empty
+                const modal = bootstrap.Modal.getInstance(importExportModal);
+                if (modal) modal.hide();
+            }
+        });
+    }
+});
 
 function displayTier(tier) {
     if (tier === "-1" || tier === -1) return "Mundane";

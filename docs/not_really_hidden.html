@@ -26,6 +26,12 @@
                         0
                     </span>
                 </button>
+                <!-- Import/Export Button -->
+                <button id="import-export-btn" class="btn btn-primary d-flex align-items-center cart-btn" type="button"
+                    aria-label="Import or Export Cart" title="Import or Export Cart">
+                    <i class="fa-solid fa-file-code"></i>
+                </button>
+                <!-- End Import/Export Button -->
                 <button class="btn btn-primary toggle-theme d-flex align-items-center theme-btn me-3" type="button"
                     aria-label="Toggle theme">
                     <i class="fas fa-sun"></i>
@@ -109,7 +115,9 @@
                         <tbody></tbody>
                     </table>
                 </div>
-                <div class="sticky-table-scrollbar"><div></div></div>
+                <div class="sticky-table-scrollbar">
+                    <div></div>
+                </div>
             </div>
         </div>
     </div>
@@ -151,6 +159,39 @@
                 <div class="modal-footer justify-content-between">
                     <span id="add-to-cart-btn-modal"></span>
                     <span id="item-link-btn-modal"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import/Export Modal -->
+    <div class="modal fade" id="importExportModal" tabindex="-1" aria-labelledby="importExportModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importExportModalLabel">Import / Export Cart</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="importExportTextarea" class="form-control" rows="8"
+                        style="font-family:monospace;"></textarea>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <div>
+                        <button id="copy-import-export-btn" class="btn btn-outline-primary me-2" type="button">
+                            <i class="fa-solid fa-copy me-1"></i>Copy
+                        </button>
+                    </div>
+                    <div>
+                        <button id="cancel-import-export-btn" class="btn btn-outline-danger me-2" type="button"
+                            data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button id="update-import-export-btn" class="btn btn-success" type="button">
+                            Update
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
