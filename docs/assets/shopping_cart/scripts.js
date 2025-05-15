@@ -342,6 +342,10 @@ function renderTable(data) {
             const td = document.createElement('td');
             if (i === 0) {
                 td.textContent = displayTier(col);
+            } else if (i === 6) { // Cost column
+                // Remove non-numeric chars, parse, and format with commas if valid
+                const num = parseInt((col || '').replace(/[^0-9]/g, ''));
+                td.textContent = !isNaN(num) && num > 0 ? num.toLocaleString() : (col || '');
             } else {
                 td.textContent = col || '';
             }
@@ -894,7 +898,7 @@ function renderCart() {
                     style="max-width: 100px; min-width: 60px; display:inline-block;"
                     data-idx="${idx}" value="${item.customName ?? ''}" placeholder="Type">` : ''}
             </td>
-            <td>${costDisplay ? costDisplay : perItem.toLocaleString()}</td>
+            <td>${costDisplay ? (parseInt(costDisplay.replace(/[^0-9]/g, '')) || 0).toLocaleString() : perItem.toLocaleString()}</td>
             <td>${total.toLocaleString()}</td>
             <td>
                 <button class="btn btn-danger btn-sm cart-delete" data-idx="${idx}" title="Remove"><i class="fa fa-trash"></i></button>
