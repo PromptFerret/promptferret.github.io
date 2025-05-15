@@ -130,8 +130,8 @@ async function tryFetchJSON(url) {
 }
 
 const ITEM_JSON_FILES = [
-    'items.json',
-    'items-base.json',
+    'https://raw.githubusercontent.com/5etools-mirror-3/5etools-2014-src/refs/heads/main/data/items.json',
+    'https://raw.githubusercontent.com/5etools-mirror-3/5etools-2014-src/refs/heads/main/data/items-base.json',
     // Add more file names here as needed
 ];
 
@@ -140,7 +140,7 @@ const KNOWN_ARRAY_KEYS = ['item', 'baseitem'];
 async function loadAllBatchedJsonData() {
     let loadedCount = 0;
     for (const file of ITEM_JSON_FILES) {
-        const data = await tryFetchJSON(`assets/shopping_cart/${file}`);
+        const data = await tryFetchJSON(file);
         let arr = [];
         if (Array.isArray(data)) {
             arr = data;
