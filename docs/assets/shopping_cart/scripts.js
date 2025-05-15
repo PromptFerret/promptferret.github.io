@@ -511,14 +511,33 @@ function showCopyToast(text, x, y) {
 }
 
 function setBootstrapTheme(dark) {
+    // Remove table from DOM to avoid repaint cost
+    const tableWrapper = document.getElementById('tableWrapper');
+    let parent, next;
+    if (tableWrapper) {
+        parent = tableWrapper.parentNode;
+        next = tableWrapper.nextSibling;
+        parent.removeChild(tableWrapper);
+    }
+
     document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
-    // Optionally update icon
     const themeBtn = document.querySelector('.toggle-theme');
     if (themeBtn) {
         themeBtn.innerHTML = dark
             ? '<i class="fas fa-sun"></i>'
             : '<i class="fas fa-moon"></i>';
     }
+
+    // Re-insert table after a short delay to allow repaint
+    setTimeout(() => {
+        if (parent && tableWrapper) {
+            if (next) {
+                parent.insertBefore(tableWrapper, next);
+            } else {
+                parent.appendChild(tableWrapper);
+            }
+        }
+    }, 50);
 }
 
 function setupEvents() {
