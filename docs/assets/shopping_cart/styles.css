@@ -365,7 +365,7 @@ tr.selected-row:hover {
 }
 
 #cartModal .modal-body {
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 300px);
     overflow-y: auto;
 }
 
