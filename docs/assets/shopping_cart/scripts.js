@@ -4,31 +4,45 @@ const CACHE_BUSTER = Date.now();
 
 function setCookie(name, value, hours) {
     const d = new Date();
-    d.setTime(d.getTime() + (hours*60*60*1000));
+    d.setTime(d.getTime() + (hours * 60 * 60 * 1000));
     document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()};path=/;SameSite=Strict`;
 }
 function getCookie(name) {
-    const v = document.cookie.match('(^|;)\\s*'+name+'\\s*=\\s*([^;]+)');
+    const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
     return v ? decodeURIComponent(v.pop()) : "";
 }
 
 async function getDecryptedCsvUrl() {
+    let tries = 0;
     let password = getCookie("SHOP_PASSWORD") || (typeof window.SHOP_PASSWORD === "string" ? window.SHOP_PASSWORD : "");
-    while (!password) {
-        password = prompt("Enter password to access the item shop:");
-        if (password === null) throw new Error("No password entered.");
+    while (tries < 6) {
+        if (!password) {
+            password = prompt("Enter password to access the item shop:");
+            if (password === null) throw new Error("No password entered.");
+        }
+        try {
+            const decrypted = CryptoJS.AES.decrypt(ENCRYPTED_CSV_URL, password).toString(CryptoJS.enc.Utf8);
+            if (!decrypted.startsWith("http")) throw new Error("Decryption failed");
+            setCookie("SHOP_PASSWORD", password, 6); // Save for 6 hours
+            return decrypted;
+        } catch {
+            tries++;
+            password = "";
+            document.cookie = "SHOP_PASSWORD=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
+            // No alert here, just loop and ask again
+        }
     }
-    try {
-        const decrypted = CryptoJS.AES.decrypt(ENCRYPTED_CSV_URL, password).toString(CryptoJS.enc.Utf8);
-        if (!decrypted.startsWith("http")) throw new Error("Decryption failed");
-        setCookie("SHOP_PASSWORD", password, 6); // Save for 6 hours
-        return decrypted;
-    } catch {
-        alert("Incorrect password or decryption failed.");
-        document.cookie = "SHOP_PASSWORD=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
-        location.reload();
-        throw new Error("Decryption failed");
-    }
+    // 6th failure: wipe DOM and show error
+    document.body.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;">
+            <div style="font-size:2rem;color:#c00;margin-bottom:1rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div style="font-size:1.5rem;font-weight:bold;margin-bottom:0.5rem;">Too many failed attempts</div>
+            <div style="font-size:1.1rem;">Access denied. Please reload the page to try again.</div>
+        </div>
+    `;
+    throw new Error("Too many failed password attempts");
 }
 
 let allData = [];
@@ -266,7 +280,7 @@ function applyFilters() {
 
 function renderTable(data) {
     const tbody = $('#itemsTable tbody');
-    if (!tbody) return; // Prevent error if table is not in DOM
+    if (!tbody) return;
     tbody.innerHTML = '';
     data.forEach(row => {
         const tr = document.createElement('tr');
@@ -341,6 +355,9 @@ function renderTable(data) {
             });
         });
     });
+
+    // Always re-sync sticky scrollbar after table changes
+    if (typeof setupStickyScrollbar === "function") setupStickyScrollbar();
 }
 
 function formatBatchedJsonTags(text) {
@@ -572,15 +589,15 @@ function setupEvents() {
         })
     );
     // Row click
-$('#itemsTable tbody').addEventListener('click', e => {
-    const tr = e.target.closest('tr');
-    if (tr && tr.dataset.row) {
-        const rowData = JSON.parse(tr.dataset.row);
-        selectedRowName = rowData[2]; // Use the Name column as unique identifier
-        renderDetails(rowData); // Now opens modal
-        applyFilters(); // Re-render table to update selected row highlight
-    }
-});
+    $('#itemsTable tbody').addEventListener('click', e => {
+        const tr = e.target.closest('tr');
+        if (tr && tr.dataset.row) {
+            const rowData = JSON.parse(tr.dataset.row);
+            selectedRowName = rowData[2]; // Use the Name column as unique identifier
+            renderDetails(rowData); // Now opens modal
+            applyFilters(); // Re-render table to update selected row highlight
+        }
+    });
     // Theme toggle
     const themeBtn = document.querySelector('.toggle-theme');
     let dark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
@@ -917,34 +934,31 @@ async function initialLoad() {
 
 initialLoad();
 
-function setupStickyScrollbar(){
-  const tableWrapper=document.querySelector('.table-responsive-custom');
-  const stickyScrollbar=document.querySelector('.sticky-table-scrollbar');
-  if(!tableWrapper||!stickyScrollbar)return;
-  function updateScrollbarWidth(){
-    const table=tableWrapper.querySelector('table');
-    if(table)stickyScrollbar.firstElementChild.style.width=table.scrollWidth+'px';
-  }
-  function syncScrollbars(){
-    if(window.innerWidth<992){
-      stickyScrollbar.onscroll=()=>{tableWrapper.scrollLeft=stickyScrollbar.scrollLeft;};
-      tableWrapper.onscroll=()=>{stickyScrollbar.scrollLeft=tableWrapper.scrollLeft;};
-    }else{
-      stickyScrollbar.onscroll=null;
-      tableWrapper.onscroll=null;
-    }
-  }
-  window.addEventListener('resize',()=>{
-    updateScrollbarWidth();
-    syncScrollbars();
-  });
-  new MutationObserver(updateScrollbarWidth).observe(tableWrapper,{childList:true,subtree:true});
-  updateScrollbarWidth();
-  syncScrollbars();
+function setupStickyScrollbar() {
+    const tableWrapper = document.querySelector('.table-responsive-custom');
+    const stickyScrollbar = document.querySelector('.sticky-table-scrollbar');
+    if (!tableWrapper || !stickyScrollbar) return;
+    const table = tableWrapper.querySelector('table');
+    if (!table) return;
+
+    // Set sticky scrollbar width to match table
+    stickyScrollbar.firstElementChild.style.width = table.scrollWidth + 'px';
+
+    // Remove previous event handlers
+    stickyScrollbar.onscroll = null;
+    tableWrapper.onscroll = null;
+
+    // Always sync, all sizes
+    stickyScrollbar.onscroll = () => {
+        tableWrapper.scrollLeft = stickyScrollbar.scrollLeft;
+    };
+    tableWrapper.onscroll = () => {
+        stickyScrollbar.scrollLeft = tableWrapper.scrollLeft;
+    };
 }
 
-document.addEventListener('DOMContentLoaded',setupStickyScrollbar);
-
+document.addEventListener('DOMContentLoaded', setupStickyScrollbar);
+window.addEventListener('resize', setupStickyScrollbar);
 
 function displayTier(tier) {
     if (tier === "-1" || tier === -1) return "Mundane";
