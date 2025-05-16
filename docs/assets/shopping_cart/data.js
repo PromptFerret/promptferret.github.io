@@ -1,4 +1,4 @@
-const LOG_SKIP_BOOKS = ["WEL ", "ERLW", "WGE", "FM!", "GH"];
+const LOG_SKIP_BOOKS = ["WEL", "ERLW", "WGE", "FM!", "GH"];
 const ENCRYPTED_CSV_URL = "U2FsdGVkX1/7NiSx7Ugsj0XsHxvxjGZJBq/yVSy1T/+bNDHbGnORMUcQpa9AXMVautQ1Gn+8NGt0pdrwsWa3mxuW0yMSo/zV9Q/9hEsfrO5QKbDg13Kd8n1Ka+VUL6TxT+Y+50KCmf47vOqkmfSAqp9+R0H6Kf9fUm98LHmB4D1kKhFlboN6kkpIbhbn3bqhT3TeXyFvYlZJd7wityCOR24ZAjXNhdjwgfff5zVLf6VABmny28jCng0L5XLm5r1g";
 const CACHE_BUSTER = Date.now();
 const CART_EXPORT_PASSWORD = "cart-export-2024";

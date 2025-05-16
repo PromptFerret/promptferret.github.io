@@ -654,7 +654,7 @@ function renderCart() {
             <tr>
                 <th>Name</th>
                 <th>Qty</th>
-                <th>Base</th>
+                <th></th>
                 <th>Per Item Price</th>
                 <th>Total</th>
                 <th></th>
@@ -702,7 +702,7 @@ function renderCart() {
                     <input type="text" inputmode="numeric" pattern="[0-9]*"
                         class="form-control form-control-sm cart-base"
                         style="max-width: 60px; min-width: 40px; display:inline-block; margin-right: 4px;"
-                        data-idx="${originalIdx}" value="${item.base ?? ''}">
+                        data-idx="${originalIdx}" value="${item.base === 0 || item.base === '' || item.base == null ? '' : item.base}" placeholder="Cost">
                     <input type="text"
                         class="form-control form-control-sm cart-custom-name"
                         style="max-width: 100px; min-width: 60px; display:inline-block;"
