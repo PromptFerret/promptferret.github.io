@@ -194,37 +194,47 @@ function renderTable(data) {
     if (typeof setupStickyScrollbar === "function") setupStickyScrollbar();
 }
 
-function formatBatchedJsonTags(text) {
+function formatBatchedJsonTags(text, item) {
     if (!text) return "";
-    // Match both {@tag ...} and {#tag ...}
-    return text.replace(/\{[@#]\w+\s+([^}]+)\}/g, (match, content) => {
-        const parsed = content.split('|')[0].trim();
+
+    // Replace {=variable} with value from item or item.inherits, styled like batched JSON tags
+    text = text.replace(/\{=([a-zA-Z0-9_]+)\}/g, (match, varName) => {
+        let val = match;
+        if (item && varName in item) val = item[varName];
+        else if (item && item.inherits && varName in item.inherits) val = item.inherits[varName];
+        return `<span class="parsed-BatchedJson-tag">${val}</span>`;
+    });
+
+    // Recursively replace batched JSON tags, handling nested tags
+    return text.replace(/\{([@#][^\s}]+)\s+([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}/g, (match, tag, content) => {
+        // Recursively process the content for nested tags
+        const parsed = formatBatchedJsonTags(content.split('|')[0].trim(), item);
         return `<span class="parsed-BatchedJson-tag">${parsed}</span>`;
     });
 }
 
-function formatEntry(entry) {
+function formatEntry(entry, item) {
     if (typeof entry === "string") {
-        return formatBatchedJsonTags(entry);
+        return formatBatchedJsonTags(entry, item);
     } else if (entry && typeof entry === "object") {
         let html = "";
         if (entry.name) {
             html += `<b>${entry.name}:</b> `;
         }
         if (entry.type === "list" && Array.isArray(entry.items)) {
-            html += "<ul>" + entry.items.map(item => `<li>${formatEntry(item)}</li>`).join("") + "</ul>";
+            html += "<ul>" + entry.items.map(e => `<li>${formatEntry(e, item)}</li>`).join("") + "</ul>";
         } else if (entry.type === "table" && Array.isArray(entry.rows)) {
             html += "<table class='table table-sm mb-2'>";
             if (entry.colLabels) {
-                html += "<thead><tr>" + entry.colLabels.map(label => `<th>${formatBatchedJsonTags(label)}</th>`).join("") + "</tr></thead>";
+                html += "<thead><tr>" + entry.colLabels.map(label => `<th>${formatBatchedJsonTags(label, item)}</th>`).join("") + "</tr></thead>";
             }
             html += "<tbody>";
             for (const row of entry.rows) {
-                html += "<tr>" + row.map(cell => `<td>${formatEntry(cell)}</td>`).join("") + "</tr>";
+                html += "<tr>" + row.map(cell => `<td>${formatEntry(cell, item)}</td>`).join("") + "</tr>";
             }
             html += "</tbody></table>";
         } else if (Array.isArray(entry.entries)) {
-            html += entry.entries.map(formatEntry).join(" ");
+            html += entry.entries.map(e => formatEntry(e, item)).join(" ");
         }
         return html;
     }
@@ -236,7 +246,7 @@ function formatEntry(entry) {
 function renderDetails(rowData) {
     if (isAnyModalOpen()) return;
     const [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes, link] = rowData;
-    const item = itemsData.find(i => normalizeItemName(i.name) === normalizeItemName(name));
+    const item = item_data[normalizeItemName(name)];
 
     // Helper to wrap any value as copyable
     const copy = v => `<span class="copyable">${v ?? ''}</span>`;
@@ -261,7 +271,7 @@ function renderDetails(rowData) {
     }
 
     if (item && item.entries) {
-        html += `<div class="item-desc">${item.entries.map(formatEntry).join(" ")}</div>`;
+        html += `<div class="item-desc">${item.entries.map(e => formatEntry(e, item)).join(" ")}</div>`;
     }
 
     // Render into modal content
@@ -795,8 +805,8 @@ function renderCart() {
 
 // Initial load
 async function initialLoad() {
-    await loadData();                // Wait for data to load and allData to be populated
-    await loadAllBatchedJsonData();  // Wait for itemsData to be populated
+    await loadData();
+
     populateFilters();               // Populate filter checkboxes
     setupEvents();                   // Attach event listeners
 

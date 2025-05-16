@@ -1,12 +1,16 @@
+const LOG_SKIP_BOOKS = ["WEL ", "ERLW", "WGE", "FM!", "GH"];
 const ENCRYPTED_CSV_URL = "U2FsdGVkX1/7NiSx7Ugsj0XsHxvxjGZJBq/yVSy1T/+bNDHbGnORMUcQpa9AXMVautQ1Gn+8NGt0pdrwsWa3mxuW0yMSo/zV9Q/9hEsfrO5QKbDg13Kd8n1Ka+VUL6TxT+Y+50KCmf47vOqkmfSAqp9+R0H6Kf9fUm98LHmB4D1kKhFlboN6kkpIbhbn3bqhT3TeXyFvYlZJd7wityCOR24ZAjXNhdjwgfff5zVLf6VABmny28jCng0L5XLm5r1g";
 const CACHE_BUSTER = Date.now();
 const CART_EXPORT_PASSWORD = "cart-export-2024";
+
+let NAME_ALIASES = {}; // Will be loaded from custom_mapping.json
 
 let allData = [];
 let itemsData = [];
 let sortCol = null;
 let sortAsc = true;
 let selectedRowName = null;
+let item_data = {}; // Key: normalized name, Value: item object
 
 function setCookie(name, value, hours) {
     const d = new Date();
@@ -105,8 +109,9 @@ async function tryFetchJSON(url) {
 const ITEM_JSON_FILES = [
     'https://raw.githubusercontent.com/5etools-mirror-3/5etools-2014-src/refs/heads/main/data/items.json',
     'https://raw.githubusercontent.com/5etools-mirror-3/5etools-2014-src/refs/heads/main/data/items-base.json',
+    'https://raw.githubusercontent.com/5etools-mirror-3/5etools-2014-src/refs/heads/main/data/magicvariants.json',
 ];
-const KNOWN_ARRAY_KEYS = ['item', 'baseitem'];
+const KNOWN_ARRAY_KEYS = ['item', 'baseitem', 'magicvariant'];
 async function loadAllBatchedJsonData() {
     let loadedCount = 0;
     for (const file of ITEM_JSON_FILES) {
@@ -130,6 +135,7 @@ async function loadAllBatchedJsonData() {
 }
 async function loadData() {
     try {
+        // 1. Load CSV
         const CSV_URL = await getDecryptedCsvUrl();
         const csvRows = await fetchCSV(CSV_URL);
         allData = csvRows.slice(1);
@@ -142,7 +148,102 @@ async function loadData() {
             if (tb === 0 && ta !== 0) return 1;
             return ta - tb;
         });
-        itemsData = [];
+
+        // 2. Load custom_items.json into item_data
+        const customItemsArr = await fetchJSON('assets/shopping_cart/custom_items.json');
+        item_data = {};
+        if (Array.isArray(customItemsArr)) {
+            for (const item of customItemsArr) {
+                const norm = normalizeItemName(item.name);
+                item_data[norm] = item;
+            }
+        }
+
+        // 2b. Load custom_mapping.json into NAME_ALIASES
+        // The mapping file should be an object: { 'Bag of Explosive Seeds (x20)': 'Explosive Seed', ... }
+        const mappingObj = await fetchJSON('assets/shopping_cart/custom_mapping.json');
+        NAME_ALIASES = {};
+        if (mappingObj && typeof mappingObj === "object") {
+            for (const [csvName, mirrorName] of Object.entries(mappingObj)) {
+                // Normalize both keys and values for consistency
+                NAME_ALIASES[normalizeItemName(csvName)] = normalizeItemName(mirrorName);
+            }
+        }
+
+        console.log("NAME_ALIASES:", NAME_ALIASES);
+        console.log("Normalized 'Guild Signet (Any)':", normalizeItemName("Guild Signet (Any)"));
+        console.log("Normalized 'Guild Signet':", normalizeItemName("Guild Signet"));
+
+        // 3. Load 5etools mirror data
+        let mirrorItems = [];
+        for (const file of ITEM_JSON_FILES) {
+            const data = await tryFetchJSON(file);
+            let arr = [];
+            if (Array.isArray(data)) {
+                arr = data;
+            } else if (data && typeof data === 'object') {
+                for (const key of KNOWN_ARRAY_KEYS) {
+                    if (Array.isArray(data[key])) {
+                        arr = data[key];
+                        break;
+                    }
+                }
+            }
+            if (arr.length) mirrorItems.push(...arr);
+        }
+
+        console.log(
+          "Mirror items with normalized name 'guild signet':",
+          mirrorItems.filter(i => normalizeItemName(i.name) === "guild signet")
+        );
+
+        // 4. For each CSV row, add to item_data if not already present
+        let missingMirrorCount = 0;
+        for (const row of allData) {
+            const name = row[2];
+            const norm = normalizeItemName(name);
+            if (!item_data[norm]) {
+                const lookupNorm = NAME_ALIASES[norm] || norm;
+                const found = mirrorItems.find(i =>
+                    (i.name && normalizeItemName(i.name) === lookupNorm) ||
+                    (i.inherits && i.inherits.namePrefix && normalizeItemName(i.inherits.namePrefix) === lookupNorm)
+                );
+                if (found) {
+                    // --- Normalization step ---
+                    // If the item doesn't have entries but has inherits.entries, copy them up and resolve templates
+                    if (!found.entries && found.inherits && found.inherits.entries) {
+                        found.entries = found.inherits.entries.slice();
+                    } else if (found.entries) {
+                        found.entries = found.entries.slice();
+                    }
+                    // If the item doesn't have a name but has inherits.namePrefix, construct a name
+                    if (!found.name && found.inherits && found.inherits.namePrefix) {
+                        found.name = `${found.inherits.namePrefix}${name.replace(/^\+?\d+\s*/, "")}`;
+                    }
+                    item_data[norm] = found;
+                } else {
+                    const book = row[7] || '';
+                    const page = row[8] || '';
+                    const skip = LOG_SKIP_BOOKS.some(code => book.includes(code) || page.includes(code));
+                    if (!skip) {
+                        missingMirrorCount++;
+                        console.log(`No mirror data for: ${name} :: ${book}:${page} | lookup: ${lookupNorm}`);
+                    }
+                }
+            }
+        }
+
+        // After the loop, log the total count
+        if (missingMirrorCount > 0) {
+            console.log(`Total missing mirrors: ${missingMirrorCount}`);
+        }
+
+        // 5. Free mirrorItems from memory
+        mirrorItems = null;
+
+        // 6. itemsData is now just the values of item_data
+        itemsData = Object.values(item_data);
+
     } catch (err) {
         console.error("Failed to load data:", err);
     }
@@ -158,4 +259,11 @@ function normalizeRarity(val) {
     if (val === "Very Rare (S)") return "Very Rare";
     if (val === "Very Rare/Rare") return ["Very Rare", "Rare"];
     return val;
+}
+function resolveTemplateVars(text, item) {
+    return text.replace(/\{=([a-zA-Z0-9_]+)\}/g, (match, varName) => {
+        if (item && varName in item) return item[varName];
+        if (item && item.inherits && varName in item.inherits) return item.inherits[varName];
+        return match;
+    });
 }

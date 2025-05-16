@@ -20,8 +20,8 @@ function displayTier(tier) {
     return tier;
 }
 function normalizeItemName(name) {
-    // Remove all trailing parenthetical groups and convert to lowercase
-    return name.replace(/(\s*\([^)]+\))+$/g, '').trim().toLowerCase();
+    // Only trim and lowercase, do NOT strip parentheticals
+    return name.trim().toLowerCase();
 }
 function isAnyModalOpen() {
     return document.querySelector('.modal.show') !== null;
