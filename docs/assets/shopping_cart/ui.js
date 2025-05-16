@@ -43,6 +43,7 @@ function applyFilters() {
     const itemTypeQ = $('#filter-itemtype').value;
     const bookQ = $('#filter-book').value;
     const notesQ = $('#filter-notes').value;
+    const descQ = $('#filter-description') ? $('#filter-description').value.trim().toLowerCase() : ""; // <-- Add this
     const costMin = parseInt($('#filter-cost-min').value) || 0;
     const costMax = parseInt($('#filter-cost-max').value) || 20000000;
 
@@ -54,6 +55,15 @@ function applyFilters() {
             ? normRarity.some(r => rarities.includes(r))
             : (rarities.length === 0 || rarities.includes(normRarity));
 
+        // --- Description filter logic ---
+        let descMatch = true;
+        if (descQ) {
+            const item = item_data[normalizeItemName(name)];
+            descMatch = !!(item && Array.isArray(item.entries) && item.entries.some(e =>
+                typeof e === "string" && tokenizeMatch(e, descQ)
+            ));
+        }
+
         return (
             (tiers.length === 0 || tiers.includes(tier)) &&
             (types.length === 0 || types.includes(type)) &&
@@ -64,7 +74,8 @@ function applyFilters() {
             (costVal >= costMin && costVal <= costMax) &&
             rarityMatch &&
             tokenizeMatch(book, bookQ) &&
-            tokenizeMatch(notes, notesQ)
+            tokenizeMatch(notes, notesQ) &&
+            descMatch // <-- Add this
         );
     });
 
@@ -73,7 +84,7 @@ function applyFilters() {
         tiers.length === 0 &&
         types.length === 0 &&
         rarities.length === 0 &&
-        !nameQ && !atn && !session && !itemTypeQ && !bookQ && !notesQ &&
+        !nameQ && !atn && !session && !itemTypeQ && !bookQ && !notesQ && !descQ &&
         (costMin === 0 && costMax === 20000000);
 
     if (data.length === 0 && noFilters) {
