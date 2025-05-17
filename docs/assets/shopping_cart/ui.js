@@ -109,6 +109,7 @@ function applyFilters() {
 }
 
 function renderTable(data) {
+    const descQ = $('#filter-description') ? $('#filter-description').value.trim().toLowerCase() : "";
     const tbody = $('#itemsTable tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
@@ -173,7 +174,7 @@ function renderTable(data) {
             if (e.target.closest('button, a')) return;
             const rowData = JSON.parse(tr.dataset.row);
             selectedRowName = rowData[2];
-            renderDetails(rowData);
+            renderDetails(rowData, descQ);
             applyFilters();
         });
     });
@@ -207,7 +208,7 @@ function renderTable(data) {
     if (typeof setupStickyScrollbar === "function") setupStickyScrollbar();
 }
 
-function formatBatchedJsonTags(text, item) {
+function formatBatchedJsonTags(text, item, highlightText = "") {
     if (!text) return "";
 
     // Replace {=variable} with value from item or item.inherits, styled like batched JSON tags
@@ -219,35 +220,44 @@ function formatBatchedJsonTags(text, item) {
     });
 
     // Recursively replace batched JSON tags, handling nested tags
-    return text.replace(/\{([@#][^\s}]+)\s+([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}/g, (match, tag, content) => {
-        // Recursively process the content for nested tags
-        const parsed = formatBatchedJsonTags(content.split('|')[0].trim(), item);
+    let result = text.replace(/\{([@#][^\s}]+)\s+([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}/g, (match, tag, content) => {
+        const parsed = formatBatchedJsonTags(content.split('|')[0].trim(), item, highlightText);
         return `<span class="parsed-BatchedJson-tag">${parsed}</span>`;
     });
+    // Highlight matches
+    if (highlightText && highlightText.length > 1) {
+        const tokens = highlightText.split(/\s+/).filter(Boolean);
+        for (const token of tokens) {
+            if (token.length > 1) {
+                result = result.replace(new RegExp(`(${token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, "gi"), `<mark>$1</mark>`);
+            }
+        }
+    }
+    return result;
 }
 
-function formatEntry(entry, item) {
+function formatEntry(entry, item, highlightText = "") {
     if (typeof entry === "string") {
-        return formatBatchedJsonTags(entry, item);
+        return formatBatchedJsonTags(entry, item, highlightText);
     } else if (entry && typeof entry === "object") {
         let html = "";
         if (entry.name) {
             html += `<b>${entry.name}:</b> `;
         }
         if (entry.type === "list" && Array.isArray(entry.items)) {
-            html += "<ul>" + entry.items.map(e => `<li>${formatEntry(e, item)}</li>`).join("") + "</ul>";
+            html += "<ul>" + entry.items.map(e => `<li>${formatEntry(e, item, highlightText)}</li>`).join("") + "</ul>";
         } else if (entry.type === "table" && Array.isArray(entry.rows)) {
             html += "<table class='table table-sm mb-2'>";
             if (entry.colLabels) {
-                html += "<thead><tr>" + entry.colLabels.map(label => `<th>${formatBatchedJsonTags(label, item)}</th>`).join("") + "</tr></thead>";
+                html += "<thead><tr>" + entry.colLabels.map(label => `<th>${formatBatchedJsonTags(label, item, highlightText)}</th>`).join("") + "</tr></thead>";
             }
             html += "<tbody>";
             for (const row of entry.rows) {
-                html += "<tr>" + row.map(cell => `<td>${formatEntry(cell, item)}</td>`).join("") + "</tr>";
+                html += "<tr>" + row.map(cell => `<td>${formatEntry(cell, item, highlightText)}</td>`).join("") + "</tr>";
             }
             html += "</tbody></table>";
         } else if (Array.isArray(entry.entries)) {
-            html += entry.entries.map(e => formatEntry(e, item)).join(" ");
+            html += entry.entries.map(e => formatEntry(e, item, highlightText)).join(" ");
         }
         return html;
     }
@@ -256,7 +266,7 @@ function formatEntry(entry, item) {
 
 
 // Replace the entire renderDetails function with this:
-function renderDetails(rowData) {
+function renderDetails(rowData, highlightText = "") {
     if (isAnyModalOpen()) return;
     const [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes, link] = rowData;
     const item = Object.entries(item_data).find(
@@ -285,8 +295,9 @@ function renderDetails(rowData) {
         html += `<div class="item-notes my-2"><i class="fa-solid fa-circle-info me-1"></i>${formatBatchedJsonTags(notes)}</div>`;
     }
 
+    // When rendering entries:
     if (item && item.entries) {
-        html += `<div class="item-desc">${item.entries.map(e => formatEntry(e, item)).join(" ")}</div>`;
+        html += `<div class="item-desc">${item.entries.map(e => formatEntry(e, item, highlightText)).join(" ")}</div>`;
     }
 
     // Render into modal content
