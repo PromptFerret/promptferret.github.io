@@ -303,8 +303,22 @@ function renderDetails(rowData, highlightText = "") {
         html += `<div class="item-notes my-2"><i class="fa-solid fa-circle-info me-1"></i>${formatBatchedJsonTags(notes)}</div>`;
     }
 
-    // When rendering entries:
-    if (item && item.entries) {
+    // If no item data, show a friendly message with Open Link button if available
+    if (!item || !item.entries || (item.entries.length === 1 && (
+        typeof item.entries[0] === "string" &&
+        item.entries[0].toLowerCase().includes("no description available")
+    )) ) {
+        html += `
+            <div class="alert alert-warning mt-3" style="font-size:1.05em;">
+                <i class="fa-solid fa-circle-info me-1"></i>
+                <b>No detailed description could be found for this item.</b><br><br>
+                Please click 
+                ${link && link.trim() ? `<a href="${link}" target="_blank" rel="noopener" class="btn btn-primary btn-sm ms-1 table-link-btn" style="display:inline-block;vertical-align:middle;"><i class="fa-solid fa-up-right-from-square"></i></a>` : '<b>the Open Link button</b>'}
+                for more information in this item.
+            </div>
+        `;
+    } else {
+        // When rendering entries:
         html += `<div class="item-desc">${item.entries.map(e => formatEntry(e, item, highlightText)).join(" ")}</div>`;
     }
 
