@@ -282,7 +282,7 @@ function renderDetails(rowData) {
 
     // Only include notes if present
     if (notes && notes.trim()) {
-        html += `<div class="item-notes mb-2"><i class="fa-solid fa-circle-info me-1"></i>${formatBatchedJsonTags(notes)}</div>`;
+        html += `<div class="item-notes my-2"><i class="fa-solid fa-circle-info me-1"></i>${formatBatchedJsonTags(notes)}</div>`;
     }
 
     if (item && item.entries) {
