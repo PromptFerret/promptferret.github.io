@@ -2,6 +2,7 @@ site/
 .venv/
 .obsidian/
 **/.DS_Store
+docs/assets/shopping_cart/password.js
 docs/assets/shopping_cart/items2.json
 docs/assets/shopping_cart/items-base.json
 test cart.txt
