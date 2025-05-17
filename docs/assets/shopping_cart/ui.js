@@ -345,6 +345,11 @@ function updateAddToCartBtnModal(name) {
 function updateItemLinkBtnModal(name, link) {
     const linkBtn = document.getElementById('item-link-btn-modal');
     if (!linkBtn) return;
+    let markdownHtml = `
+        <button id="item-markdown-btn-modal" class="btn btn-primary btn-sm ms-2" title="Copy as Markdown">
+            <i class="fa-brands fa-markdown"></i>
+        </button>
+    `;
     let screenshotHtml = `
         <button id="item-screenshot-btn-modal" class="btn btn-primary btn-sm ms-2" title="Download screenshot">
             <i class="fa-solid fa-camera"></i>
@@ -363,7 +368,21 @@ function updateItemLinkBtnModal(name, link) {
             </a>
         `;
     }
-    linkBtn.innerHTML = screenshotHtml + shareHtml + linkHtml;
+    linkBtn.innerHTML = markdownHtml + screenshotHtml + shareHtml + linkHtml;
+
+    // Markdown button event
+    const markdownBtn = document.getElementById('item-markdown-btn-modal');
+    if (markdownBtn) {
+        markdownBtn.onclick = () => {
+            const content = document.getElementById('itemDetailModalContent');
+            if (!content) return;
+            const md = htmlToDiscordMarkdown(content);
+            navigator.clipboard.writeText(md).then(() => {
+                const rect = markdownBtn.getBoundingClientRect();
+                showCopyToast('Copied as Markdown!', rect.left + rect.width / 2, rect.top - 20 + window.scrollY);
+            });
+        };
+    }
 
     // Screenshot button event
     const screenshotBtn = document.getElementById('item-screenshot-btn-modal');
@@ -920,3 +939,85 @@ document.addEventListener('hide.bs.modal', function (event) {
         document.activeElement.blur();
     }
 });
+
+function htmlToDiscordMarkdown(contentEl) {
+    // Clone to avoid modifying the DOM
+    const clone = contentEl.cloneNode(true);
+
+    // Remove copyable spans, keep text
+    clone.querySelectorAll('.copyable').forEach(el => {
+        el.replaceWith(document.createTextNode(el.textContent));
+    });
+
+    // Convert <h5> to bold
+    clone.querySelectorAll('h5').forEach(el => {
+        el.replaceWith(document.createTextNode(`**${el.textContent.trim()}**\n`));
+    });
+
+    // Convert <b> to bold
+    clone.querySelectorAll('b').forEach(el => {
+        el.replaceWith(document.createTextNode(`**${el.textContent.trim()}**`));
+    });
+
+    // Convert <ul>/<ol> to lines with dashes
+    clone.querySelectorAll('ul,ol').forEach(list => {
+        let lines = [];
+        list.querySelectorAll('li').forEach(li => {
+            lines.push(`- ${li.textContent.trim()}`);
+        });
+        list.replaceWith(document.createTextNode(lines.join('\n') + '\n'));
+    });
+
+    // Convert <table> to Discord code block table
+    clone.querySelectorAll('table').forEach(table => {
+        let rows = Array.from(table.querySelectorAll('tr'))
+            .map(tr => Array.from(tr.children).map(td => td.textContent.trim()));
+        // Remove empty rows (all cells empty)
+        rows = rows.filter(row => row.some(cell => cell.length > 0));
+        if (!rows.length) return;
+
+        // Calculate max width for each column
+        const colWidths = [];
+        rows.forEach(row => {
+            row.forEach((cell, i) => {
+                colWidths[i] = Math.max(colWidths[i] || 0, cell.length);
+            });
+        });
+
+        // Pad each cell for alignment
+        const pad = (str, len) => str + ' '.repeat(len - str.length);
+
+        // Build the table as a code block, code block start/end on its own line
+        let md = '```\n';
+        rows.forEach((row, i) => {
+            md += row.map((cell, j) => pad(cell, colWidths[j])).join(' | ') + '\n';
+            if (i === 0) {
+                md += colWidths.map(w => '-'.repeat(w)).join('-|-') + '\n';
+            }
+        });
+        md += '```'; // No extra newline after
+        table.replaceWith(document.createTextNode(md));
+    });
+
+    // Convert <mark> to __underline__
+    clone.querySelectorAll('mark').forEach(el => {
+        el.replaceWith(document.createTextNode(`__${el.textContent}__`));
+    });
+
+    // Remove all other tags, keep text
+    let md = clone.textContent;
+
+    // Remove trailing whitespace from each line and collapse multiple blank lines
+    md = md
+        .split('\n')
+        .map(line => line.trimEnd())
+        .filter((line, idx, arr) => {
+            // Remove lines that are empty unless the previous line is not empty
+            return line.length > 0 || (idx > 0 && arr[idx - 1].length > 0);
+        })
+        .join('\n')
+        .replace(/\n{3,}/g, '\n\n') // just in case, collapse 3+ blank lines to 2
+        .trim();
+
+    return md;
+}
