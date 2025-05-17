@@ -1,24 +1,31 @@
 let cart = [];
 
-function isInCart(name) {
-    return cart.some(item => item.name === name);
-}
 function addToCart(name) {
-    if (!isInCart(name)) {
-        const row = allData.find(row => row[2] === name);
-        let costField = row ? (row[6] || '') : '';
-        let needsBase = costField.includes('+');
-        cart.push({
-            name,
-            quantity: 1,
-            base: 0,
-            ...(needsBase ? { customName: "" } : {})
-        });
-        updateAddToCartBtn(name);
-        updateCartCount();
-        applyFilters();
-    }
+    const row = allData.find(row => row[2] === name);
+    let costField = row ? (row[6] || '') : '';
+    let needsBase = costField.includes('+');
+    cart.push({
+        name,
+        quantity: 1,
+        base: 0,
+        ...(needsBase ? { customName: "" } : {})
+    });
+    updateAddToCartBtn(name);
+    updateCartCount();
+    applyFilters();
 }
+
+function updateAddToCartBtn(name) {
+    const btn = document.getElementById('add-to-cart-btn');
+    if (!btn) return;
+    btn.innerHTML = `
+        <button class="btn btn-primary btn-sm" title="Add to Cart">
+            <i class="fa-solid fa-cart-plus"></i>
+        </button>
+    `;
+    btn.querySelector('button').onclick = () => addToCart(name);
+}
+
 function updateCartCount() {
     const count = cart.length;
     const badge = document.getElementById('cart-count');
