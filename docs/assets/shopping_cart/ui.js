@@ -302,12 +302,30 @@ function renderDetails(rowData, highlightText = "") {
     const modalContent = document.getElementById('itemDetailModalContent');
     if (modalContent) modalContent.innerHTML = html;
 
+    // Update modal Add to Cart button
+    updateAddToCartBtnModal(name);
+
     // Update modal link/share buttons
     updateItemLinkBtnModal(name, link);
 
     // Show the modal
     const modal = new bootstrap.Modal(document.getElementById('itemDetailsModal'));
     modal.show();
+}
+
+// Add these helper functions:
+function updateAddToCartBtnModal(name) {
+    const btn = document.getElementById('add-to-cart-btn-modal');
+    if (!btn) return;
+    btn.innerHTML = `
+        <button class="btn btn-primary btn-sm" title="Add to Cart">
+            <i class="fa-solid fa-cart-plus"></i>
+        </button>
+    `;
+    btn.querySelector('button').onclick = () => {
+        addToCart(name);
+        updateAddToCartBtnModal(name);
+    };
 }
 
 function updateItemLinkBtnModal(name, link) {
@@ -627,6 +645,17 @@ function setupEvents() {
     }
 }
 
+function updateAddToCartBtn(name) {
+    const btn = document.getElementById('add-to-cart-btn');
+    if (!btn) return;
+    btn.innerHTML = `
+        <button class="btn btn-primary btn-sm" title="Add to Cart">
+            <i class="fa-solid fa-cart-plus"></i>
+        </button>
+    `;
+    btn.querySelector('button').onclick = () => addToCart(name);
+}
+
 function renderCart() {
     const container = document.getElementById('cart-contents');
     if (!container) return;
@@ -800,6 +829,7 @@ function renderCart() {
             cart.splice(idx, 1);
             renderCart();
             updateCartCount();
+            updateAddToCartBtn(removed.name); // Update item details button
             applyFilters(); // Re-render table to update buttons
             // Hide modal if cart is empty
             if (cart.length === 0) {
