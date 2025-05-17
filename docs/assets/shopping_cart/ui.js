@@ -153,8 +153,18 @@ function renderTable(data) {
             if (i === 0) {
                 td.textContent = displayTier(col);
             } else if (i === 6) { // Cost column
-                const num = parseInt((col || '').replace(/[^0-9]/g, ''));
-                td.textContent = !isNaN(num) && num > 0 ? num.toLocaleString() : (col || '');
+                let costStr = col || '';
+                const plusIdx = costStr.indexOf('+');
+                if (plusIdx !== -1) {
+                    // Format the number before the plus, keep the rest
+                    const numPart = costStr.slice(0, plusIdx).replace(/[^0-9]/g, '');
+                    const rest = costStr.slice(plusIdx);
+                    td.textContent = (numPart ? parseInt(numPart, 10).toLocaleString() : '') + ' ' + rest.trim();
+                } else {
+                    // Just format the number if possible
+                    const num = parseInt(costStr.replace(/[^0-9]/g, ''));
+                    td.textContent = !isNaN(num) && num > 0 ? num.toLocaleString() : costStr;
+                }
             } else {
                 td.textContent = col || '';
             }
@@ -545,12 +555,16 @@ function setupEvents() {
             let perItem = cost + base;
             let itemTotal = perItem * qty;
             total += itemTotal;
-            const displayName = showBase
-                ? (item.customName && item.customName.trim()
-                    ? `${item.name} (${item.customName.trim()})`
-                    : item.name)
-                : item.name;
-            lines.push(`     ${displayName} ${perItem.toLocaleString()} x${qty} - ${itemTotal.toLocaleString()} GP`);
+
+            // Build display name with custom type if present
+            let displayName = item.name;
+            if (item.customName && item.customName.trim()) {
+                displayName += ` (${item.customName.trim()})`;
+            }
+
+            lines.push(
+                `     (${qty}x) ${displayName} ${perItem.toLocaleString()} - ${itemTotal.toLocaleString()} GP`
+            );
         });
 
         let output = `discordName as characterName buys:\n${lines.join('\n')}\nTotal ${total.toLocaleString()} GP`;
@@ -759,11 +773,11 @@ function renderCart() {
                         class="form-control form-control-sm cart-base"
                         style="max-width: 60px; min-width: 40px; display:inline-block; margin-right: 4px;"
                         data-idx="${originalIdx}" value="${item.base === 0 || item.base === '' || item.base == null ? '' : item.base}" placeholder="Cost">
-                    <input type="text"
-                        class="form-control form-control-sm cart-custom-name"
-                        style="max-width: 100px; min-width: 60px; display:inline-block;"
-                        data-idx="${originalIdx}" value="${item.customName ?? ''}" placeholder="Type">
                 ` : ''}
+                <input type="text"
+                    class="form-control form-control-sm cart-custom-name"
+                    style="max-width: 100px; min-width: 60px; display:inline-block;"
+                    data-idx="${originalIdx}" value="${item.customName ?? ''}" placeholder="Type">
             </td>
             <td>${costDisplay ? (parseInt(costDisplay.replace(/[^0-9]/g, '')) || 0).toLocaleString() : perItem.toLocaleString()}</td>
             <td>${total.toLocaleString()}</td>
