@@ -878,3 +878,10 @@ function setupStickyScrollbar() {
 }
 
 initialLoad();
+
+document.addEventListener('hide.bs.modal', function (event) {
+    // If the modal being hidden contains the active element, blur it
+    if (event.target.contains(document.activeElement)) {
+        document.activeElement.blur();
+    }
+});
