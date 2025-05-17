@@ -136,6 +136,12 @@ async function loadAllBatchedJsonData() {
 async function loadData() {
     console.log("loadData called");
     try {
+        // --- Load mapping config FIRST ---
+        const mappingObj = await fetchJSON('assets/shopping_cart/custom_mapping.json');
+        const stripList = mappingObj.strip || [];
+        const replaceList = mappingObj.replace || [];
+        const remap = mappingObj.remap || {};
+
         // 1. Load CSV
         const CSV_URL = await getDecryptedCsvUrl();
         const csvRows = await fetchCSV(CSV_URL);
@@ -160,13 +166,10 @@ async function loadData() {
         }
 
         // 2b. Load custom_mapping.json into NAME_ALIASES
-        const mappingObj = await fetchJSON('assets/shopping_cart/custom_mapping.json');
         NAME_ALIASES = {};
-        if (mappingObj && typeof mappingObj === "object") {
-            for (const [csvName, mirrorName] of Object.entries(mappingObj.remap || {})) {
-                NAME_ALIASES[normalizeForMapping(csvName, stripList, replaceList)] =
-                    normalizeForMapping(mirrorName, stripList, replaceList);
-            }
+        for (const [csvName, mirrorName] of Object.entries(remap)) {
+            NAME_ALIASES[normalizeForMapping(csvName, stripList, replaceList)] =
+                normalizeForMapping(mirrorName, stripList, replaceList);
         }
 
         console.log("NAME_ALIASES:", NAME_ALIASES);
@@ -191,7 +194,7 @@ async function loadData() {
             if (arr.length) mirrorItems.push(...arr);
         }
 
-        // After loading mirrorItems:
+        // When building mirrorItemMap:
         let mirrorItemMap = {};
         for (const item of mirrorItems) {
             if (item.name) {

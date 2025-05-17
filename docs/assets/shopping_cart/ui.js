@@ -238,14 +238,14 @@ function formatBatchedJsonTags(text, item, highlightText = "") {
 
 function formatEntry(entry, item, highlightText = "") {
     if (typeof entry === "string") {
-        return formatBatchedJsonTags(entry, item, highlightText);
+        return `<div class="mb-2">${formatBatchedJsonTags(entry, item, highlightText)}</div>`;
     } else if (entry && typeof entry === "object") {
         let html = "";
         if (entry.name) {
-            html += `<b>${entry.name}:</b> `;
+            html += `<h5 class="mt-3 mb-1">${entry.name}</h5>`;
         }
         if (entry.type === "list" && Array.isArray(entry.items)) {
-            html += "<ul>" + entry.items.map(e => `<li>${formatEntry(e, item, highlightText)}</li>`).join("") + "</ul>";
+            html += "<ul class='mb-2'>" + entry.items.map(e => `<li>${formatEntry(e, item, highlightText)}</li>`).join("") + "</ul>";
         } else if (entry.type === "table" && Array.isArray(entry.rows)) {
             html += "<table class='table table-sm mb-2'>";
             if (entry.colLabels) {
@@ -256,8 +256,10 @@ function formatEntry(entry, item, highlightText = "") {
                 html += "<tr>" + row.map(cell => `<td>${formatEntry(cell, item, highlightText)}</td>`).join("") + "</tr>";
             }
             html += "</tbody></table>";
+        } else if (entry.type === "item" && entry.entry) {
+            html += `<div class="mb-2"><b>${entry.name}:</b> ${formatBatchedJsonTags(entry.entry, item, highlightText)}</div>`;
         } else if (Array.isArray(entry.entries)) {
-            html += entry.entries.map(e => formatEntry(e, item, highlightText)).join(" ");
+            html += entry.entries.map(e => formatEntry(e, item, highlightText)).join("");
         }
         return html;
     }

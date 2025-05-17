@@ -125,10 +125,21 @@
     background: var(--bs-tertiary-bg, #f8f9fa);
     padding: 0.5rem 1rem;
     margin-top: 0.5rem;
-    font-size: 1rem;
+    font-size: 0.96rem;
     line-height: 1.5;
     border-bottom: 3px solid var(--bs-primary);
     border-radius: 0.25rem;
+}
+
+.item-desc h5 {
+    font-size: 1.08rem;
+    margin-top: 1.1em;
+    margin-bottom: 0.4em;
+}
+
+.item-desc ul,
+.item-desc ol {
+    font-size: 0.95em;
 }
 
 /* --- Copyable --- */
@@ -488,6 +499,7 @@ select.form-select {
     max-height: 70vh;
     overflow-y: auto;
     margin: 0 auto !important; /* Center the body if it has a width */
+    font-size: 0.97rem;
 }
 
 #itemDetailsModal .item-desc {

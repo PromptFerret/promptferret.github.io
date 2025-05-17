@@ -33,12 +33,17 @@
         "(medium or heavy except hide)",
         "(must specify type)",
         "(must Specify)",
+        "(must specify version)",
         "(stack of 10)",
         "(stack of 20)",
         "(Stack of 9)",
         "(vial)",
         "(x20)",
-        "(x8 packets)"
+        "(x8 packets)",
+        "(5th level spell or lower)",
+        "(empty on purchase)",
+        "(Must specify color)",
+        "(7 ounces)"
     ],
     "replace": [
         [
@@ -225,6 +230,8 @@
         "Wraps of Unarmed Prowess +1": "+1 Wraps of Unarmed Prowess",
         "Wraps of Unarmed Prowess +2": "+2 Wraps of Unarmed Prowess",
         "Wraps of Unarmed Prowess +3": "+3 Wraps of Unarmed Prowess",
-        "Wreath of the Prism (Dormant)*": "Wreath of the Prism (Dormant)"
+        "Wreath of the Prism (Dormant)*": "Wreath of the Prism (Dormant)",
+        "Stygian Javelin": "Stygian Spear",
+        "Pennant of the Vind-Rune":"Pennant of the Vind Rune"
     }
 }
