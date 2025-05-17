@@ -172,10 +172,6 @@ async function loadData() {
                 normalizeForMapping(mirrorName, stripList, replaceList);
         }
 
-        console.log("NAME_ALIASES:", NAME_ALIASES);
-        console.log("Normalized 'Guild Signet (Any)':", normalizeItemName("Guild Signet (Any)"));
-        console.log("Normalized 'Guild Signet':", normalizeItemName("Guild Signet"));
-
         // 3. Load 5etools mirror data
         let mirrorItems = [];
         for (const file of ITEM_JSON_FILES) {
@@ -206,11 +202,6 @@ async function loadData() {
                 mirrorItemMap[normPrefix] = item;
             }
         }
-
-        console.log(
-          "Mirror items with normalized name 'guild signet':",
-          mirrorItems.filter(i => normalizeItemName(i.name) === "guild signet")
-        );
 
         // 4. For each CSV row, add to item_data if not already present
         let missingMirrorCount = 0;

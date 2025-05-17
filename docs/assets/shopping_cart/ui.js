@@ -303,18 +303,31 @@ function renderDetails(rowData, highlightText = "") {
         html += `<div class="item-notes my-2"><i class="fa-solid fa-circle-info me-1"></i>${formatBatchedJsonTags(notes)}</div>`;
     }
 
-    // If no item data, show a friendly message with Open Link button if available
-    if (!item || !item.entries || (item.entries.length === 1 && (
-        typeof item.entries[0] === "string" &&
-        item.entries[0].toLowerCase().includes("no description available")
-    )) ) {
+    // If no item data, or the only entry is "No description available." or matches the notes, show friendly message
+    if (
+        !item ||
+        !item.entries ||
+        (item.entries.length === 1 && (
+            (typeof item.entries[0] === "string" &&
+                (
+                    item.entries[0].toLowerCase().includes("no description available") ||
+                    (notes && item.entries[0].trim() === notes.trim())
+                )
+            )
+        ))
+    ) {
         html += `
             <div class="alert alert-warning mt-3" style="font-size:1.05em;">
                 <i class="fa-solid fa-circle-info me-1"></i>
-                <b>No detailed description could be found for this item.</b><br><br>
-                Please click 
-                ${link && link.trim() ? `<a href="${link}" target="_blank" rel="noopener" class="btn btn-primary btn-sm ms-1 table-link-btn" style="display:inline-block;vertical-align:middle;"><i class="fa-solid fa-up-right-from-square"></i></a>` : '<b>the Open Link button</b>'}
-                for more information in this item.
+                <b>No detailed description could be found for this item.</b>
+                ${
+                    link && link.trim()
+                    ? `<br><br>For more information, please click 
+                        <a href="${link}" target="_blank" rel="noopener" class="btn btn-primary btn-sm ms-1 table-link-btn" style="display:inline-block;vertical-align:middle;">
+                            <i class="fa-solid fa-up-right-from-square"></i> Open Link
+                        </a>.`
+                    : `<br><br>No additional information is available.`
+                }
             </div>
         `;
     } else {
