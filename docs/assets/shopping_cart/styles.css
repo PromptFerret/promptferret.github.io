@@ -607,3 +607,23 @@ header.navbar, .navbar {
 body {
     padding-top: 70px; /* adjust to your header height */
 }
+
+.item-notes {
+    background: #fffbe6;
+    color: #7a3c00;
+    border-left: 5px solid var(--pf-gold, #f4874c);
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 4px rgba(244, 135, 76, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+[data-bs-theme="dark"] .item-notes {
+    background: #2a1a00;
+    color: #ffb185;
+    border-left: 5px solid var(--pf-gold-dark, #c96a36);
+}

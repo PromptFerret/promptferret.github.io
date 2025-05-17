@@ -134,6 +134,7 @@ async function loadAllBatchedJsonData() {
     }
 }
 async function loadData() {
+    console.log("loadData called");
     try {
         // 1. Load CSV
         const CSV_URL = await getDecryptedCsvUrl();
@@ -154,19 +155,17 @@ async function loadData() {
         item_data = {};
         if (Array.isArray(customItemsArr)) {
             for (const item of customItemsArr) {
-                const norm = normalizeItemName(item.name);
-                item_data[norm] = item;
+                item_data[item.name] = item;
             }
         }
 
         // 2b. Load custom_mapping.json into NAME_ALIASES
-        // The mapping file should be an object: { 'Bag of Explosive Seeds (x20)': 'Explosive Seed', ... }
         const mappingObj = await fetchJSON('assets/shopping_cart/custom_mapping.json');
         NAME_ALIASES = {};
         if (mappingObj && typeof mappingObj === "object") {
-            for (const [csvName, mirrorName] of Object.entries(mappingObj)) {
-                // Normalize both keys and values for consistency
-                NAME_ALIASES[normalizeItemName(csvName)] = normalizeItemName(mirrorName);
+            for (const [csvName, mirrorName] of Object.entries(mappingObj.remap || {})) {
+                NAME_ALIASES[normalizeForMapping(csvName, stripList, replaceList)] =
+                    normalizeForMapping(mirrorName, stripList, replaceList);
             }
         }
 
@@ -192,6 +191,19 @@ async function loadData() {
             if (arr.length) mirrorItems.push(...arr);
         }
 
+        // After loading mirrorItems:
+        let mirrorItemMap = {};
+        for (const item of mirrorItems) {
+            if (item.name) {
+                const norm = normalizeForMapping(item.name, stripList, replaceList);
+                mirrorItemMap[norm] = item;
+            }
+            if (item.inherits && item.inherits.namePrefix) {
+                const normPrefix = normalizeForMapping(item.inherits.namePrefix, stripList, replaceList);
+                mirrorItemMap[normPrefix] = item;
+            }
+        }
+
         console.log(
           "Mirror items with normalized name 'guild signet':",
           mirrorItems.filter(i => normalizeItemName(i.name) === "guild signet")
@@ -200,28 +212,28 @@ async function loadData() {
         // 4. For each CSV row, add to item_data if not already present
         let missingMirrorCount = 0;
         for (const row of allData) {
-            const name = row[2];
-            const norm = normalizeItemName(name);
-            if (!item_data[norm]) {
+            const name = row[2]; // raw name from CSV
+            if (!item_data[name]) { // use raw name as key
+                // Only normalize for the lookup!
+                const norm = normalizeForMapping(name, stripList, replaceList);
                 const lookupNorm = NAME_ALIASES[norm] || norm;
-                const found = mirrorItems.find(i =>
-                    (i.name && normalizeItemName(i.name) === lookupNorm) ||
-                    (i.inherits && i.inherits.namePrefix && normalizeItemName(i.inherits.namePrefix) === lookupNorm)
-                );
+                const found = mirrorItemMap[lookupNorm];
+                let itemCopy;
                 if (found) {
-                    // --- Normalization step ---
-                    // If the item doesn't have entries but has inherits.entries, copy them up and resolve templates
-                    if (!found.entries && found.inherits && found.inherits.entries) {
-                        found.entries = found.inherits.entries.slice();
-                    } else if (found.entries) {
-                        found.entries = found.entries.slice();
+                    // Copy the found object, but store under the raw name
+                    itemCopy = { ...found };
+                    // If the item doesn't have entries but has inherits.entries, copy them up
+                    if (!itemCopy.entries && itemCopy.inherits && itemCopy.inherits.entries) {
+                        itemCopy.entries = itemCopy.inherits.entries.slice();
+                    } else if (itemCopy.entries) {
+                        itemCopy.entries = itemCopy.entries.slice();
                     }
                     // If the item doesn't have a name but has inherits.namePrefix, construct a name
-                    if (!found.name && found.inherits && found.inherits.namePrefix) {
-                        found.name = `${found.inherits.namePrefix}${name.replace(/^\+?\d+\s*/, "")}`;
+                    if (!itemCopy.name && itemCopy.inherits && itemCopy.inherits.namePrefix) {
+                        itemCopy.name = `${itemCopy.inherits.namePrefix}${name.replace(/^\+?\d+\s*/, "")}`;
                     }
-                    item_data[norm] = found;
                 } else {
+                    // Fallback: create a minimal object from the CSV row
                     const book = row[7] || '';
                     const page = row[8] || '';
                     const skip = LOG_SKIP_BOOKS.some(code => book.includes(code) || page.includes(code));
@@ -229,7 +241,16 @@ async function loadData() {
                         missingMirrorCount++;
                         console.log(`No mirror data for: ${name} :: ${book}:${page} | lookup: ${lookupNorm}`);
                     }
+                    itemCopy = {
+                        name,
+                        source: book,
+                        page: page,
+                        rarity: row[7] || "",
+                        entries: [row[9] || "No description available."],
+                        // Optionally add more fields from the row if needed
+                    };
                 }
+                item_data[name] = itemCopy; // always store under raw name
             }
         }
 
@@ -267,3 +288,41 @@ function resolveTemplateVars(text, item) {
         return match;
     });
 }
+function normalizeForMapping(name, stripList, replaceList) {
+    if (typeof name !== "string") {
+        console.warn("Non-string name:", name);
+        return "";
+    }
+    let norm = name.trim().toLowerCase();
+    // Apply replacements
+    if (replaceList && Array.isArray(replaceList)) {
+        for (const [from, to] of replaceList) {
+            norm = norm.split(from).join(to);
+        }
+    }
+    // Case-insensitive strip (like str_ireplace)
+    if (stripList && Array.isArray(stripList)) {
+        for (const pattern of stripList) {
+            // Escape regex special chars
+            const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            // Replace all case-insensitive occurrences
+            norm = norm.replace(new RegExp(escaped, "gi"), "");
+        }
+    }
+    // Collapse multiple spaces and trim
+    return norm.replace(/\s{2,}/g, " ").trim();
+}
+
+async function setupMappingConfig() {
+    const mappingConfig = await fetchJSON('assets/shopping_cart/custom_mapping.json');
+    const stripList = mappingConfig.strip || [];
+    const replaceList = mappingConfig.replace || [];
+    const remap = mappingConfig.remap || {};
+
+    // Use these variables as needed, or export them if needed elsewhere
+    window.stripList = stripList;
+    window.replaceList = replaceList;
+    window.remap = remap;
+}
+// Instead of calling setupMappingConfig() and loadData() separately:
+// setupMappingConfig().then(loadData);

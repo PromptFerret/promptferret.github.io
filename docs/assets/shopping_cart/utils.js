@@ -20,7 +20,7 @@ function displayTier(tier) {
     return tier;
 }
 function normalizeItemName(name) {
-    // Only trim and lowercase, do NOT strip parentheticals
+    if (typeof name !== "string") return "";
     return name.trim().toLowerCase();
 }
 function isAnyModalOpen() {

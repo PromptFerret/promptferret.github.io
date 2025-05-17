@@ -58,7 +58,9 @@ function applyFilters() {
         // --- Description filter logic ---
         let descMatch = true;
         if (descQ) {
-            const item = item_data[normalizeItemName(name)];
+            const item = Object.entries(item_data).find(
+                ([key]) => key.toLowerCase() === name.toLowerCase()
+            )?.[1];
             descMatch = !!(item && Array.isArray(item.entries) && item.entries.some(e =>
                 typeof e === "string" && tokenizeMatch(e, descQ)
             ));
@@ -257,7 +259,9 @@ function formatEntry(entry, item) {
 function renderDetails(rowData) {
     if (isAnyModalOpen()) return;
     const [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes, link] = rowData;
-    const item = item_data[normalizeItemName(name)];
+    const item = Object.entries(item_data).find(
+        ([key]) => key.toLowerCase() === name.toLowerCase()
+    )?.[1];
 
     // Helper to wrap any value as copyable
     const copy = v => `<span class="copyable">${v ?? ''}</span>`;
@@ -278,7 +282,7 @@ function renderDetails(rowData) {
 
     // Only include notes if present
     if (notes && notes.trim()) {
-        html += `<div class="item-desc">${formatBatchedJsonTags(notes)}</div>`;
+        html += `<div class="item-notes mb-2"><i class="fa-solid fa-circle-info me-1"></i>${formatBatchedJsonTags(notes)}</div>`;
     }
 
     if (item && item.entries) {
@@ -816,14 +820,14 @@ function renderCart() {
 
 // Initial load
 async function initialLoad() {
+    await setupMappingConfig();
     await loadData();
 
-    populateFilters();               // Populate filter checkboxes
-    setupEvents();                   // Attach event listeners
+    populateFilters();
+    setupEvents();
 
-    // Wait for the DOM to update with new filters before rendering table
     setTimeout(() => {
-        applyFilters();              // Now allData is ready and filters are in the DOM
+        applyFilters();
     }, 50);
 
     // --- Check for ?v=BASE64 in URL (after all data is loaded) ---
