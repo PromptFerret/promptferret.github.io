@@ -345,6 +345,11 @@ function updateAddToCartBtnModal(name) {
 function updateItemLinkBtnModal(name, link) {
     const linkBtn = document.getElementById('item-link-btn-modal');
     if (!linkBtn) return;
+    let screenshotHtml = `
+        <button id="item-screenshot-btn-modal" class="btn btn-primary btn-sm ms-2" title="Download screenshot">
+            <i class="fa-solid fa-camera"></i>
+        </button>
+    `;
     let shareHtml = `
         <button id="item-share-btn-modal" class="btn btn-primary btn-sm ms-2" title="Share item">
             <i class="fa-solid fa-share-nodes"></i>
@@ -358,9 +363,37 @@ function updateItemLinkBtnModal(name, link) {
             </a>
         `;
     }
-    linkBtn.innerHTML = shareHtml + linkHtml;
+    linkBtn.innerHTML = screenshotHtml + shareHtml + linkHtml;
 
-    // Add share button event
+    // Screenshot button event
+    const screenshotBtn = document.getElementById('item-screenshot-btn-modal');
+    if (screenshotBtn) {
+        screenshotBtn.onclick = async () => {
+            const content = document.getElementById('itemDetailModalContent');
+            if (!content) return;
+            screenshotBtn.disabled = true;
+            screenshotBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+            try {
+                // Use html2canvas to render the content
+                const canvas = await html2canvas(content, {
+                    backgroundColor: window.getComputedStyle(content).backgroundColor || "#fff",
+                    scale: window.devicePixelRatio || 2,
+                    useCORS: true
+                });
+                // Create a download link
+                const link = document.createElement('a');
+                link.download = `${name.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_details.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            } catch (e) {
+                alert("Screenshot failed. Try again or use your OS screenshot tool.");
+            }
+            screenshotBtn.disabled = false;
+            screenshotBtn.innerHTML = `<i class="fa-solid fa-camera"></i>`;
+        };
+    }
+
+    // Share button event
     const shareBtn = document.getElementById('item-share-btn-modal');
     if (shareBtn) {
         shareBtn.onclick = () => {
