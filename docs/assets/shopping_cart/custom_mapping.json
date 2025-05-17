@@ -1,6 +1,7 @@
 {
     "strip": [
         "(1 bead)",
+        "(10 charges)",
         "(10 pinches)",
         "(1st level)",
         "(2 beads)",
@@ -12,10 +13,12 @@
         "(4th level)",
         "(5 beads)",
         "(50 charges)",
+        "(5th level spell or lower)",
         "(5th level)",
         "(6 beads)",
         "(6 pots)",
         "(6th level)",
+        "(7 ounces)",
         "(7th level)",
         "(8th level)",
         "(9th level)",
@@ -24,6 +27,7 @@
         "(can be all elements)",
         "(ea)",
         "(each)",
+        "(empty on purchase)",
         "(five doses)",
         "(flask)",
         "(fully charged)",
@@ -31,19 +35,17 @@
         "(limited charges)",
         "(max rank)",
         "(medium or heavy except hide)",
+        "(must specify color)",
         "(must specify type)",
-        "(must Specify)",
         "(must specify version)",
+        "(must specify)",
+        "(per potion)",
         "(stack of 10)",
         "(stack of 20)",
-        "(Stack of 9)",
+        "(stack of 9)",
         "(vial)",
         "(x20)",
-        "(x8 packets)",
-        "(5th level spell or lower)",
-        "(empty on purchase)",
-        "(Must specify color)",
-        "(7 ounces)"
+        "(x8 packets)"
     ],
     "replace": [
         [
@@ -68,7 +70,6 @@
         ]
     ],
     "remap": {
-        "Armor of the Valiant Soul (Dormant)*": "Armor of the Valiant Soul (Dormant)",
         "1st Level Spell Scroll": "Spell Scroll (1st Level)",
         "2nd Level Spell Scroll": "Spell Scroll (2nd Level)",
         "3rd Level Spell Scroll": "Spell Scroll (3rd Level)",
@@ -94,6 +95,7 @@
         "Armor +1 (any)": "+1 Armor",
         "Armor +2": "+2 Armor",
         "Armor +3": "+3 Armor",
+        "Armor of the Valiant Soul (Dormant)*": "Armor of the Valiant Soul (Dormant)",
         "Assassins Blood": "Assassin's Blood",
         "Bag of Explosive Seeds (x20)": "Explosive Seed",
         "Bag of Tricks": "Bag of Tricks, Gray",
@@ -166,6 +168,7 @@
         "Junky Dagger +1": "Junky +1 Dagger",
         "Kiss of the Changebringer (Dormant)*": "Kiss of the Changebringer (Dormant)",
         "Lash of Shadows (Dormant)*": "Lash of Shadows (Dormant)",
+        "Libram of Soul and Flesh":"Libram of Souls and Flesh"
         "Mace of the Black Crown (Dormant)*": "Mace of the Black Crown (Dormant)",
         "Mithral Armor +1": "Mithral Armor",
         "Moon Sickle +1": "+1 Moon Sickle",
@@ -174,6 +177,7 @@
         "Mythcarver (Dormant)*": "Mythcarver (Dormant)",
         "Order of the Silver Dragon Shield +2": "Shield of the Silver Dragon",
         "Packet of Smokepowder": "Smokepowder",
+        "Pennant of the Vind-Rune":"Pennant of the Vind Rune",
         "Piwafwi of Fire Resistance (Cloak of Elvenkind)": "Piwafwi (Cloak of Elvenkind)",
         "Plate of the Dawnmartyr (Dormant)*": "Plate of the Dawnmartyr (Dormant)",
         "Potion Of Resistance (Must specify type)": "Potion of Resistance",
@@ -213,6 +217,7 @@
         "Stormgirdle (Dormant)*": "Stormgirdle (Dormant)",
         "Studded Leather Armor of Acid Resistance +2": "+2 Studded Leather Armor of Acid Resistance",
         "Studded White Dragon Leather Armor of Cold Resistance +2": "+2 Studded White Dragon Leather Armor of Cold Resistance",
+        "Stygian Javelin": "Stygian Spear",
         "The Bloody End (Dormant)*": "The Bloody End (Dormant)",
         "Titanstone Knuckles (Dormant)*": "Titanstone Knuckles (Dormant)",
         "True-Ice Shards": "True-Ice Shards (Dagger)",
@@ -231,7 +236,5 @@
         "Wraps of Unarmed Prowess +2": "+2 Wraps of Unarmed Prowess",
         "Wraps of Unarmed Prowess +3": "+3 Wraps of Unarmed Prowess",
         "Wreath of the Prism (Dormant)*": "Wreath of the Prism (Dormant)",
-        "Stygian Javelin": "Stygian Spear",
-        "Pennant of the Vind-Rune":"Pennant of the Vind Rune"
     }
 }
