@@ -48,8 +48,12 @@
         </div>
     </header>
 
-
-    <div class="collapse show" id="filtersCollapse">
+    <!-- Only the filters are collapsible -->
+    <button class="btn btn-outline-secondary w-100 mb-2 d-lg-none" type="button" data-bs-toggle="collapse"
+        data-bs-target="#mobileFilters" aria-expanded="false" aria-controls="mobileFilters">
+        Show/Hide Filters
+    </button>
+    <div class="collapse show" id="mobileFilters">
         <div class="filters">
             <form class="row g-2 mb-3">
                 <div class="col-12 col-md-2">
@@ -102,33 +106,33 @@
                 </div>
             </form>
         </div>
+    </div>
 
-
-        <div class="row mb-5">
-            <div class="col-lg-8 mb-3 order-2 order-lg-1" id="tableWrapper">
-                <div class="table-responsive-custom">
-                    <table id="itemsTable" class="table table-hover table-bordered align-middle mb-4">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="action-col"></th>
-                                <th data-col="0">Tier</th>
-                                <th data-col="1">Type</th>
-                                <th data-col="2">Name</th>
-                                <th data-col="3">ATN</th>
-                                <th data-col="4">Session</th>
-                                <th data-col="5">Item Type</th>
-                                <th data-col="6">Cost</th>
-                                <th data-col="7">Rarity</th>
-                                <th data-col="8">Book/Page</th>
-                                <th data-col="9">Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <div class="sticky-table-scrollbar">
-                    <div></div>
-                </div>
+    <!-- Table and rest of content OUTSIDE the collapse -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mb-3 order-2 order-lg-1" id="tableWrapper">
+            <div class="table-responsive-custom">
+                <table id="itemsTable" class="table table-hover table-bordered align-middle mb-4">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="action-col"></th>
+                            <th data-col="0">Tier</th>
+                            <th data-col="1">Type</th>
+                            <th data-col="2">Name</th>
+                            <th data-col="3">ATN</th>
+                            <th data-col="4">Session</th>
+                            <th data-col="5">Item Type</th>
+                            <th data-col="6">Cost</th>
+                            <th data-col="7">Rarity</th>
+                            <th data-col="8">Book/Page</th>
+                            <th data-col="9">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="sticky-table-scrollbar">
+                <div></div>
             </div>
         </div>
     </div>
