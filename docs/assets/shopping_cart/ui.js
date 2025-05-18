@@ -870,8 +870,6 @@ function renderCart() {
             cart.splice(idx, 1);
             renderCart();
             updateCartCount();
-            updateAddToCartBtn(removed.name); // Update item details button
-            applyFilters(); // Re-render table to update buttons
             // Hide modal if cart is empty
             if (cart.length === 0) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
