@@ -275,6 +275,18 @@ function formatEntry(entry, item, highlightText = "") {
 
 // Replace the entire renderDetails function with this:
 function renderDetails(rowData, highlightText = "") {
+    // Wait for item_data to be ready
+    if (!window.itemDataReady) {
+        // Optionally show a loading spinner or message
+        const modalContent = document.getElementById('itemDetailModalContent');
+        if (modalContent) {
+            modalContent.innerHTML = `<div class="p-4 text-center text-muted"><i class="fa-solid fa-spinner fa-spin"></i> Loading item details...</div>`;
+        }
+        // Try again shortly
+        setTimeout(() => renderDetails(rowData, highlightText), 150);
+        return;
+    }
+
     if (isAnyModalOpen()) return;
     const [tier, type, name, atnVal, sessVal, itemType, cost, rarity, book, notes, link] = rowData;
     const item = Object.entries(item_data).find(

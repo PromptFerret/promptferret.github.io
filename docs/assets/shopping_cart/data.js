@@ -281,6 +281,9 @@ async function loadMirrorDataInBackground(mappingObj, stripList, replaceList) {
             if (row && typeof renderDetails === "function") renderDetails(row);
         }
 
+        // After all item_data is populated, before refreshing modal:
+        window.itemDataReady = true;
+
     } catch (err) {
         console.error("Failed to load mirror data:", err);
     }
@@ -340,5 +343,7 @@ async function setupMappingConfig() {
     window.replaceList = replaceList;
     window.remap = remap;
 }
+
+window.itemDataReady = false;
 // Instead of calling setupMappingConfig() and loadData() separately:
 // setupMappingConfig().then(loadData);
