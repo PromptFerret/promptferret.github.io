@@ -156,7 +156,7 @@ async function loadData() {
             return ta - tb;
         });
 
-        // 2. Load custom_items.json into item_data
+        // 2. Load custom_items.json into item_data (initially only custom items)
         const customItemsArr = await fetchJSON('assets/shopping_cart/custom_items.json');
         item_data = {};
         if (Array.isArray(customItemsArr)) {
@@ -172,7 +172,22 @@ async function loadData() {
                 normalizeForMapping(mirrorName, stripList, replaceList);
         }
 
-        // 3. Load 5etools mirror data
+        // 3. Render table immediately (no mirror data yet)
+        if (typeof renderTable === "function") renderTable(allData);
+
+        // 4. Start loading mirror data in the background
+        setTimeout(() => loadMirrorDataInBackground(mappingObj, stripList, replaceList), 0);
+
+    } catch (err) {
+        console.error("Failed to load data:", err);
+    }
+}
+
+async function loadMirrorDataInBackground(mappingObj, stripList, replaceList) {
+    try {
+        const remap = mappingObj.remap || {};
+
+        // Load 5etools mirror data
         let mirrorItems = [];
         for (const file of ITEM_JSON_FILES) {
             const data = await tryFetchJSON(file);
@@ -190,7 +205,7 @@ async function loadData() {
             if (arr.length) mirrorItems.push(...arr);
         }
 
-        // When building mirrorItemMap:
+        // Build mirrorItemMap
         let mirrorItemMap = {};
         for (const item of mirrorItems) {
             if (item.name) {
@@ -203,7 +218,7 @@ async function loadData() {
             }
         }
 
-        // 4. For each CSV row, add to item_data if not already present
+        // For each CSV row, add to item_data if not already present
         let missingMirrorCount = 0;
         for (const row of allData) {
             const name = row[2]; // raw name from CSV
@@ -259,8 +274,15 @@ async function loadData() {
         // 6. itemsData is now just the values of item_data
         itemsData = Object.values(item_data);
 
+        // 7. If the details modal is open, refresh it with new data
+        const modal = document.getElementById('itemDetailsModal');
+        if (modal && modal.classList.contains('show') && window.selectedRowName) {
+            const row = allData.find(r => r[2] === window.selectedRowName);
+            if (row && typeof renderDetails === "function") renderDetails(row);
+        }
+
     } catch (err) {
-        console.error("Failed to load data:", err);
+        console.error("Failed to load mirror data:", err);
     }
 }
 function uniqueSorted(arr) {
