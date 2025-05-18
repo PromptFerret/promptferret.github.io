@@ -12,7 +12,6 @@ function addToCart(name) {
     });
     updateAddToCartBtn(name);
     updateCartCount();
-    applyFilters();
 }
 
 function updateAddToCartBtn(name) {

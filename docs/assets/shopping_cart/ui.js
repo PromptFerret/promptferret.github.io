@@ -191,7 +191,7 @@ function renderTable(data) {
             e.stopPropagation();
             const name = decodeURIComponent(btn.getAttribute('data-name'));
             addToCart(name);
-            applyFilters();
+            // applyFilters(); // REMOVE THIS LINE
         });
     });
 
