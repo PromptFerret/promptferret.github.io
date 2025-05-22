@@ -1,23 +1,36 @@
 /* --- Theme Variables --- */
 :root {
+    /* Main brand colors */
     --pf-gold: #f4874c;
-    --pf-gold-dark: #c96a36;
-    /* a deeper, muted orange for dark mode */
-    --pf-gold-hover: #ff9b66;
-    /* lighter, more saturated for hover */
-    --pf-gold-hover-dark: #ffb185;
-    /* lighter, softer orange for dark hover */
-    --pf-title-light: #7a3c00;
-    --pf-title-dark: #f4b942;
-    --pf-source-light: #4c2c91;
-    --pf-source-dark: #d1b2ff;
+    --pf-title: #7a3c00;
+    --pf-source: #4c2c91;
     --pf-secondary: #666;
+
+    /* Derived colors using color-mix for best browser support, fallback to filter: brightness in usage */
+    --pf-gold-dark: color-mix(in srgb, var(--pf-gold) 70%, black 30%);
+    --pf-gold-hover: color-mix(in srgb, var(--pf-gold) 80%, white 20%);
+    --pf-gold-hover-dark: color-mix(in srgb, var(--pf-gold) 60%, white 40%);
+    --pf-title-dark: color-mix(in srgb, var(--pf-title) 60%, white 40%);
+    --pf-source-dark: color-mix(in srgb, var(--pf-source) 60%, white 40%);
+
+    /* Table head and border colors */
     --pf-table-head-light: #f8f9fa;
     --pf-table-head-dark: #23272b;
     --pf-table-head-border-light: #dee2e6;
     --pf-table-head-border-dark: #343a40;
     --pf-table-head-color-light: #212529;
     --pf-table-head-color-dark: #f8f9fa;
+}
+
+/* Fallback for browsers that do not support color-mix */
+@supports not (color: color-mix(in srgb, red, blue)) {
+    :root {
+        --pf-gold-dark: #c96a36;
+        --pf-gold-hover: #ff9b66;
+        --pf-gold-hover-dark: #ffb185;
+        --pf-title-dark: #f4b942;
+        --pf-source-dark: #d1b2ff;
+    }
 }
 
 [data-bs-theme="light"] {
@@ -179,7 +192,7 @@
     border-left: 1px solid var(--bs-border-color, #dee2e6);
     height: fit-content;
     position: sticky;
-    top: .625rem;
+    top: 0.625rem;
     max-height: calc(65vh - 250px);
     overflow-y: auto;
     border-radius: 0.5rem;
@@ -205,7 +218,7 @@
         margin-left: 1.5rem;
         margin-top: 0;
         position: sticky;
-        top: .625rem;
+        top: 0.625rem;
     }
 }
 
@@ -326,11 +339,11 @@
 
 /* Instantly show/hide the filter collapse on mobile (no animation) */
 @media (max-width: 991px) {
-  #mobileFilters.collapse,
-  #mobileFilters.collapsing {
-    transition: none !important;
-    height: auto !important;
-  }
+    #mobileFilters.collapse,
+    #mobileFilters.collapsing {
+        transition: none !important;
+        height: auto !important;
+    }
 }
 
 /* Always show filters on desktop, regardless of collapse state */
@@ -354,7 +367,7 @@
     vertical-align: middle;
 }
 
-.table> :not(caption)>*>* {
+.table > :not(caption) > * > * {
     background: none;
     border-bottom-width: 1px;
 }
@@ -409,23 +422,38 @@ tr.selected-row:hover {
     width: max-content;
 }
 
-  html,body{overflow-x:hidden!important;}
-  .row,#tableWrapper,.table-responsive-custom{
-    width:100vw!important;
-    max-width:100vw!important;
-    min-width:100vw!important;
-    margin:0!important;
-    padding:0!important;
-    box-sizing:border-box;
-  }
-  /* .table-responsive-custom{overflow-x:hidden!important;} */
-  .sticky-table-scrollbar{
-    position:fixed;left:0;right:0;bottom:0;height:22px;
-    background:var(--bs-body-bg,#fff);z-index:1050;
-    box-shadow:0 -2px 8px rgba(0,0,0,0.07);
-    display:block!important;overflow-x:auto;overflow-y:hidden;width:100vw;
-  }
-  .sticky-table-scrollbar>div{height:1px;}
+html,
+body {
+    overflow-x: hidden !important;
+}
+.row,
+#tableWrapper,
+.table-responsive-custom {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+}
+/* .table-responsive-custom{overflow-x:hidden!important;} */
+.sticky-table-scrollbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 22px;
+    background: var(--bs-body-bg, #fff);
+    z-index: 1050;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.07);
+    display: block !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100vw;
+}
+.sticky-table-scrollbar > div {
+    height: 1px;
+}
 
 /* --- Cart/Buttons --- */
 #cart-count {
@@ -549,7 +577,7 @@ select.form-select {
 #itemDetailsModal .modal-content {
     margin: 0 auto !important;
     border-radius: 0.5rem;
-    box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+    box-shadow: 0 4px 32px rgba(0, 0, 0, 0.18);
     width: 100%;
     max-width: 600px;
 }
@@ -593,7 +621,7 @@ select.form-select {
 #itemDetailsModal .modal-content {
     margin: 0 auto !important;
     border-radius: 0.5rem;
-    box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+    box-shadow: 0 4px 32px rgba(0, 0, 0, 0.18);
     width: 100%;
     max-width: 600px;
 }
@@ -617,7 +645,6 @@ select.form-select {
 
 /* --- Mobile Tweaks --- */
 @media (max-width: 575.98px) {
-
     html,
     body {
         overflow-x: hidden !important;
@@ -660,7 +687,8 @@ html {
 }
 
 /* --- Sticky Header --- */
-header.navbar, .navbar {
+header.navbar,
+.navbar {
     position: fixed !important;
     top: 0;
     left: 0;
@@ -670,7 +698,7 @@ header.navbar, .navbar {
     max-width: 100vw;
     z-index: 2000;
     background: var(--bs-body-bg, #fff);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
     margin-left: 0 !important;
     margin-right: 0 !important;
     padding-left: 0 !important;
