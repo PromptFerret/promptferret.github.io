@@ -334,7 +334,7 @@ function renderDetails(rowData, highlightText = "") {
                 <b>No detailed description could be found for this item.</b>
                 ${
                     link && link.trim()
-                    ? `<br><br>For more information, please click 
+                    ? `<br><br>For more information, please click
                         <a href="${link}" target="_blank" rel="noopener" class="btn btn-primary btn-sm ms-1 table-link-btn" style="display:inline-block;vertical-align:middle;">
                             <i class="fa-solid fa-up-right-from-square"></i> Open Link
                         </a>.`
@@ -552,6 +552,12 @@ function setupEvents() {
         modal.show();
     });
     document.getElementById('order-btn').addEventListener('click', () => {
+        // Get names from inputs
+        let discordName = document.getElementById('discord-name-input')?.value.trim() || "discordName";
+        const characterName = document.getElementById('character-name-input')?.value.trim() || "characterName";
+        // Strip any leading @ from discordName
+        if (discordName.startsWith("@")) discordName = discordName.slice(1);
+
         // Filter out items with blank or 0 quantity
         const filtered = cart.filter(item => {
             // Remove if quantity is blank, 0, or not a number
@@ -606,7 +612,9 @@ function setupEvents() {
             );
         });
 
-        let output = `discordName as characterName buys:\n${lines.join('\n')}\nTotal ${total.toLocaleString()} GP`;
+        // Only add @ if discordName was changed from the default
+        let discordPrefix = (discordName !== "discordName") ? `@${discordName}` : discordName;
+        let output = `${discordPrefix} as ${characterName} buys:\n${lines.join('\n')}\nTotal ${total.toLocaleString()} GP`;
 
         // Copy to clipboard
         const orderBtn = document.getElementById('order-btn');
@@ -695,6 +703,38 @@ function setupEvents() {
                 if (modal) modal.hide();
             }
         });
+    }
+
+    // Discord name tip on focus
+    const discordInput = document.getElementById('discord-name-input');
+    let discordTipTimeout = null;
+    let discordTipActive = false;
+    if (discordInput) {
+        const showDiscordTip = () => {
+            let toast = $('#copyToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'copyToast';
+                toast.className = 'copy-toast';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = "Use your default Discord username (not your server nickname).";
+            toast.style.left = `${discordInput.getBoundingClientRect().left + discordInput.offsetWidth / 2}px`;
+            toast.style.top = `${discordInput.getBoundingClientRect().top - 28 + window.scrollY}px`;
+            toast.style.opacity = 1;
+            toast.style.transform = "translateY(-20px)";
+            discordTipActive = true;
+        };
+        const hideDiscordTip = () => {
+            let toast = $('#copyToast');
+            if (toast && discordTipActive) {
+                toast.style.opacity = 0;
+                toast.style.transform = "translateY(-10px)";
+                discordTipActive = false;
+            }
+        };
+        discordInput.addEventListener('focus', showDiscordTip);
+        discordInput.addEventListener('blur', hideDiscordTip);
     }
 }
 
