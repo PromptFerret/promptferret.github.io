@@ -727,3 +727,7 @@ body {
     color: #ffb185;
     border-left: 5px solid var(--pf-gold-dark, #c96a36);
 }
+
+.pf-green-check {
+    color: green !important;
+}
