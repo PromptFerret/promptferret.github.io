@@ -1,11 +1,9 @@
 * **Race**: *Changeling*
-* **Age**: *22 (Appears early twenties)*  
-* **Gender**: *Fluid, but naturally leans feminine*  
+* **Age**: *22 (Appears early twenties)*
+* **Gender**: *Fluid, but naturally leans feminine*
 * **Sexuality**: *Undefined, uncertain*
 * **Goals**:
 Nyx has spent her life wearing faces, slipping into lives as easily as others slip into conversation. Each of her personas **has found belonging**—a purpose, a place, a role to fill. But Nyx herself? **She has never truly belonged anywhere.**
-
-` This is a test `
 
 She does not know what it means to be changeling. She has never met another like herself, never heard her own truth spoken by another. Her existence has been a **performance**—an act perfected not out of deception, but survival. She is _what others need her to be_ because she does not know what it means to simply be _herself_.
 
@@ -176,9 +174,9 @@ She dips a finger into the drink, swirling it slowly before pulling it free, a w
 ```
 
 ### Lirin Vey – The Unseen Blade
-* **Race**: *Human*  
-* **Age**: *29*  
-* **Gender**: *Female*  
+* **Race**: *Human*
+* **Age**: *29*
+* **Gender**: *Female*
 * **Sexuality**: *Doesn’t matter; survival comes first*
 * **Goals**:
 Lirin doesn’t fight for glory, wealth, or power—**she fights to live.** There’s no art to killing, no honor in a clean strike. **It’s just work.** Simple, efficient, necessary.
