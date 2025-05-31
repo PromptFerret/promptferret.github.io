@@ -58,6 +58,9 @@ function renderObsidianCallouts() {
     };
 
     document.querySelectorAll("blockquote").forEach((block) => {
+        const rawText = block.innerText.trim();
+        if (!rawText.startsWith("[!")) return; // Only convert callout-style blockquotes
+
         if (block.classList.contains("obsidian-callout-processed")) return;
 
         const calloutChunks = [];
