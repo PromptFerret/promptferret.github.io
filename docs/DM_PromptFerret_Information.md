@@ -1,7 +1,7 @@
 
 ![A circle with logo written in the center](https://lh7-rt.googleusercontent.com/docsz/AD_4nXdUM9OtvxlfMzSjAZnDKJLVrcbm9lJXP2CCHxegsUR7P_0XkQwUvQ67rkMcK00r4lzcXfJwX_aJSTwTpk3QfnCiTDEP8W-9SwdNAEE9-ADV-PONX_FLHwIGht5vgek-TR8NPr7vNg?key=sbHuWRD8Bpaevg7ipnajKw)
 
----
+> “The dice don’t care about your plans — but I might.”
 # SUMMARY
 - **Status:** Apprentice DM
 - **Average Game Tier:** T2
