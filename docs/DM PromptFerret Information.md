@@ -1,8 +1,8 @@
 
 ![A circle with logo written in the center](https://lh7-rt.googleusercontent.com/docsz/AD_4nXdUM9OtvxlfMzSjAZnDKJLVrcbm9lJXP2CCHxegsUR7P_0XkQwUvQ67rkMcK00r4lzcXfJwX_aJSTwTpk3QfnCiTDEP8W-9SwdNAEE9-ADV-PONX_FLHwIGht5vgek-TR8NPr7vNg?key=sbHuWRD8Bpaevg7ipnajKw)
 
-# SUMMARY
 ---
+# SUMMARY
 - **Status:** Apprentice DM
 - **Average Game Tier:** T2
 - **Timezone & Active Hours:** Pacific, mostly Fri, Sat and Sun
@@ -83,6 +83,5 @@ Living World Information: https://marrowfen.github.io/
 ---
 # REQUESTS
 
----
 - Soon
     
