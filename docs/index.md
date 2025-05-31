@@ -40,5 +40,5 @@ This will be where I host my Obsidian notebook with all my personal projects on 
 
 Ignore this....
 
-[[Untitled]]
-[[DM PromptFerret Information]]
+- [[Untitled]]
+- [[DM PromptFerret Information]]
