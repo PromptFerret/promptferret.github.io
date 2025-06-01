@@ -10,7 +10,7 @@
 - **Genre:** Living world, Random one shots
 - **Strengths: I love RP and failure:** The best stories are not told about successes, but the failures we faced when trying to succeed.
 
-Living World Information: (https://marrowfen.github.io/)[https://marrowfen.github.io/]
+Living World Information: [https://marrowfen.github.io/](https://marrowfen.github.io/)
 
 ---
 # RULES
