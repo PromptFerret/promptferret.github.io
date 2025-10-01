@@ -1,0 +1,121 @@
+site_name: PromptFerret
+site_url: https://promptferret.github.io
+
+theme:
+    # favicon: assets/favicon.ico
+    # logo: assets/logo.png
+    name: "material"
+    features:
+        - navigation.tabs
+        - navigation.sections
+        - navigation.expand
+        - navigation.instant
+        - navigation.tabs.sticky
+        # - navigation.path
+        - navigation.indexes
+        - toc.follow
+        # - toc.integrate
+        - header.autohide
+
+    palette:
+        # Light mode
+        - media: "(prefers-color-scheme: light)"
+          scheme: default
+          primary: blue grey
+          accent: light blue
+          toggle:
+              icon: material/toggle-switch-off-outline
+              name: Switch to dark mode
+
+        # Dark mode
+        - media: "(prefers-color-scheme: dark)"
+          scheme: slate
+          primary: blue grey
+          accent: light blue
+          toggle:
+              icon: material/toggle-switch
+              name: Switch to light mode
+
+extra:
+    consent:
+        title: Cookie consent
+        actions:
+            - accept
+            - reject
+        description: >-
+            We use cookies to recognize your repeated visits and preferences, as well
+            as to measure the effectiveness of our documentation and whether users
+            find what they're searching for. With your consent, you're helping us to
+            make our documentation better.
+
+nav:
+    - Home: index.md
+    - Arcanum Mechanica:
+          - Arcanum Mechanica/Welcome.md
+          - Races & Species:
+                - Arcanum Mechanica/Races & Species/Overview.md
+                - Animari: Arcanum Mechanica/Races & Species/Animari.md
+                - Sentari: Arcanum Mechanica/Races & Species/Sentari.md
+          - Stars & Solar Systems:
+                - Arcanum Mechanica/Stars & Solar Systems/Overview.md
+                - Eldraluma:
+                      - Arcanum Mechanica/Stars & Solar Systems/Eldraluma/Overview.md
+
+# Extensions
+markdown_extensions:
+    - footnotes
+    - attr_list
+    - pymdownx.arithmatex:
+          generic: true
+    # - pymdownx.superfences
+    # - pymdownx.details
+    # - pymdownx.magiclink
+    - pymdownx.tasklist:
+          custom_checkbox: true
+    - def_list
+    - pymdownx.critic
+    - pymdownx.caret
+    - pymdownx.keys
+    - pymdownx.mark
+    - pymdownx.tilde
+    - wikilinks
+    - pymdownx.superfences
+    - admonition
+    - pymdownx.details
+    - pymdownx.superfences
+      # custom_fences:
+      #     - name: mermaid
+      #       class: mermaid
+      #       format: !!python/name:pymdownx.superfences.fence_code_format
+    - toc:
+          permalink: true
+
+plugins:
+    - search
+    - roamlinks
+    # - blog
+    - rss:
+          match_path: blog/posts/.*
+          date_from_meta:
+              as_creation: date
+          categories:
+              - categories
+              - tags
+
+extra_css:
+    - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css
+    - assets/stylesheet/custom.css
+    - assets/stylesheet/obsidian-style-callouts.css
+
+extra_javascript:
+    - assets/javascript/mathjax.js
+    - https://polyfill.io/v3/polyfill.min.js?features=es6
+    - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+    - https://unpkg.com/mermaid/dist/mermaid.min.js
+    - https://code.jquery.com/jquery-3.7.1.min.js
+    - assets/javascript/random-story.js
+    - assets/javascript/obsidian-style-callouts.js
+    - assets/javascript/copy-inline-code.js
+    - assets/javascript/copy-code.js
+    - assets/javascript/copy-image-url.js
+    # - assets/javascript/disable-mobile.js
