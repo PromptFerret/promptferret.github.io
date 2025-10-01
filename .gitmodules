@@ -1,0 +1,4 @@
+[submodule "vault"]
+	path = docs
+	url = https://github.com/PromptFerret/promptferret_obsidian_vault.git
+	branch = main
