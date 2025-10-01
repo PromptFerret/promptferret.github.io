@@ -1,0 +1,136 @@
+/* Ensure the image container is positioned correctly */
+img {
+    position: relative;
+    display: block;
+}
+
+/* Ensure the image container is correctly positioned */
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.justify {
+    text-align: justify;
+}
+
+/* Ensure code blocks wrap lines properly */
+.md-content pre {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* Copy Button Styling */
+.copy-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    opacity: 0.1;
+    transition: opacity 0.3s ease;
+}
+
+/* Show button only when hovering over the code block */
+pre {
+    position: relative;
+}
+pre:hover .copy-button {
+    opacity: 1;
+}
+
+/* SVG Icon Styling */
+.copy-button svg {
+    width: 20px;
+    height: 20px;
+    stroke: #fff; /* Change color if needed */
+}
+
+/* Fix the position of the copy button */
+/* Style the copy button */
+.copy-image-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    opacity: 0.1;
+    transition: opacity 0.3s ease;
+}
+
+/* Show the button when hovering over the image */
+.image-container:hover .copy-image-button {
+    opacity: 1;
+}
+
+/* SVG Icon Styling */
+.copy-image-button svg {
+    width: 18px;
+    height: 18px;
+    stroke: #fff;
+}
+
+/* Wrap inline code blocks */
+.inline-code-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Copy button for inline code */
+.copy-inline-button {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    opacity: 0.1;
+    transition: opacity 0.3s ease;
+}
+
+/* Show button on hover */
+.inline-code-wrapper:hover .copy-inline-button {
+    opacity: 1;
+}
+
+/* Small icon size */
+.copy-inline-button svg {
+    width: 14px;
+    height: 14px;
+    stroke: #fff;
+}
+
+/*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*/
