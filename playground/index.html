@@ -896,14 +896,18 @@ Source: Prompt Ferret, 2025</p>
 <div style="
   padding:1rem; margin:1rem 0; border-radius:6px;
   color: var(--text-normal, var(--md-default-fg-color, inherit));
-  background-color: var(--background-secondary, var(--md-default-bg-color, #f7f8fa));
+  /* Make a subtle tint from accent + page bg */
+  background: color-mix(in srgb,
+    var(--interactive-accent, var(--md-accent-fg-color, #00bcd4)) 12%,
+    var(--background-primary, var(--md-default-bg-color, #ffffff))
+  );
   border-left: 4px solid var(--interactive-accent, var(--md-accent-fg-color, #00bcd4));
 ">
   <strong style="display:block; font-size:1.15rem; margin-bottom:0.35rem;">
     Welcome to The Starry Shore
   </strong>
   <em>
-    Discover an endless number of worlds to explore at The Starry Shore! A place of respite adrift in the Astral Sea…
+    Discover an endless number of worlds to explore at The Starry Shore…
   </em>
 </div>
 
