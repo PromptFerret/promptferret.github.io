@@ -1,0 +1,68 @@
+.md-typeset .timeline {
+  position: relative;
+  max-width: 900px;
+  margin: 2em auto;
+  padding: 0 2em;
+  font-size: .5rem;
+}
+
+.md-typeset .timeline::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  background-color: var(--md-default-fg-color--light, #ccc);
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  margin-left: -2px;
+}
+
+.md-typeset .timeline-entry {
+  padding: 1em 2em;
+  position: relative;
+  width: 50%;
+}
+
+.md-typeset .timeline-entry.left {
+  left: 0;
+}
+
+.md-typeset .timeline-entry.right {
+  left: 50%;
+}
+
+.md-typeset .timeline-content {
+  background-color: var(--md-default-bg-color, #f0f0f0);
+  color: var(--md-typeset-color, #111);
+  border: 1px solid var(--md-default-fg-color--light, #ccc);
+  padding: 1em;
+  border-radius: 6px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+}
+
+.md-typeset .timeline-entry.left .timeline-content {
+  margin-left: auto;
+}
+
+.md-typeset .timeline-entry.right .timeline-content {
+  margin-right: auto;
+}
+
+.md-typeset .timeline-entry::before {
+  content: '';
+  position: absolute;
+  top: 1em;
+  width: 14px;
+  height: 14px;
+  background-color: var(--md-primary-fg-color, #666);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.md-typeset .timeline-entry.left::before {
+  right: -7px;
+}
+
+.md-typeset .timeline-entry.right::before {
+  left: -7px;
+}
