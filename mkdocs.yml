@@ -48,18 +48,18 @@ extra:
             find what they're searching for. With your consent, you're helping us to
             make our documentation better.
 
-nav:
-    - Home: index.md
-    - Arcanum Mechanica:
-          - Arcanum Mechanica/Welcome.md
-          - Races & Species:
-                - Arcanum Mechanica/Races & Species/Overview.md
-                - Animari: Arcanum Mechanica/Races & Species/Animari.md
-                - Sentari: Arcanum Mechanica/Races & Species/Sentari.md
-          - Stars & Solar Systems:
-                - Arcanum Mechanica/Stars & Solar Systems/Overview.md
-                - Eldraluma:
-                      - Arcanum Mechanica/Stars & Solar Systems/Eldraluma/Overview.md
+# nav:
+#     - Home: index.md
+#     - Arcanum Mechanica:
+#           - Arcanum Mechanica/Welcome.md
+#           - Races & Species:
+#                 - Arcanum Mechanica/Races & Species/Overview.md
+#                 - Animari: Arcanum Mechanica/Races & Species/Animari.md
+#                 - Sentari: Arcanum Mechanica/Races & Species/Sentari.md
+#           - Stars & Solar Systems:
+#                 - Arcanum Mechanica/Stars & Solar Systems/Overview.md
+#                 - Eldraluma:
+#                       - Arcanum Mechanica/Stars & Solar Systems/Eldraluma/Overview.md
 
 # Extensions
 markdown_extensions:
