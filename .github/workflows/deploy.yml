@@ -50,7 +50,9 @@ jobs:
                     mkdocs-roamlinks-plugin \
                     mkdocs-blog-plugin \
                     mkdocs-rss-plugin \
-                    pymdown-extensions
+                    pymdown-extensions \
+                    mkdocs-awesome-pages-plugin \
+                    mkdocs-exclude
 
             - name: Deploy to GitHub Pages (gh-pages branch)
               env:
