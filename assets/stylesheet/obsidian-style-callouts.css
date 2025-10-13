@@ -160,55 +160,55 @@
 }
 
 .callout-statblock {
-    --callout-border: #a52a2a;
-    --callout-bg: #fdf1dc;
-    background: var(--callout-bg);
-    border-left: 4px solid var(--callout-border);
-    font-family: Georgia, serif;
-    padding: 1em 1.5em;
-    margin: 1.5em 0;
-    color: #111;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-    border-radius: 6px;
-    line-height: 1.6;
+  --callout-border: #a52a2a;
+  --callout-bg: #fdf1dc;
+  background: var(--callout-bg);
+  border-left: 4px solid var(--callout-border);
+  font-family: Georgia, serif;
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  color: #111;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  line-height: 1.6;
 }
 
 .callout-statblock .callout-header {
-    color: #a00;
-    font-family: Georgia, serif;
-    font-size: 1.15em;
-    font-weight: bold;
-    border-bottom: 2px solid #a52a2a;
-    padding-bottom: 0.3em;
-    margin-bottom: 0.8em;
+  color: #a00;
+  font-family: Georgia, serif;
+  font-size: 1.15em;
+  font-weight: bold;
+  border-bottom: 2px solid #a52a2a;
+  padding-bottom: 0.3em;
+  margin-bottom: 0.8em;
 }
 
 .callout-statblock h3,
 .callout-statblock h4 {
-    font-family: Georgia, serif;
-    color: #7b1e1e;
-    font-size: 1.15em;
-    border-bottom: 2px solid #c88;
-    margin-top: 1.2em;
-    margin-bottom: 0.5em;
+  font-family: Georgia, serif;
+  color: #7b1e1e;
+  font-size: 1.15em;
+  border-bottom: 2px solid #c88;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
 }
 
 .callout-statblock hr {
-    border: none;
-    border-bottom: 1px solid #c88;
-    margin: 1em 0;
+  border: none;
+  border-bottom: 1px solid #c88;
+  margin: 1em 0;
 }
 
 .callout-statblock p {
-    margin: 0.5em 0;
+  margin: 0.5em 0;
 }
 
 .callout-statblock strong {
-    color: #a52a2a;
-    font-weight: bold;
+  color: #a52a2a;
+  font-weight: bold;
 }
 
 .callout-statblock em {
-    color: #a52a2a;
-    font-style: italic;
+  color: #a52a2a;
+  font-style: italic;
 }

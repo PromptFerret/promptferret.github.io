@@ -40,6 +40,8 @@ function renderObsidianCallouts() {
 
         quote: "quote",
         cite: "quote",
+
+        statblock: "statblock"
     };
 
     const calloutIcons = {
@@ -55,11 +57,37 @@ function renderObsidianCallouts() {
         bug: "fa-solid fa-bug",
         example: "fa-solid fa-list",
         quote: "fa-solid fa-quote-left",
+        statblock: "fa-solid fa-dice-d20"
     };
 
+    function convertInlineMarkdown(text) {
+        const escapeHtml = (str) =>
+            str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+
+        const escaped = escapeHtml(text);
+
+        return escaped
+            // bold: **text**
+            .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+            // italic: *text*
+            .replace(/\*(.+?)\*/g, "<em>$1</em>")
+            // underline: __text__
+            .replace(/__(.+?)__/g, "<u>$1</u>")
+            // strikethrough: ~~text~~ (optional)
+            .replace(/~~(.+?)~~/g, "<s>$1</s>");
+    }
+
+
+
     document.querySelectorAll("blockquote").forEach((block) => {
-        const rawText = block.innerText.trim();
-        if (!rawText.startsWith("[!")) return; // Only convert callout-style blockquotes
+        const blockText = block.textContent.trim();
+
+        console.log("🧪 Blockquote candidate:", blockText);
+        if (!blockText.startsWith("[!")) return;
+        console.log("✅ Matched callout block:", blockText);
+
 
         if (block.classList.contains("obsidian-callout-processed")) return;
 
@@ -68,6 +96,7 @@ function renderObsidianCallouts() {
 
         const rawHtml = block.innerHTML;
         const lines = rawHtml.split(/<br\s*\/?>|\n/);
+
 
         lines.forEach((line) => {
             const div = document.createElement("div");
@@ -89,8 +118,22 @@ function renderObsidianCallouts() {
                 };
             } else if (currentChunk && text !== "") {
                 const p = document.createElement("p");
-                p.innerHTML = line.trim();
-                currentChunk.content.push(p);
+                const lineText = line.trim();
+
+                // Convert lines like "Traits" or "Actions" into headers
+                if (/^(Traits|Actions|Reactions|Legendary Actions|Lair Actions)\s*[:¶]?$/.test(lineText)) {
+                    const h = document.createElement("h3");
+                    h.textContent = lineText.replace(/[:¶]$/, '');
+                    currentChunk.content.push(h);
+                } else {
+                    const p = document.createElement("p");
+                    const isPlain = !/[<>]/.test(lineText); // skip markdown conversion if tags exist
+                    p.innerHTML = isPlain ? convertInlineMarkdown(lineText) : lineText;
+                    currentChunk.content.push(p);
+
+                }
+
+
             }
         });
 

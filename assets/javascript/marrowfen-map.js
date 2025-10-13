@@ -13,7 +13,7 @@ function renderMarrowfenMap() {
         [0, 0],
         [1344, 1357],
     ];
-    const image = L.imageOverlay("/assets/img/marrowfen-map.png", bounds).addTo(map);
+    const image = L.imageOverlay("/assets/images/Marrowfen/marrowfen-map.png", bounds).addTo(map);
     map.fitBounds(bounds);
 
     const markers = [
