@@ -124,14 +124,25 @@ async function loadData() {
             }
         });
 
+        // Default ordering: group by Perk Type (column 1) first, then Tier (column 0).
+        // Tier keeps the special ordering: -1 (Mundane) first, then 0, then numeric ascending.
         allData.sort((a, b) => {
+            const typeA = (a[1] || "").toLowerCase();
+            const typeB = (b[1] || "").toLowerCase();
+            const typeCmp = typeA.localeCompare(typeB);
+            if (typeCmp !== 0) return typeCmp;
+
             const ta = parseInt(a[0], 10);
             const tb = parseInt(b[0], 10);
-            if (ta === -1 && tb !== -1) return -1;
-            if (tb === -1 && ta !== -1) return 1;
-            if (ta === 0 && tb !== 0) return -1;
-            if (tb === 0 && ta !== 0) return 1;
-            return ta - tb;
+
+            const tierRank = (t) => {
+                if (t === -1) return -2; // Mundane first
+                if (t === 0) return -1; // then 0
+                if (!isNaN(t)) return t; // then numeric tiers
+                return 1000; // unknown/other values go last
+            };
+
+            return tierRank(ta) - tierRank(tb);
         });
 
         // 2. Load custom_items.json into item_data (initially only custom items)
