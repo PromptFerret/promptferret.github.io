@@ -1898,8 +1898,24 @@
   <h1>2   Another test, this one should test scripts.</h1>
 
 <script>
-alert('Testing');
+  (function () {
+    // Wait until the HTML is parsed
+    document.addEventListener('DOMContentLoaded', function () {
+      // IDs with spaces are awkward for CSS selectors, but work with getElementById
+      var mount = document.getElementById('MY TOOL');
+      if (!mount) return;
+
+      // Inject text (plain text)
+      mount.textContent = 'Hello from /tools! Injected on page load.';
+
+      // If you want rich HTML instead of plain text, use innerHTML:
+      // mount.innerHTML = '<strong>Hello</strong> from <em>/tools</em>!';
+    });
+  })();
 </script>
+
+<div id="MY TOOL">
+</div>
 
 
 
