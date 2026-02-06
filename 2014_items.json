@@ -301,7 +301,7 @@
         "Book/Page": "TDCSR p100",
         "Notes": "",
         "Link": "https://5e.tools/items.html#gluebomb_tdcsr",
-        "Description": "This unique explosive can be primed and thrown up to 30 feet as an action. It explodes on impact. Creatures within 20 feet of it must make a DC 12 Dexterity saving throw or be restrained for 1 minute. A restrained creature can make a DC 12 Strength check as an action, escaping on a success."
+        "Description": ""
     },
     "hoopak": {
         "Tier": "-1",
@@ -477,7 +477,7 @@
         "Book/Page": "TDCSR p100",
         "Notes": "",
         "Link": "https://5e.tools/items.html#stink%20bomb_tdcsr",
-        "Description": "This smelly explosive can be primed and thrown up to 30 feet as an action. It explodes at the start of your next turn. Creatures within 20 feet of it must make a DC 12 Constitution saving throw or be poisoned for 1 minute. A creature can repeat this save at the end of each of its turns, ending the effect on itself on a success."
+        "Description": ""
     },
     "tangler-grenade": {
         "Tier": "-1",
@@ -573,7 +573,7 @@
         "Book/Page": "GH:PP",
         "Notes": "requires attunement by a creature of good alignment",
         "Link": "https://5e.tools/items.html#zeal_grimhollowplayerpack",
-        "Description": "Distilled from the ichor of demons, zeal was originally used by Tal'Dorei's ancient berserkers to grant them incredible strength and courage before battles. These days, it's most commonly used by criminal bruisers before a brawl. Most modern warriors stay well away from zeal, due both to its addictive nature and to the mental and physical degeneration it can cause over long periods of time. When prepared properly, zeal is a purple, ashy-tasting gel that typically costs 150 gp per dose.\n\nAfter slathering zeal across your exposed skin as an action, you must make a DC 12 Constitution saving throw. On a failure, you become paralyzed for 1d4 rounds as your muscles lock up. On a success, your weapon attacks deal an additional 1d6 damage for the next minute. After this effect ends, you gain one level of exhaustion."
+        "Description": ""
     },
     "hunting-rifle": {
         "Tier": "-1",
@@ -1837,7 +1837,7 @@
         "Book/Page": "TDCSR p195",
         "Notes": "",
         "Link": "https://5e.tools/items.html#doublet%20of%20dramatic%20demise_tdcsr",
-        "Description": "This striking satin jacket allows you to make the most of your dying moments. When you drop to 0 hit points while wearing this doublet, you do not fall unconscious. Instead, you are incapacitated and your speed becomes 0, but you can speak and communicate.\n\nYou make death 1 as normal, but if you roll a 1 on the d20, you swoon with a loud gasp and die instantly."
+        "Description": ""
     },
     "dragon-compass": {
         "Tier": "0",
@@ -1917,7 +1917,7 @@
         "Book/Page": "TDCSR p195",
         "Notes": "",
         "Link": "https://5e.tools/items.html#echo%20stone_tdcsr",
-        "Description": "This dull-blue river stone is soft to the touch, and makes remarkably little sound if dropped. When an echo stone is squeezed as an action, it glows faintly for 1 minute. The stone records all sound made within 15 feet of it while glowing, then repeats that recorded sound at an equal volume once every 5 minutes. This cycle of repetition continues until the stone is squeezed again as an action, which silences it. Squeezing the stone twice in quick succession as an action causes it to play the sounds it has most recently recorded, rather than recording new sounds."
+        "Description": ""
     },
     "enduring-spellbook": {
         "Tier": "0",
@@ -2621,7 +2621,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#sunbeam%20compass_tdcsr",
-        "Description": "A device that always directs the user to the sun by emitting a small light at the tip of the needle in a glass orb, allowing it to rotate in all directions—a very useful tool when exploring subterranean territory.\n\nCreated by Karaline von Ethro."
+        "Description": ""
     },
     "talking-doll": {
         "Tier": "0",
@@ -4877,7 +4877,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#mirror%20of%20infinite%20transpondence_tdcsr",
-        "Description": "These silver hand mirrors always come in pairs. When activated as an action, a mirror establishes a visual link with its paired mirror for 10 minutes, with the two mirrors acting as opposite sides of the same open window. The mirrors create this connection even if both are on different planes.\n\nWhen a single mirror of infinite transpondence is found, the GM decides where its paired mirror is and who possesses it. A random possessor and location can be determined by rolling on the table below. Named bearers are described in chapter 2.\n\nOnce the connection between the two mirrors has been activated three times from either end, it can't be activated again until the next dawn."
+        "Description": ""
     },
     "mithral-armor": {
         "Tier": "1",
@@ -5133,7 +5133,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#raven's%20slumber_tdcsr",
-        "Description": "This black crystal pendant is a magical gateway to a small pocket dimension. You can use the pendant as an improvised weapon to make a melee or ranged weapon attack against a Large or smaller creature. On a hit, the target must succeed on a DC 10 Wisdom saving throw or be trapped within the crystal. A creature that wants to be trapped can intentionally fail this saving throw.\n\nOnly one creature at a time can be held in a raven's slumber. That creature is aware of the passage of time and can see the world outside of this talisman as if through a window. You can release a held creature to an unoccupied space within 5 feet of you as a bonus action.\n\nIf a companion creature granted to you by a class feature, or a beast that you've tamed as a companion, is reduced to 0 hit points while within 100 feet of you, it is immediately drawn into the pendant and stabilized. If the pendant already holds a creature, this effect fails."
+        "Description": ""
     },
     "ring-of-hidden-desire": {
         "Tier": "1",
@@ -5405,7 +5405,7 @@
         "Book/Page": "TDCSR",
         "Notes": "transform once",
         "Link": "https://5e.tools/items.html#rod%20of%20mercurial%20form_tdcsr",
-        "Description": "This humble steel rod is engraved with tiny symbols representing different weapons, as well as the monogram \"T.D.\" A creature holding this rod can speak the name of any simple or martial weapon aloud as a bonus action, causing the rod to transform into an ordinary weapon of that type. When in the form of a ranged weapon, this rod magically creates its own ammunition, which disappears after a ranged attack hits or misses."
+        "Description": ""
     },
     "rod-of-retribution": {
         "Tier": "1",
@@ -5757,7 +5757,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#tinkertop%20boltblaster%201000_tdcsr",
-        "Description": "This strange contraption of gears, wires, and lacquered wood has a handle with a metal grip and crank. Its stock bears a flamboyant maker's mark that reads: \"Made in Hupperdook,\" a city in Wildemount. You gain a +1 bonus to attack and damage rolls made with this magic weapon.\n\nWhen you roll a 20 on an attack roll made with this weapon, you can immediately make another attack with this weapon after resolving the critical hit. When you roll a 1 on an attack roll made with this weapon, you must succeed on a DC 14 Dexterity saving throw or take 1d6 piercing damage as some of its gears and wires spring loose."
+        "Description": ""
     },
     "travel-alchemical-kit-max-rank": {
         "Tier": "1",
@@ -7117,7 +7117,7 @@
         "Book/Page": "TDCSR p194",
         "Notes": "",
         "Link": "https://5e.tools/items.html#boots%20of%20the%20vigilant_tdcsr",
-        "Description": "While you wear these boots, you can sense impending danger. After you roll initiative, you can choose to roll a d8 and add it to your initiative roll. Once this property is used, it can't be used again until the next dawn."
+        "Description": ""
     },
     "bow-of-conflagration": {
         "Tier": "2",
@@ -7453,7 +7453,7 @@
         "Book/Page": "TDCSR p194",
         "Notes": "",
         "Link": "https://5e.tools/items.html#coat%20of%20the%20crest_tdcsr",
-        "Description": "This exquisite brocade coat is cut in a long, high-collared style popular among nobles of the Clovis Concord—a nation on the west coast of Wildemount whose stylish fashion is often mimicked in Tal'Dorei. Its shimmering lining hints at its magical properties. You gain a +1 bonus to AC while wearing this coat, which can be worn over light armor.\n\nAdditionally, the coat has 3 charges and regains 1d3 expended charges daily at dawn. When you are the target of an attack while wearing this coat, you can spend 1 charge as a reaction to gain resistance to one type of damage from the triggering attack. This resistance is effective against the triggering attack and lasts until the start of your next turn."
+        "Description": ""
     },
     "corpse-slayer": {
         "Tier": "2",
@@ -7885,7 +7885,7 @@
         "Book/Page": "TDCSR p198",
         "Notes": "",
         "Link": "https://5e.tools/items.html#earthboard_tdcsr",
-        "Description": "An earthboard is a slab of granite about three inches thick, nine feet long, and two feet wide, with smooth, tapered ends. However, its mundane appearance belies its unique elemental power, which reduces its weight to 40 pounds while a creature is attuned to it. Terrah can often be seen with these stone boards upon their backs as they trek into the crags of the Cliffkeep Mountains.\n\nWhile standing on an earthboard, you gain the following benefits:\n\nYour speed increases to 60 feet as the board skims across solid ground (but not liquid surfaces).\n\nIf you ramp off a surface of solid earth, you can long jump up to 60 feet. When you end this jump, you can choose to slam into the ground, creating a shockwave. Each creature standing on the ground within 20 feet of you must succeed on a DC 14 Strength saving throw or fall prone.\n\nYou have a burrowing speed of 20 feet that allows you to tunnel through earth or solid rock, leaving a 5-foot-diameter tunnel in your wake. As an action, you can increase this burrowing speed to 60 feet until the start of your next turn.\n\nThe earthboard always moves with you until you decide to dismount it (no action required).\n\nThese benefits last until you end your turn not standing on the earthboard."
+        "Description": ""
     },
     "eldritch-staff": {
         "Tier": "2",
@@ -8317,7 +8317,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#flamefriend%20lantern_tdcsr",
-        "Description": "This wrought-iron lantern holds a small fire elemental spirit. To attune to this item, you must also succeed on a DC 10 Charisma check to bond with the spirit inside the lantern.\n\n**Light and Flame**\n\nWhile attuned to the lantern, you can verbally ask the elemental to glow (no action required), causing the lantern to cast bright light in a radius of your choice up to 60 feet and dim light for the same distance beyond that. You can also cast the produce flame cantrip from the lantern at will. Wisdom is your spellcasting ability for this spell.\n\n**Elemental Essence**\n\nThe fire elemental spirit in the lantern can grant you a small fragment of its power. As an action, you gain one of the following benefits of your choice for 1 hour:\n\nYou have resistance to fire damage.\n\nWhenever a creature hits you with a melee attack, that creature takes fire damage equal to your proficiency bonus.\n\nYou can cast the burning hands spell (spell save DC 15) from the lantern at 3rd level. Once you cast the spell, you can't do so again until the next time you use this property of the lantern.\n\nOnce the elemental has shared its power with you in this way, it can't do so again until the next dawn.\n\n**Willful Attunement**\n\nYour 0 to the lantern lasts until you choose to end it, or until you anger the elemental (by dousing the lantern in water, attacking another nonhostile elemental being, and so forth). You can attempt to attune to the lantern again and repeat the check to bond with the elemental during a short or long rest, but you make this check with disadvantage until you have made amends to the spirit, as the GM determines."
+        "Description": ""
     },
     "flayer-slayer": {
         "Tier": "2",
@@ -8717,7 +8717,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#inescapable%20lash_tdcsr",
-        "Description": "This braided cord is dull bronze in color, ends in a splayed set of three barbs, and gleams like metal under any light. You gain a +1 bonus to attack and damage rolls made with this magic weapon, which has a reach of 20 feet. When you hit a creature or object using this whip, you can attempt to grapple the target as a bonus action.\n\nWhile you have a creature grappled using this whip, you can use your action to either pull the creature up to 20 feet toward you, or cause the creature to be restrained until you let go of the whip. A creature restrained in this way can escape by making a successful Strength (Athletics) or Dexterity (Acrobatics) check as an action. The DC of this check equals 8 + your proficiency bonus + your Strength modifier."
+        "Description": ""
     },
     "insignia-of-claws": {
         "Tier": "2",
@@ -10493,7 +10493,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#skysail_tdcsr",
-        "Description": "These bat-like wings were first used by the Zephrah to soar through the sky. They are constructed of either leather and bone, or cloth and wood, and are set onto a sturdy wooden pole that helps their user remain stable during flight.\n\nWhile these wings are open and you are riding the skysail, you can glide through the air. You have a flying speed of 60 feet, but you must descend at least 10 feet by the end of each of your turns and you can't gain altitude.\n\nAdditionally, while in contact with the skysail, you can use an action to cast the fly spell on yourself, with a duration of 1 minute and requiring no concentration.\n\nThe spell ends if you lose physical contact with the skysail. Once this property is used, it can't be used again until the next dawn, or unless the skysail is immersed in powerful magic of elemental air. (This includes magic such as that found at the top of the Summit Peaks near the rift of air in Zephrah, or on the Elemental Plane of Air).\n\nWhen the skysail is not in use, its wings can be retracted, and its pole can be used as a quarterstaff."
+        "Description": ""
     },
     "speaking-stone": {
         "Tier": "2",
@@ -10829,7 +10829,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#summer's%20dance_tdcsr",
-        "Description": "This beautiful golden blade appears to bend and flex like a reed with your movements. You gain a +1 bonus to attack and damage rolls made with this magic weapon.\n\nAdditionally, the scimitar has 3 charges and regains 1 expended charge daily at dawn. While wielding this scimitar, you can expend 1 charge as a bonus action to cast the misty step spell."
+        "Description": ""
     },
     "sun-eaters-mind": {
         "Tier": "2",
@@ -11549,7 +11549,7 @@
         "Book/Page": "TDCSR p194",
         "Notes": "",
         "Link": "https://5e.tools/items.html#cataclysm%20bolts_tdcsr",
-        "Description": "These steel crossbow bolt were first created by the Jaggenstrike Clan during the The Scattered War, and the secret to crafting them remains well guarded by the Houses of Kraghammer. Cataclysm bolts are usually kept in sets of ten, though anyone who holds even one can feel it thrumming with magical power. When you hit with an attack using a cataclysm bolt, the attack deals normal damage. Then roll a d6 on the following table to determine its additional effect.\n\nOnce the bolt hits, the enchantment ends and it becomes a normal piece of ammunition."
+        "Description": ""
     },
     "chi-balancing-tea": {
         "Tier": "3",
@@ -11773,7 +11773,7 @@
         "Book/Page": "TDCSR p85",
         "Notes": "",
         "Link": "https://5e.tools/items.html#oloore%20root%20teabag_tdcsr",
-        "Description": "This root is typically Oloore Root Teabag for 100 gp per dose. It was originally a ritualistic tool used by the followers of many gods, but now sees more recreational use. Oracles used it to enhance their divinations, for it helped them leave their physical bodies behind and become closer to gods and spirits. Drinking tea brewed from the root causes intense hallucinations, which feel like they have granted perfect clarity of mind to the imbiber.\n\nAfter drinking Oloore Root Teabag as an action, you must succeed on a DC 19 Constitution saving throw or experience vivid hallucinations for 1d4 hours. During this time, you have disadvantage on attack rolls and 0. If you fail the saving throw by 10 or more, your hallucinations become horrific visions and you gain a level of exhaustion. On a success, you gain preternatural clarity, allowing you to cast the scrying spell once within the next 1d4 hours."
+        "Description": ""
     },
     "potion-of-flying-each": {
         "Tier": "3",
@@ -12397,7 +12397,7 @@
         "Book/Page": "TDCSR p194",
         "Notes": "",
         "Link": "https://5e.tools/items.html#boots%20of%20haste_tdcsr",
-        "Description": "While you wear these boots, you can click your heels together to cast the haste spell on yourself as a bonus action. You don't suffer from lethargy when the spell ends when cast using these boots. Once this property is used, it can't be used again until next dawn."
+        "Description": ""
     },
     "bowl-of-commanding-water-elementals": {
         "Tier": "3",
@@ -12493,7 +12493,7 @@
         "Book/Page": "TDCSR p203",
         "Notes": "",
         "Link": "https://5e.tools/items.html#cabal's%20ruin_tdcsr",
-        "Description": "This cloak is made of heavy dark cloth trimmed with golden patterns, and occasionally shimmers with sparks of arcane energy. It was once worn by the famed gunslinger Percival de Rolo.\n\n**Dormant**\n\nWhile Cabal's Ruin is in a dormant state, the cloak has 4 charges and it regains 1d4 expended charges daily at dawn. When you hit with an attack, you can expend any number of charges from the cloak, with the attack dealing an extra 1d6 lightning damage per charge expended. If your attack strikes multiple targets, you choose one target that takes this extra damage.\n\nWhen you are targeted by an enemy's spell, you can use your reaction to absorb a portion of the spell's energy into the cloak. The spell affects you normally, but the cloak regains a number of charges equal to the level of the spell. This property can't be used again until you finish a short or long rest."
+        "Description": ""
     },
     "cape-of-enlargement": {
         "Tier": "3",
@@ -12653,7 +12653,7 @@
         "Book/Page": "TDCSR p203",
         "Notes": "requires attunement by a creature of non-good alignment",
         "Link": "https://5e.tools/items.html#circlet%20of%20barbed%20vision_tdcsr",
-        "Description": "When you don this circlet of gnarled onyx, black barbs dig into your head, imparting power to you as the circlet twists your appearance to amuse The Spider Queen. The current resting place of the Circlet of Barbed Vision is unknown, but rumor has it that a spectral assassin known as Jourrael, the Caedogeist seeks this relic.\n\n**Dormant**\n\nWhile the Circlet of Barbed Vision is in a dormant state, you have advantage on initiative rolls while you wear it, but your Charisma score decreases by 2. Your Charisma score returns to normal if you remove the circlet, but you take 4d6 psychic damage when you do so.\n\nAdditionally, when you make an attack roll, you can use your reaction to gain a +5 bonus to the roll. You make this choice after you see the roll, but before the GM says whether the attack hits or misses. You can't use this property again until you finish a short or long rest."
+        "Description": ""
     },
     "cloak-of-arachnida": {
         "Tier": "3",
@@ -12781,7 +12781,7 @@
         "Book/Page": "TDCSR p204",
         "Notes": "",
         "Link": "https://5e.tools/items.html#condemner_tdcsr",
-        "Description": "This shadow-touched heavy crossbow once served as the weapon of choice for the legendary assassin Todora. Though few know this, Condemner is now in the possession of an equally infamous assassin named Ixrattu Khar.\n\n**Dormant**\n\nWhen Condemner is in a dormant state, you gain a +1 bonus to attack and damage rolls made with this magic weapon. When you hit with an attack using this weapon, the target takes an extra 1d4 poison damage.\n\nAdditionally, if you hit with an attack using this weapon, you can activate one of the following effects instead of dealing damage:\n\nYou cast fog cloud centered on the target's space.\n\nYou cast silence centered on the target's space.\n\nWhen an effect is used, it can't be used again until you finish a short or long rest."
+        "Description": ""
     },
     "corecut-dagger": {
         "Tier": "3",
@@ -12797,7 +12797,7 @@
         "Book/Page": "TDCSR p195",
         "Notes": "",
         "Link": "https://5e.tools/items.html#corecut%20dagger_tdcsr",
-        "Description": "This dark metal blade bends in a wicked, hooked curve. You gain a +1 bonus to attack and damage rolls made with this magic weapon. When you hit with an attack using this weapon, you can spend 1 Hit Die to deal an extra 3d6 necrotic damage.\n\n**Curse**\n\nThis weapon is cursed, a fact that is revealed only when an identify spell is cast on the weapon or you attune to it. Attuning to the dagger curses you until you are targeted by the remove curse spell or similar magic; disposing of the dagger fails to end the curse. While cursed, whenever you receive magical healing, you must spend 1 Hit Die to regain any hit points. If you spend all your Hit Dice at any point, you die."
+        "Description": ""
     },
     "crown-of-majesty": {
         "Tier": "3",
@@ -12893,7 +12893,7 @@
         "Book/Page": "TDCSR p195",
         "Notes": "",
         "Link": "https://5e.tools/items.html#dagger%20of%20denial_tdcsr",
-        "Description": "This silver stiletto blade bears intricate grooves that spiral from its tip to its ivory hilt and handle. You gain a +2 bonus to attack and damage rolls made with this magic weapon.\n\nAs an action, you can place the point of the blade into any keyhole and seal it shut. A keyhole sealed in this way can't be unlocked until this dagger is placed into that keyhole once more (though a sealed door or container can still be broken, bypassing the lock). Sealing a keyhole unseals any keyholes previously sealed with this weapon."
+        "Description": ""
     },
     "dancing-sword-must-specify": {
         "Tier": "3",
@@ -12925,7 +12925,7 @@
         "Book/Page": "TDCSR p204",
         "Notes": "",
         "Link": "https://5e.tools/items.html#deathwalker's%20ward_tdcsr",
-        "Description": "This beautiful black leather armor is covered in intricate scrollwork, and has a mantle bearing the black feathers of The Matron of Ravens. Legends say that it has been worn by a number of that deity's champions over the centuries—most recently, Champion of Ravens.\n\n**Dormant**\n\nWhen the Deathwalker's Ward is in a dormant state, you gain a +1 bonus to AC and you have advantage on death 1 while wearing the armor."
+        "Description": ""
     },
     "deck-of-dimensions": {
         "Tier": "3",
@@ -13309,7 +13309,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#fenthras_tdcsr",
-        "Description": "This gorgeous longbow made of everbark from the Fey Realm flexes and shifts like a living entity. It is said to have been wielded by the legendary ranger Vex'ahlia against great evils.\n\n**Dormant**\n\nWhile Fenthras is in a dormant state, you gain a +1 bonus to attack and damage rolls made with this magic weapon.\n\nWhen you make an attack with Fenthras, you can declare it an oracle shot, allowing you to experience the area around the arrow using your normal senses for 10 minutes. Once this property is used, it can't be used again until you finish a short or long rest.\n\nAdditionally, when a creature is killed by an attack using this weapon, a six-foot-tall tree rapidly grows out of the corpse over the next minute. The tree is rooted in the ground to make the body difficult to move, but does not permanently damage the corpse or its organs."
+        "Description": ""
     },
     "figurine-of-wondrous-power-obsidian-steed": {
         "Tier": "3",
@@ -13661,7 +13661,7 @@
         "Book/Page": "TDCSR",
         "Notes": "requires attunement by a creature of non-evil alignment",
         "Link": "https://5e.tools/items.html#honor's%20last%20stand_tdcsr",
-        "Description": "This massive silvered shield bears the crest of The Platinum Dragon and never tarnishes. Its metal is always warm to the touch.\n\n**Dormant**\n\nWhile Honor's Last Stand is in a dormant state, you gain a +1 bonus to AC while holding the shield. This bonus is in addition to the shield's normal bonus to AC. You also can't be knocked prone while bearing this shield."
+        "Description": ""
     },
     "horseshoes-of-the-zephyr": {
         "Tier": "3",
@@ -14061,7 +14061,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#magician's%20judge_tdcsr",
-        "Description": "An executioner's blade from the Age of Arcanum, this magic greatsword is one of many similar weapons once used to execute magic-wielding criminals. Though most commonly found in the lands now known as Wildemount and Issylra, a few such blades have found their way to Tal'Dorei.\n\nIf you hit a creature with an attack using this weapon, you can cast the dispel magic spell from the sword against the target as part of the attack. Alternatively, you can use an action to cast dispel magic from the sword against a target of your choice. If you need to make a check with your spellcasting ability modifier as part of casting the spell, you make this check with a +3 modifier or your own spellcasting ability modifier, whichever is higher.\n\nOnce you cast dispel magic using this weapon, you can't do so again until the next dawn."
+        "Description": ""
     },
     "mantle-of-spell-resistance": {
         "Tier": "3",
@@ -14189,7 +14189,7 @@
         "Book/Page": "TDCSR",
         "Notes": "requires attunement by a bard",
         "Link": "https://5e.tools/items.html#mythcarver_tdcsr",
-        "Description": "This incredible silvered blade once belonged to the legendary White Duke, a founding member of the Golden Grin, and many other master bards before him. It resonates with nearby musical tones. In the modern era, it is best known as the personal weapon of famed bard Scanlan Shorthalt.\n\n**Dormant**\n\nWhile Mythcarver is in a dormant state, you gain a +1 bonus to attack and damage rolls made with this magic weapon. This longsword's enchantments and light construction also grant it the Finesse property, which allows you to use either your Strength or Dexterity modifier for the attack and damage rolls when making an attack with this weapon.\n\nAdditionally, when you target an ally with your Bardic Inspiration feature, you gain advantage on attacks with this weapon until the end of your turn."
+        "Description": ""
     },
     "natures-mantle": {
         "Tier": "3",
@@ -14397,7 +14397,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#plate%20of%20the%20dawnmartyr_tdcsr",
-        "Description": "Beautiful silver scrollwork and priceless cut rubies adorn this set of brass-and-gold armor. Legend holds that it was worn by Duana, High Priest of the The Dawnfather, when she was martyred in the Battle of Ghor Dranas in the final days of the The Calamity. In more recent times, it was worn by Pike Trickfoot, a legendary cleric of the The Everlight, while fighting against The Chroma Conclave and The Whispered One.\n\n**Dormant**\n\nWhile the Plate of the Dawnmartyr is in a dormant state, you gain a +1 bonus to AC while wearing it. When a creature within 5 feet of you hits you with a melee attack, you can use your reaction to rebuke that creature, dealing it 1d6 fire damage."
+        "Description": ""
     },
     "platinum-scarf": {
         "Tier": "3",
@@ -15405,7 +15405,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#star%20razor_tdcsr",
-        "Description": "The thick, grooved blade of this shining silver longsword is lined with etched runes that sparkle blue in the light. Star Razor—known also as Dwueth'var—was thought to have been destroyed or lost after the The Calamity, but new rumors suggest that it might be wielded by a half-orc somewhere in Wildemount.\n\n**Dormant**\n\nWhile Star Razor is in a dormant state, you can hold this magic longsword and use a bonus action to speak the command word Galas-var, causing the sword to emit a pale blue glow that sheds bright light in a 20-foot radius and dim light for an additional 20 feet. This glow lasts until you use a bonus action to speak the command word again, or until you drop or sheathe the sword.\n\nWhile this longsword is glowing, you gain a +1 bonus to attack and damage rolls made with the weapon, and you have resistance to radiant damage.\n\nYou can cast the faerie fire spell from the weapon as an action, requiring no components (save DC 13). Once a spell has been cast using Star Razor, that spell can't be cast from the sword until the next dawn."
+        "Description": ""
     },
     "starcrossed-bow": {
         "Tier": "3",
@@ -15485,7 +15485,7 @@
         "Book/Page": "TDCSR p271",
         "Notes": "",
         "Link": "",
-        "Description": "You have a +2 bonus to AC while wearing this armor.\n\nYou have resistance to acid damage while you wear this armor.\n\nNote: Worn by Scanlan Shorthalt."
+        "Description": ""
     },
     "studded-white-dragon-leather-armor-of-cold-resistance-2": {
         "Tier": "3",
@@ -15501,7 +15501,7 @@
         "Book/Page": "TDCSR p267",
         "Notes": "",
         "Link": "",
-        "Description": "You have a +2 bonus to AC while wearing this armor.\n\nYou have resistance to cold damage while you wear this armor.\n\nNote: Worn by Vex'ahlia."
+        "Description": ""
     },
     "stygian-javelin": {
         "Tier": "3",
@@ -15869,7 +15869,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#whisper_tdcsr",
-        "Description": "Forged with a mercurial metal accidentally drawn from the Realms Beyond, this dagger shimmers with an unsettling sourceless light. It was once wielded by Champion of Ravens. Two raven feathers are linked to its pommel as a memento of its former bearer.\n\n**Dormant**\n\nWhile Whisper is in a dormant state, you gain a +1 bonus to attack and damage rolls made with this magic weapon.\n\nAdditionally, when you score a critical hit with this dagger, the target must succeed on a DC 13 Wisdom saving throw or become frightened of you for 1 minute. On a success, the target is immune to this effect for 24 hours."
+        "Description": ""
     },
     "whistle-of-freedom": {
         "Tier": "3",
@@ -16365,7 +16365,7 @@
         "Book/Page": "TDCSR p202",
         "Notes": "requires attunement by a creature of non-good alignment",
         "Link": "https://5e.tools/items.html#agony_tdcsr",
-        "Description": "Utilized in countless tortures and slow executions, the hooked chains of this brutal weapon constantly show dried blood and rot. Legend says that Agony was wielded in the The Calamity by the gnoll scion of a flesh-eating Demon Lord.\n\n**Dormant**\n\nWhile Agony is in a dormant state, you gain a +2 bonus to attack and damage rolls made with this magic weapon. Whenever you damage a creature with Agony, that creature is marked for 10 minutes or until you damage a different creature. When you hit a creature marked in this way with this weapon, the target takes an extra 1d6 piercing damage."
+        "Description": ""
     },
     "all-purposetool-3": {
         "Tier": "4",
@@ -16509,7 +16509,7 @@
         "Book/Page": "TDCSR p202",
         "Notes": "",
         "Link": "https://5e.tools/items.html#armor%20of%20the%20valiant%20soul_tdcsr",
-        "Description": "This antique armor forged from jade and black dragon scales was once worn by J'mon Sa Ord of Marquet.\n\n**Dormant**\n\nWhile the Armor of the Valiant Soul is in a dormant state, you gain a +1 bonus to AC while wearing it. You can also cast the command spell (save DC 14) while attuned to this armor. Once this property is used, it can't be used again until you finish a long rest."
+        "Description": ""
     },
     "belashyrras-beholder-crown": {
         "Tier": "4",
@@ -17037,7 +17037,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#graz'tchar%2c%20the%20decadent%20end_tdcsr",
-        "Description": "This blade appears to be a beautiful cruciform sword of shining silver, inlaid with sparkling rubies. You gain a +3 bonus to attack and damage rolls made with this magic weapon, which has the following properties.\n\n**Corrosive Submission**\n\nWhen you hit a creature that has an Intelligence score of 4 or higher with an attack using this sword, the target takes an extra 3d6 acid damage and must succeed on a DC 17 Charisma saving throw or be charmed by you for 1 hour. If you attack the creature again while it is charmed in this way, the extra acid damage increases to 10d6 and the charmed condition ends. If the target succeeds on its saving throw or the charm ends for it, it can't be charmed again in this way for 24 hours.\n\n**Hidden Nature**\n\nThe acid damage dealt by this greatsword appears to be radiant damage to all who perceive it. A true seeing spell or similar magic reveals that the sword is actually a rusted, pitted blade dripping with acid.\n\n**Sentience**\n\nGraz'tchar is a sentient neutral evil weapon with an Intelligence of 14, a Wisdom of 12, and a Charisma of 18. It has hearing and darkvision out to a range of 120 feet.\n\nThe sword can speak, read, and understand Common, and can communicate with its wielder telepathically. Anyone who holds it hears the wise voice of a sorrowful king, beckoning the user to seize their destiny. A creature that succeeds on a DC 26 Wisdom (Insight) check while listening to the blade's voice hears a sliver of malice that suggests the truth: the voice is a corrupting trick of the Demon Prince of Indulgence.\n\n**Personality**\n\nGraz'tchar slowly attempts to sway its wielder to sow chaos in Exandria, telling lies and spreading malign truths about great leaders, and claiming that the Tal'Dorei Council are corrupt and must be overthrown. The voice of this blade is actually the Demon Prince of Indulgence, speaking from his Abyssal prison.\n\nIf the sword's attuned wielder disobeys the urges of the weapon for an extended period of time, Graz'tchar can attempt to control the wielder, who must succeed on a DC 17 Charisma saving throw or become charmed by the sword for 24 hours. While the wielder is charmed in this way, the sword can compel them to take an action of the sword's choice once per hour, though the wielder believes this action is taken of their own free will. If the chosen action leads to the harm of someone the wielder considers a trusted friend or ally, the charmed condition immediately ends. On a successful saving throw or if the charmed condition ends for the wielder, they are immune to this property of the sword for 24 hours."
+        "Description": ""
     },
     "hammer-of-thunderbolts": {
         "Tier": "4",
@@ -17613,7 +17613,7 @@
         "Book/Page": "TDCSR",
         "Notes": "",
         "Link": "https://5e.tools/items.html#pyremaul_tdcsr",
-        "Description": "Forged from deep red iron, this massive hammer is set with a brilliant fire opal that shimmers with eternal flame. It is rumored to be currently wielded by fire giants, somewhere beneath the Cliffkeep Mountains.\n\n**Dormant**\n\nWhile Pyremaul is in a dormant state, you gain a +1 bonus to attack rolls made with this magic weapon. When you hit with an attack using this weapon, the target takes an extra 1d6 fire damage.\n\nAdditionally, you can choose to have this weapon shed bright light in a 30-foot radius and dim light for an additional 30 feet (no action required)."
+        "Description": ""
     },
     "pyxis-of-pandemonium": {
         "Tier": "4",
@@ -18061,7 +18061,7 @@
         "Book/Page": "TDCSR",
         "Notes": "requires attunement by a spellcaster",
         "Link": "https://5e.tools/items.html#spire%20of%20conflux_tdcsr",
-        "Description": "A powerful relic passed down from generation to generation of Ashari leaders, the Spire of Conflux was lost over three centuries ago when Joran the Sea-Speaker, a respected leader of The Ashari, was devoured by a demon of the Abyss. It was rediscovered by the legendary druid Keyleth, Voice of the Tempest. However, rumors swirl that she is seeking another hero to wield it—one who can travel the land and do good in small ways as she once did.\n\n**Dormant**\n\nWhile the Spire of Conflux is in a dormant state, the staff has 8 charges and regains 1d4 + 2 expended charges daily at dawn. While holding the staff, you can expend 1 or more of its charges to cast one of the following spells from it, using your spell save DC: burning hands (1 charge) or fireball (3 charges).\n\nAdditionally, while holding this staff, you have a +1 bonus to spell attack rolls and your spell save DC increases by 1."
+        "Description": ""
     },
     "spymasters-signet": {
         "Tier": "4",
@@ -18365,7 +18365,7 @@
         "Book/Page": "TDCSR",
         "Notes": "requires attunement by a monk",
         "Link": "https://5e.tools/items.html#wraps%20of%20dyamak_tdcsr",
-        "Description": "Created and wielded by the ancient warrior-monk Dyamak, these thick strips of enchanted cloth are stained to appear dark crimson with blood of unknown origin. The current resting place of the wraps is unknown.\n\n**Dormant**\n\nWhen the Wraps of Dyamak are in a dormant state, you gain a +1 bonus to attack and damage rolls made with your unarmed strike while wearing them.\n\nIn addition, when you finish a short or long rest, you gain a number of temporary hit points equal to your total number of ki points."
+        "Description": ""
     },
     "wraps-of-unarmed-prowess-3": {
         "Tier": "4",
@@ -18573,7 +18573,7 @@
         "Book/Page": "",
         "Notes": "Item state flavor costs: Dormant 0, Awakened 20, Exalted 50",
         "Link": "https://5e.tools/items.html#kiss%20of%20the%20changebringer_tdcsr",
-        "Description": "A beautiful, glittering emerald is set within this silver chain, humming with power and possibility. It is said that this amulet was stolen from the neck of The Changebringer herself by the The Lord of the Hells, and locked within the vaults of Bazzoxan in Wildemount. It was later claimed there by a group of Aurora Watch soldiers during an expedition into that grim fortress's abandoned temples.\n\n**Dormant**\n\nWhile the Kiss of the Changebringer is in a dormant state, you have a +1 bonus to 1 and are immune to the grappled condition while wearing it."
+        "Description": ""
     },
     "luck-blade": {
         "Tier": "5",
@@ -18653,7 +18653,7 @@
         "Book/Page": "",
         "Notes": "Item state flavor costs: Dormant 0, Awakened 20, Exalted 50",
         "Link": "https://5e.tools/items.html#titanstone%20knuckles_tdcsr",
-        "Description": "Carved from the heartstone of a slain earth primordial, these gauntlets bestow immeasurable might to their wearer. In recent times, they were wielded by the legendary barbarian Grog Strongjaw, who continues to use them as he seeks worthy challengers across Tal'Dorei and Exandria.\n\n**Dormant**\n\nWhile the Titanstone Knuckles are in a dormant state, your Strength score becomes 22 while you wear these gauntlets. Additionally, your weapon attacks deal double damage to objects and structures."
+        "Description": ""
     },
     "wand-of-viscid-globs": {
         "Tier": "5",
