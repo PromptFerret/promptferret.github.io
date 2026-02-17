@@ -1575,6 +1575,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#preview-rendering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Preview Rendering
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2954,6 +2965,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#preview-rendering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Preview Rendering
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3092,9 +3114,11 @@
 </ul>
 <h3 id="output-formats">Output Formats<a class="headerlink" href="#output-formats" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Markdown</strong> (primary): tables for stats, bullet lists for features/equipment</li>
+<li><strong>Preview</strong> (default): renders markdown as styled HTML for visual review</li>
+<li><strong>Markdown</strong>: raw markdown code for pasting into LLMs</li>
 <li><strong>JSON</strong>: structured object with all the same fields</li>
-<li>Toggle between them with buttons; "Copy" button copies to clipboard</li>
+<li>Toggle between Preview/MD/JSON with toolbar buttons</li>
+<li>"Copy" button always copies the raw markdown (or JSON when in JSON mode), even from Preview</li>
 </ul>
 <h2 id="starry-shore-40-complete-position-map-csv">Starry Shore 4.0 — Complete Position Map (CSV)<a class="headerlink" href="#starry-shore-40-complete-position-map-csv" title="Permanent link">&para;</a></h2>
 <p>All positions verified against marker sheet CSV export AND real Nyx sheet CSV export.
@@ -3673,20 +3697,27 @@ This distinguishes e.g. Warlock spells (◉) from item-granted spells like Ring 
 ## Ability Scores (table)
 ## Saving Throws (table with Proficient column)
 ## Skills (table with Proficient / Expert columns)
-## Proficiencies (table)
+## Proficiencies (table with Type|Details header)
 ## Attacks (table)
 ## Features &amp; Traits (bullet list)
 ## Equipment (bullet list, attunement items marked)
 ## Languages (comma-separated)
-## Spellcasting (cantrips in 5-per-row table, leveled spells in Prepared|Spell tables)
+## Spellcasting (cantrips in single-column Spell table, leveled spells in Prepared|Spell tables)
 ## Allies &amp; Organizations (bullet list)
 ## Backstory (text)
 </code></pre></div>
 <h3 id="markdown-table-rules">Markdown Table Rules<a class="headerlink" href="#markdown-table-rules" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Every table MUST have a valid header row — the first data row serves as the header</li>
-<li>The separator row (<code>|---|---|</code>) goes after the first data row</li>
+<li>Tables with column headers (Combat Stats, Skills, Attacks, Spells, Proficiencies) have a proper header row</li>
+<li>Tables used as key-value pairs (Basic Info, Personality/Physical) use <code>**bold**</code> labels in the first column — no column header row</li>
+<li>The separator row (<code>|---|---|</code>) goes after the first row</li>
 <li>Empty headers (<code>| | |</code>) break markdown rendering — never use them</li>
+</ul>
+<h3 id="preview-rendering">Preview Rendering<a class="headerlink" href="#preview-rendering" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Built-in markdown-to-HTML renderer (<code>mdToHTML()</code>) handles headings, tables, lists, bold/italic</li>
+<li>Header detection heuristic: first table row is <code>&lt;th&gt;</code> only if cells don't contain <code>**bold**</code> markup</li>
+<li>This correctly renders key-value tables (bold labels = data) vs column-header tables (plain labels = headers)</li>
 </ul>
 <h2 id="development-notes">Development Notes<a class="headerlink" href="#development-notes" title="Permanent link">&para;</a></h2>
 <h3 id="do-not">DO NOT<a class="headerlink" href="#do-not" title="Permanent link">&para;</a></h3>
