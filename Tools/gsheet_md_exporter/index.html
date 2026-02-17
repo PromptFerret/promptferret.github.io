@@ -6,206 +6,302 @@
 <title>GSheet Character Sheet Exporter</title>
 <style>
   :root {
-    --bg: #1a1a2e;
-    --surface: #16213e;
-    --surface2: #0f3460;
-    --accent: #e94560;
-    --accent-hover: #ff6b81;
-    --text: #eee;
-    --text-muted: #aaa;
-    --border: #333;
-    --success: #2ecc71;
-    --mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+    --bg: #0f0f17;
+    --surface: #1a1a2e;
+    --surface2: #252545;
+    --accent: #7c5cbf;
+    --accent-hover: #9b7ed8;
+    --accent-glow: rgba(124, 92, 191, 0.25);
+    --text: #e8e6f0;
+    --text-muted: #8a8a9a;
+    --text-dim: #5a5a6a;
+    --border: #2a2a3e;
+    --success: #4ecb71;
+    --error: #e05565;
+    --mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    --radius: 8px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    padding: 2rem;
-  }
-
-  h1 {
-    text-align: center;
-    margin-bottom: 0.25rem;
-    font-size: 1.8rem;
-    color: var(--accent);
-  }
-
-  .subtitle {
-    text-align: center;
-    color: var(--text-muted);
-    margin-bottom: 2rem;
-    font-size: 0.9rem;
-  }
-
-  .input-row {
     display: flex;
-    gap: 0.75rem;
-    max-width: 800px;
-    margin: 0 auto 1.5rem;
+    flex-direction: column;
   }
 
-  input[type="text"] {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+  /* ── Header ── */
+  .header {
+    padding: 1.5rem 2rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
     background: var(--surface);
-    color: var(--text);
-    font-size: 0.95rem;
   }
 
-  input[type="text"]::placeholder { color: var(--text-muted); }
-  input[type="text"]:focus { outline: none; border-color: var(--accent); }
+  .header h1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .header h1 span { color: var(--accent); }
+
+  .header .tagline {
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .toolbar input[type="text"] {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-family: var(--mono);
+    transition: border-color 0.2s;
+  }
+
+  .toolbar input[type="text"]::placeholder { color: var(--text-dim); }
+  .toolbar input[type="text"]:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+
+  .toolbar .sep {
+    width: 1px;
+    height: 1.5rem;
+    background: var(--border);
+    margin: 0 0.25rem;
+  }
 
   button {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    transition: background 0.2s;
+    transition: all 0.15s;
+    background: var(--surface2);
+    color: var(--text-muted);
+    white-space: nowrap;
   }
 
-  .btn-primary {
+  button:hover { background: var(--accent); color: white; border-color: var(--accent); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+  .btn-fetch {
     background: var(--accent);
     color: white;
+    border-color: var(--accent);
+    padding: 0.5rem 1.25rem;
   }
-  .btn-primary:hover { background: var(--accent-hover); }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-fetch:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
-  .btn-secondary {
-    background: var(--surface2);
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-  .btn-secondary:hover { background: #1a4a7a; }
-  .btn-secondary.active {
+  .btn-toggle.active {
     background: var(--accent);
     color: white;
     border-color: var(--accent);
   }
 
-  .controls {
+  /* ── Status Bar ── */
+  #statusEl {
+    font-size: 0.75rem;
+    padding: 0.35rem 1.5rem;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    min-height: 1.6rem;
+  }
+  #statusEl:empty { display: none; }
+  #statusEl.error { color: var(--error); }
+  #statusEl.success { color: var(--success); }
+  #statusEl.loading { color: var(--text-muted); }
+
+  /* ── Output ── */
+  .output-area {
+    flex: 1;
     display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    flex-direction: column;
+    min-height: 0;
   }
-
-  .status {
-    text-align: center;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-  }
-  .status.error { color: var(--accent); }
-  .status.success { color: var(--success); }
-  .status.loading { color: var(--text-muted); }
-
-  .output-wrapper {
-    max-width: 900px;
-    margin: 0 auto;
-    position: relative;
-  }
-
-  .copy-btn {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
-    background: var(--surface2);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    z-index: 1;
-  }
-  .copy-btn:hover { background: var(--accent); color: white; }
 
   #output {
-    width: 100%;
-    min-height: 400px;
-    padding: 1.25rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface);
+    flex: 1;
+    padding: 1.25rem 1.5rem;
+    background: var(--bg);
     color: var(--text);
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-wrap: break-word;
+    line-height: 1.6;
     overflow-y: auto;
-    max-height: 80vh;
-    resize: vertical;
+    border: none;
   }
 
-  .template-note {
-    text-align: center;
+  #output.placeholder {
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    white-space: pre-wrap;
+  }
+
+  #output.code {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  /* ── Preview Mode Styles ── */
+  #output.preview {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    white-space: normal;
+    word-wrap: normal;
+  }
+
+  #output.preview h1 {
+    font-size: 1.6rem;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.75rem;
+  }
+
+  #output.preview h2 {
+    font-size: 1.15rem;
+    color: var(--text);
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.25rem;
+  }
+
+  #output.preview h3 {
+    font-size: 0.95rem;
     color: var(--text-muted);
-    font-size: 0.8rem;
     margin-top: 1rem;
+    margin-bottom: 0.35rem;
+  }
+
+  #output.preview p {
+    margin: 0.4rem 0;
+  }
+
+  #output.preview table {
+    border-collapse: collapse;
+    margin: 0.4rem 0;
+    width: auto;
+  }
+
+  #output.preview th,
+  #output.preview td {
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.6rem;
+    font-size: 0.82rem;
+    text-align: left;
+  }
+
+  #output.preview th {
+    background: var(--surface2);
+    font-weight: 600;
+  }
+
+  #output.preview td:empty { padding: 0.3rem 0.6rem; }
+
+  #output.preview ul {
+    margin: 0.3rem 0 0.3rem 1.5rem;
+    padding: 0;
+  }
+
+  #output.preview li {
+    margin: 0.15rem 0;
+    font-size: 0.85rem;
+  }
+
+  #output.preview strong { color: var(--accent-hover); }
+
+  /* ── Footer ── */
+  .footer {
+    padding: 0.4rem 1.5rem;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    justify-content: space-between;
   }
 </style>
 </head>
 <body>
 
-<h1>GSheet Character Sheet Exporter</h1>
-<p class="subtitle">Export D&D 5e character sheets from Google Sheets to Markdown/JSON for LLMs</p>
-
-<div class="input-row">
-  <input type="text" id="urlInput" placeholder="Paste your public Google Sheet URL here..." />
-  <button class="btn-primary" id="fetchBtn" onclick="fetchSheet()">Fetch</button>
-</div>
-<div class="input-row">
-  <input type="text" id="nameInput" placeholder="Character name (optional — overrides sheet value)" />
+<div class="header">
+  <h1><span>GSheet</span> Character Sheet Exporter</h1>
+  <p class="tagline">D&D 5e Google Sheets to Markdown/JSON</p>
 </div>
 
-<div class="controls">
-  <button class="btn-secondary active" id="btnMd" onclick="setFormat('markdown')">Markdown</button>
-  <button class="btn-secondary" id="btnJson" onclick="setFormat('json')">JSON</button>
+<div class="toolbar">
+  <input type="text" id="urlInput" placeholder="Paste public Google Sheet URL..." />
+  <button class="btn-fetch" id="fetchBtn" onclick="fetchSheet()">Fetch</button>
+  <div class="sep"></div>
+  <button class="btn-toggle active" id="btnPreview" onclick="setFormat('preview')">Preview</button>
+  <button class="btn-toggle" id="btnMd" onclick="setFormat('markdown')">MD</button>
+  <button class="btn-toggle" id="btnJson" onclick="setFormat('json')">JSON</button>
+  <div class="sep"></div>
+  <button onclick="copyOutput()">Copy</button>
 </div>
 
-<div id="statusEl" class="status"></div>
+<div id="statusEl"></div>
 
-<div class="output-wrapper">
-  <button class="copy-btn" onclick="copyOutput()">Copy</button>
-  <div id="output">Paste a Google Sheet URL above and click Fetch to export your character sheet.</div>
+<div class="output-area">
+  <div id="output" class="placeholder">Paste a Google Sheet URL and click Fetch to export your character sheet.</div>
 </div>
 
-<p class="template-note">Currently supports: The Starry Shore Gsheet 4.0</p>
+<div class="footer">
+  <span>Supports: Starry Shore Gsheet 4.0</span>
+  <span>Requires HTTP server (not file://)</span>
+</div>
 
 <script>
 // ── State ──
-let currentFormat = 'markdown';
+let currentFormat = 'preview';
 let characterData = null;
+let cachedMarkdown = '';
 
 // ── UI Helpers ──
 function setStatus(msg, type) {
   const el = document.getElementById('statusEl');
   el.textContent = msg;
-  el.className = 'status ' + (type || '');
+  el.className = type || '';
 }
 
 function setFormat(fmt) {
   currentFormat = fmt;
+  document.getElementById('btnPreview').classList.toggle('active', fmt === 'preview');
   document.getElementById('btnMd').classList.toggle('active', fmt === 'markdown');
   document.getElementById('btnJson').classList.toggle('active', fmt === 'json');
   if (characterData) renderOutput();
 }
 
 function copyOutput() {
-  const text = document.getElementById('output').textContent;
+  // Always copy the markdown text, even when viewing preview
+  const text = currentFormat === 'json' ? renderJSON(characterData) : cachedMarkdown;
+  if (!text) return;
   navigator.clipboard.writeText(text).then(() => {
-    const btn = document.querySelector('.copy-btn');
-    btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy', 1500);
+    setStatus('Copied ' + (currentFormat === 'json' ? 'JSON' : 'Markdown') + ' to clipboard!', 'success');
+    setTimeout(() => { if (document.getElementById('statusEl').textContent.includes('clipboard')) document.getElementById('statusEl').textContent = ''; }, 1500);
   });
 }
 
@@ -219,7 +315,60 @@ function parseSheetUrl(url) {
   return { sheetId, gid };
 }
 
-// ── CORS TEST: Fetch via direct CSV export ──
+// ── CSV Parser ──
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let field = '';
+  let inQuotes = false;
+  let i = 0;
+
+  while (i < text.length) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (i + 1 < text.length && text[i + 1] === '"') {
+          field += '"';
+          i += 2;
+        } else {
+          inQuotes = false;
+          i++;
+        }
+      } else {
+        field += ch;
+        i++;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+        i++;
+      } else if (ch === ',') {
+        row.push(field);
+        field = '';
+        i++;
+      } else if (ch === '\r') {
+        i++;
+      } else if (ch === '\n') {
+        row.push(field);
+        rows.push(row);
+        row = [];
+        field = '';
+        i++;
+      } else {
+        field += ch;
+        i++;
+      }
+    }
+  }
+  // Last field/row
+  if (field || row.length > 0) {
+    row.push(field);
+    rows.push(row);
+  }
+  return rows;
+}
+
+// ── Fetch via direct CSV export ──
 function fetchSheet() {
   const url = document.getElementById('urlInput').value.trim();
   if (!url) { setStatus('Please enter a Google Sheet URL.', 'error'); return; }
@@ -229,7 +378,7 @@ function fetchSheet() {
 
   const fetchBtn = document.getElementById('fetchBtn');
   fetchBtn.disabled = true;
-  setStatus('Testing CSV export fetch (CORS test)...', 'loading');
+  setStatus('Fetching sheet data...', 'loading');
 
   const csvUrl = `https://docs.google.com/spreadsheets/d/${parsed.sheetId}/export?format=csv&gid=${parsed.gid}`;
 
@@ -239,87 +388,8 @@ function fetchSheet() {
       return r.text();
     })
     .then(csv => {
-      const lines = csv.split('\n');
-      const totalRows = lines.length;
-      const nonEmpty = lines.filter(l => l.trim().length > 0).length;
-
-      // Check for key fields
-      const hasName = csv.includes('Nyx') || csv.includes('nyx');
-      const hasSpeed = /\d+ ft/i.test(csv);
-      const hasFeatMobile = csv.includes('Feat: Mobile') || csv.includes('Mobile');
-      const hasWarlock = csv.includes('Warlock');
-      const hasWeight = /\d+lbs/i.test(csv);
-      const hasHair = csv.includes('Hair');
-      const hasSlots = csv.includes('SLOTS') || csv.includes('slots');
-      const hasProfMarker = csv.includes('◉');
-
-      let msg = `✅ CSV EXPORT FETCH SUCCEEDED!\n\n`;
-      msg += `Rows: ${totalRows} (${nonEmpty} non-empty)\n`;
-      msg += `Size: ${csv.length} bytes\n\n`;
-      msg += `Field checks:\n`;
-      msg += `  Character Name: ${hasName ? '✅' : '❌'}\n`;
-      msg += `  Speed:          ${hasSpeed ? '✅' : '❌'}\n`;
-      msg += `  Weight:         ${hasWeight ? '✅' : '❌'}\n`;
-      msg += `  Hair:           ${hasHair ? '✅' : '❌'}\n`;
-      msg += `  Features:       ${hasFeatMobile ? '✅' : '❌'}\n`;
-      msg += `  Spellcasting:   ${hasWarlock ? '✅' : '❌'}\n`;
-      msg += `  Spell Slots:    ${hasSlots ? '✅' : '❌'}\n`;
-      msg += `  Prof Markers:   ${hasProfMarker ? '✅' : '❌'}\n\n`;
-      msg += `First 5 rows:\n`;
-      for (let i = 0; i < Math.min(5, lines.length); i++) {
-        msg += `  ${i}: ${lines[i].substring(0, 120)}...\n`;
-      }
-
-      document.getElementById('output').textContent = msg;
-      setStatus('CSV export test complete!', 'success');
-      fetchBtn.disabled = false;
-    })
-    .catch(err => {
-      let msg = `❌ CSV EXPORT FETCH FAILED\n\n`;
-      msg += `Error: ${err.message}\n\n`;
-      msg += `This means CORS is blocking the request from this origin.\n`;
-      msg += `Current origin: ${window.location.origin}\n`;
-      msg += `URL attempted: ${csvUrl}\n\n`;
-      msg += `To fix: serve this page from an HTTP server.`;
-
-      document.getElementById('output').textContent = msg;
-      setStatus('CORS blocked — see output for details.', 'error');
-      fetchBtn.disabled = false;
-    });
-
-  // Keep the rest of the original callback to avoid syntax errors
-  return;
-
-  // --- ORIGINAL GVIZ CODE (disabled) ---
-  /* original fetchSheet body preserved below for reference */
-  const callbackName = '_gsheetCallback_' + Date.now();
-  const gvizUrl = `https://docs.google.com/spreadsheets/d/${parsed.sheetId}/gviz/tq?tqx=responseHandler:${callbackName}&gid=${parsed.gid}&headers=0`;
-
-  const timeout = setTimeout(() => {
-    cleanup();
-    setStatus('Request timed out. Make sure the sheet is public.', 'error');
-    fetchBtn.disabled = false;
-  }, 15000);
-
-  const script = document.createElement('script');
-
-  function cleanup() {
-    clearTimeout(timeout);
-    delete window[callbackName];
-    if (script.parentNode) script.parentNode.removeChild(script);
-  }
-
-  window[callbackName] = function(response) {
-    cleanup();
-    try {
-      if (response.status === 'error') {
-        setStatus('Google Sheets error: ' + (response.errors?.[0]?.detailed_message || 'Unknown error'), 'error');
-        fetchBtn.disabled = false;
-        return;
-      }
-
       setStatus('Parsing character data...', 'loading');
-      const rows = gvizToRows(response.table);
+      const rows = parseCSV(csv);
 
       const template = detectTemplate(rows);
       if (!template) {
@@ -330,41 +400,13 @@ function fetchSheet() {
 
       characterData = extract(rows, template);
       renderOutput();
-      setStatus(`Exported "${characterData.name}" successfully!`, 'success');
-    } catch (e) {
-      setStatus('Error parsing sheet: ' + e.message, 'error');
-      console.error(e);
-    }
-    fetchBtn.disabled = false;
-  };
-
-  script.onerror = function() {
-    cleanup();
-    setStatus('Could not fetch sheet. Make sure the sheet is public.', 'error');
-    fetchBtn.disabled = false;
-  };
-
-  script.src = gvizUrl;
-  document.head.appendChild(script);
-}
-
-// ── Convert gviz DataTable to 2D string array ──
-function gvizToRows(table) {
-  const numCols = table.cols.length;
-  const rows = [];
-  for (const row of table.rows) {
-    const r = [];
-    for (let c = 0; c < numCols; c++) {
-      const cell = row.c?.[c];
-      if (cell == null || cell.v == null) {
-        r.push('');
-      } else {
-        r.push(String(cell.f != null ? cell.f : cell.v));
-      }
-    }
-    rows.push(r);
-  }
-  return rows;
+      setStatus(`Exported "${characterData.name || 'character'}" successfully!`, 'success');
+      fetchBtn.disabled = false;
+    })
+    .catch(err => {
+      setStatus('Fetch failed: ' + err.message + ' — Make sure the sheet is public and this page is served via HTTP.', 'error');
+      fetchBtn.disabled = false;
+    });
 }
 
 // ── Cell Helpers ──
@@ -385,101 +427,100 @@ function mdEsc(v) {
   return v.replace(/\|/g, '∣').replace(/\n/g, ' ');
 }
 
-// ── Template Position Maps ──
-// Pure JSON-serializable data. To add a new template, copy a map and adjust positions.
-// detect: [row, col, substring] — identifies the template
-// Simple fields: [row, col]
-// Ranges: { rows: [start, end], col/cols }
-// Abilities: [key, scoreRow, modRow] — all at col 2
+// ── Template Position Maps (CSV-based) ──
+// All positions verified against marker sheet CSV export.
+// Row/Col are 0-indexed from the raw CSV.
 
 const TEMPLATES = {
   starry_shore_40: {
     name: "The Starry Shore Gsheet 4.0",
-    detect: [0, 19, "Starry Shore Gsheet 4.0"],
+    detect: [1, 19, "Starry Shore Gsheet 4.0"],
 
-    charName:          [3, 2],
-    classLevel:        [2, 19],
-    race:              [4, 19],
-    playerName:        [2, 30],
-    background:        [7, 35],
-    alignment:         [24, 35],
+    charName:          [5, 2],
+    classLevel:        [4, 19],
+    race:              [6, 19],
+    playerName:        [4, 30],
+    background:        [10, 35],
+    alignment:         [27, 35],
 
-    ac:                [8, 17],
-    initiative:        [8, 21],
-    hpMax:             [12, 20],
-    currentHp:         [13, 17],
-    tempHp:            [17, 17],
-    condition:         [16, 20],
-    hitDice:           [21, 17],
-    profBonus:         [10, 7],
-    passivePerception: [40, 2],
-    // Speed and Inspiration: unreadable merged cells
+    ac:                [11, 17],
+    initiative:        [11, 21],
+    speed:             [11, 25],
+    inspiration:       [10, 7],
+    hpMax:             [15, 20],
+    currentHp:         [16, 17],
+    tempHp:            [20, 17],
+    condition:         [19, 20],
+    hitDice:           [24, 17],
+    profBonus:         [13, 7],
+    passivePerception: [44, 2],
 
+    // Abilities: [key, scoreRow, modRow] — all at col 2
     abilities: [
-      ["STR", 11, 9],
-      ["DEX", 16, 14],
-      ["CON", 21, 19],
-      ["INT", 26, 24],
-      ["WIS", 31, 29],
-      ["CHA", 36, 34]
+      ["STR", 14, 12],
+      ["DEX", 19, 17],
+      ["CON", 24, 22],
+      ["INT", 29, 27],
+      ["WIS", 34, 32],
+      ["CHA", 39, 37]
     ],
 
-    saves:  { rows: [13, 18], profCol: 7, modCol: 8, nameCol: 9 },
-    skills: { rows: [21, 38], profCol: 7, modCol: 8, nameCol: 9 },
+    saves:  { rows: [16, 21], profCol: 7, modCol: 8, nameCol: 9 },
+    skills: { rows: [24, 41], profCol: 7, modCol: 8, nameCol: 9 },
 
     attacks: {
-      rows: [28, 32], nameCol: 17, bonusCol: 24, damageCol: 28,
-      extraRows: [33, 38]
+      rows: [31, 35], nameCol: 17, bonusCol: 24, damageCol: 28,
+      extraRows: [36, 41]
     },
 
-    languages: { rows: [40, 51], col: 17 },
-    equipment: { rows: [40, 51], col: 28 },
+    languages: { rows: [44, 55], col: 17 },
+    equipment: { rows: [44, 55], col: 28 },
 
-    proficiencies: { rows: [44, 50], labelCol: 2, valueCol: 8 },
+    proficiencies: { rows: [48, 54], labelCol: 2, valueCol: 8 },
 
     personality: {
       col: 30,
-      traits: [8, 9, 10],
-      ideals: [12, 13, 14],
-      bonds:  [16, 17, 18],
-      flaws:  [20, 21, 22]
+      traits: [11, 12, 13],
+      ideals: [15, 16, 17],
+      bonds:  [19, 20, 21],
+      flaws:  [23, 24, 25]
     },
 
-    features: { rows: [53, 78], cols: [2, 15, 28] },
+    features: { rows: [58, 83], cols: [2, 15, 28] },
 
     spellcasting: {
-      class:       [86, 2],
-      ability:     [86, 20],
-      saveDC:      [86, 27],
-      attackBonus: [86, 34]
+      class:       [90, 2],
+      ability:     [90, 20],
+      saveDC:      [90, 27],
+      attackBonus: [90, 34]
     },
 
-    cantrips: { rows: [91, 93], cols: [13, 23, 33] },
+    cantrips: { rows: [95, 97], cols: [13, 23, 33] },
 
-    // Each spell level: [markerCol, nameCol] pairs
+    // Each spell level: marker/name col pairs, slot positions
     spells: [
-      { level: 1, startRow: 95,  rows: 5, cols: [[2,3],[12,13],[22,23]],  maxSlots: [96,36]  },
-      { level: 2, startRow: 100, rows: 5, cols: [[12,13],[22,23],[32,33]], maxSlots: [101,4]  },
-      { level: 3, startRow: 105, rows: 5, cols: [[2,3],[12,13],[22,23]],  maxSlots: [106,36] },
-      { level: 4, startRow: 110, rows: 4, cols: [[12,13],[22,23],[32,33]], maxSlots: [111,4]  },
-      { level: 5, startRow: 114, rows: 4, cols: [[2,3],[12,13],[22,23]],  maxSlots: [115,36] },
-      { level: 6, startRow: 118, rows: 4, cols: [[12,13],[22,23],[32,33]], maxSlots: [119,4]  },
-      { level: 7, startRow: 122, rows: 3, cols: [[2,3],[12,13],[22,23]],  maxSlots: [123,36] },
-      { level: 8, startRow: 125, rows: 3, cols: [[12,13],[22,23],[32,33]], maxSlots: [126,4]  },
-      { level: 9, startRow: 128, rows: 3, cols: [[2,3],[12,13],[22,23]],  maxSlots: [129,36] }
+      { level: 1, startRow: 99,  rows: 5, cols: [[2,3],[12,13],[22,23]],  maxSlots: [100,36], curSlots: [100,32] },
+      { level: 2, startRow: 105, rows: 5, cols: [[12,13],[22,23],[32,33]], maxSlots: [106,4],  curSlots: [106,8]  },
+      { level: 3, startRow: 111, rows: 5, cols: [[2,3],[12,13],[22,23]],  maxSlots: [112,36], curSlots: [112,32] },
+      { level: 4, startRow: 117, rows: 4, cols: [[12,13],[22,23],[32,33]], maxSlots: [118,4],  curSlots: [118,8]  },
+      { level: 5, startRow: 122, rows: 4, cols: [[2,3],[12,13],[22,23]],  maxSlots: [123,36], curSlots: [123,32] },
+      { level: 6, startRow: 127, rows: 4, cols: [[12,13],[22,23],[32,33]], maxSlots: [128,4],  curSlots: [128,8]  },
+      { level: 7, startRow: 132, rows: 3, cols: [[2,3],[12,13],[22,23]],  maxSlots: [133,36], curSlots: [133,32] },
+      { level: 8, startRow: 136, rows: 3, cols: [[12,13],[22,23],[32,33]], maxSlots: [137,4],  curSlots: [137,8]  },
+      { level: 9, startRow: 140, rows: 3, cols: [[2,3],[12,13],[22,23]],  maxSlots: [141,36], curSlots: [141,32] }
     ],
 
     physical: {
-      age: [131, 2], height: [131, 5], weight: [131, 8], size: [131, 11],
-      gender: [133, 2], eyes: [133, 5], hair: [133, 8], skin: [133, 11]
+      age: [147, 2], height: [147, 5], weight: [147, 8], size: [147, 11],
+      gender: [149, 2], eyes: [149, 5], hair: [149, 8], skin: [149, 11]
     },
 
-    allies:    { rows: [130, 145], col: 17 },
-    backstory: { rows: [148, 160], col: 17 },
+    allies:    { rows: [146, 161], col: 17 },
+    backstory: { rows: [164, 176], col: 17 },
 
-    characterImage: [138, 2],
-    appearanceUrl:  [159, 2],
-    symbolUrl:      [159, 8]
+    characterImage: [154, 2],
+    appearanceUrl:  [175, 2],
+    symbolUrl:      [175, 8]
   }
 };
 
@@ -507,8 +548,7 @@ function extract(rows, map) {
   const d = {};
 
   // Basic Info
-  const nameOverride = document.getElementById('nameInput').value.trim();
-  d.name = nameOverride || cell(rows, ...map.charName);
+  d.name = cell(rows, ...map.charName);
   d.classLevel = cell(rows, ...map.classLevel);
   d.race = cell(rows, ...map.race);
   d.player = cell(rows, ...map.playerName);
@@ -518,6 +558,8 @@ function extract(rows, map) {
   // Combat Stats
   d.ac = cell(rows, ...map.ac);
   d.initiative = cell(rows, ...map.initiative);
+  d.speed = cell(rows, ...map.speed);
+  d.inspiration = cell(rows, ...map.inspiration);
   d.hpMax = cell(rows, ...map.hpMax);
   d.currentHp = cell(rows, ...map.currentHp);
   d.tempHp = cell(rows, ...map.tempHp);
@@ -537,7 +579,7 @@ function extract(rows, map) {
     });
   }
 
-  // Saving Throws — ◉ marker IS readable for saves (v=1.0 prof, v=0.0 not)
+  // Saving Throws — ◉ = proficient, 〇 = not
   const sv = map.saves;
   d.saves = [];
   for (let r = sv.rows[0]; r <= sv.rows[1]; r++) {
@@ -551,23 +593,22 @@ function extract(rows, map) {
     });
   }
 
-  // Skills — reads name from sheet, uses math for proficiency/expertise detection
-  // (◉ marker is unreadable on real sheets due to merged cells)
+  // Skills — ◉ marker readable; use math to distinguish Proficient vs Expertise
   const sk = map.skills;
   d.skills = [];
   for (let r = sk.rows[0]; r <= sk.rows[1]; r++) {
     const name = cell(rows, r, sk.nameCol);
     if (!name) continue;
     const mod = cell(rows, r, sk.modCol);
+    const prof = cell(rows, r, sk.profCol);
     const modNum = parseInt(mod) || 0;
 
     let proficiency = '';
-    if (profBonusNum > 0) {
+    if (prof === '◉' && profBonusNum > 0) {
       const abilityKey = SKILL_ABILITIES[name];
       const ab = abilityKey && d.abilities.find(a => a.key === abilityKey);
       const abMod = ab ? (parseInt(ab.modifier) || 0) : 0;
-      if (modNum >= abMod + profBonusNum * 2) proficiency = 'Expertise';
-      else if (modNum >= abMod + profBonusNum) proficiency = 'Proficient';
+      proficiency = (modNum >= abMod + profBonusNum * 2) ? 'Expertise' : 'Proficient';
     }
     d.skills.push({ name, modifier: mod, proficiency });
   }
@@ -651,20 +692,23 @@ function extract(rows, map) {
   }
 
   // Leveled Spells — cols are [markerCol, nameCol] pairs
+  // Show all spells with names; mark ◉ as prepared
   d.spells = {};
   for (const sp of map.spells) {
     const spellsAtLevel = [];
     for (let r = sp.startRow; r < sp.startRow + sp.rows; r++) {
       for (const [markerCol, nameCol] of sp.cols) {
-        if (cell(rows, r, markerCol) === '◉') {
-          const name = cell(rows, r, nameCol);
-          if (name) spellsAtLevel.push(name);
+        const name = cell(rows, r, nameCol);
+        if (name) {
+          const marker = cell(rows, r, markerCol);
+          spellsAtLevel.push({ name, prepared: marker === '◉' });
         }
       }
     }
     const maxSlots = cell(rows, ...sp.maxSlots);
+    const curSlots = cell(rows, ...sp.curSlots);
     if (spellsAtLevel.length > 0 || maxSlots) {
-      d.spells[sp.level] = { spells: spellsAtLevel, maxSlots: maxSlots || '0' };
+      d.spells[sp.level] = { spells: spellsAtLevel, maxSlots: maxSlots || '0', curSlots: curSlots || '' };
     }
   }
 
@@ -700,7 +744,117 @@ function extract(rows, map) {
 function renderOutput() {
   if (!characterData) return;
   const el = document.getElementById('output');
-  el.textContent = currentFormat === 'markdown' ? renderMarkdown(characterData) : renderJSON(characterData);
+  el.classList.remove('placeholder');
+  cachedMarkdown = renderMarkdown(characterData);
+
+  if (currentFormat === 'preview') {
+    el.className = 'preview';
+    el.innerHTML = mdToHTML(cachedMarkdown);
+  } else {
+    el.className = 'code';
+    el.textContent = currentFormat === 'markdown' ? cachedMarkdown : renderJSON(characterData);
+  }
+}
+
+// ── Markdown to HTML (for preview) ──
+function mdToHTML(md) {
+  const lines = md.split('\n');
+  let html = '';
+  let inTable = false;
+  let inList = false;
+  let isFirstTableRow = true;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Headings
+    if (line.startsWith('### ')) {
+      if (inList) { html += '</ul>'; inList = false; }
+      if (inTable) { html += '</tbody></table>'; inTable = false; }
+      html += `<h3>${inlineFormat(line.slice(4))}</h3>`;
+      continue;
+    }
+    if (line.startsWith('## ')) {
+      if (inList) { html += '</ul>'; inList = false; }
+      if (inTable) { html += '</tbody></table>'; inTable = false; }
+      html += `<h2>${inlineFormat(line.slice(3))}</h2>`;
+      continue;
+    }
+    if (line.startsWith('# ')) {
+      if (inList) { html += '</ul>'; inList = false; }
+      if (inTable) { html += '</tbody></table>'; inTable = false; }
+      html += `<h1>${inlineFormat(line.slice(2))}</h1>`;
+      continue;
+    }
+
+    // Table separator row — skip it
+    if (/^\|[\s:_-]+\|/.test(line) && !line.match(/[a-zA-Z0-9]/)) {
+      continue;
+    }
+
+    // Table row
+    if (line.startsWith('|') && line.endsWith('|')) {
+      if (inList) { html += '</ul>'; inList = false; }
+      const cells = line.slice(1, -1).split('|').map(c => c.trim());
+      if (!inTable) {
+        html += '<table><tbody>';
+        inTable = true;
+        isFirstTableRow = true;
+      }
+      // Only use <th> for real column headers (no **bold** in cells = plain header labels)
+      const hasInlineMarkup = cells.some(c => c.includes('**'));
+      const tag = (isFirstTableRow && !hasInlineMarkup) ? 'th' : 'td';
+      html += '<tr>' + cells.map(c => `<${tag}>${inlineFormat(c)}</${tag}>`).join('') + '</tr>';
+      isFirstTableRow = false;
+      continue;
+    }
+
+    // If we were in a table and hit a non-table line, close it
+    if (inTable) {
+      html += '</tbody></table>';
+      inTable = false;
+    }
+
+    // List item
+    if (line.startsWith('- ')) {
+      if (!inList) { html += '<ul>'; inList = true; }
+      html += `<li>${inlineFormat(line.slice(2))}</li>`;
+      continue;
+    }
+
+    // If we were in a list and hit a non-list line, close it
+    if (inList) {
+      html += '</ul>';
+      inList = false;
+    }
+
+    // Blank line
+    if (line.trim() === '') {
+      isFirstTableRow = true;
+      continue;
+    }
+
+    // Regular paragraph
+    html += `<p>${inlineFormat(line)}</p>`;
+  }
+
+  if (inList) html += '</ul>';
+  if (inTable) html += '</tbody></table>';
+  return html;
+}
+
+// Inline formatting: bold+italic, bold, italic
+function inlineFormat(text) {
+  if (!text) return '';
+  // Escape HTML
+  text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // ***bold italic***
+  text = text.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  // **bold**
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // *italic*
+  text = text.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+  return text;
 }
 
 function renderMarkdown(d) {
@@ -737,9 +891,9 @@ function renderMarkdown(d) {
 
   // Combat Stats
   md += `## Combat Stats\n`;
-  md += `| AC | HP | Initiative | Prof Bonus | Hit Dice |\n`;
-  md += `|:--:|:--:|:----------:|:----------:|:--------:|\n`;
-  md += `| ${d.ac || '—'} | ${d.hpMax || '—'} | ${d.initiative || '—'} | ${d.profBonus || '—'} | ${d.hitDice || '—'} |\n\n`;
+  md += `| AC | HP | Initiative | Speed | Prof Bonus | Hit Dice |\n`;
+  md += `|:--:|:--:|:----------:|:-----:|:----------:|:--------:|\n`;
+  md += `| ${d.ac || '—'} | ${d.hpMax || '—'} | ${d.initiative || '—'} | ${d.speed || '—'} | ${d.profBonus || '—'} | ${d.hitDice || '—'} |\n\n`;
 
   if (d.currentHp || d.tempHp || d.condition) {
     md += `**Current HP:** ${d.currentHp || '—'}`;
@@ -747,7 +901,9 @@ function renderMarkdown(d) {
     if (d.condition) md += ` | **Condition:** ${d.condition}`;
     md += '\n\n';
   }
-  if (d.passivePerception) md += `**Passive Perception:** ${d.passivePerception}\n\n`;
+  if (d.passivePerception) md += `**Passive Perception:** ${d.passivePerception}`;
+  if (d.inspiration) md += ` | **Inspiration:** ${d.inspiration}`;
+  if (d.passivePerception || d.inspiration) md += '\n\n';
 
   // Ability Scores
   if (d.abilities.length > 0) {
@@ -788,10 +944,10 @@ function renderMarkdown(d) {
   const visibleProfs = d.proficiencies.filter(p => p.value);
   if (visibleProfs.length > 0) {
     md += `## Proficiencies\n`;
-    md += `| ${visibleProfs[0].label} | ${visibleProfs[0].value} |\n`;
+    md += `| Type | Details |\n`;
     md += `|---|---|\n`;
-    for (let i = 1; i < visibleProfs.length; i++) {
-      md += `| ${visibleProfs[i].label} | ${visibleProfs[i].value} |\n`;
+    for (const p of visibleProfs) {
+      md += `| ${p.label} | ${p.value} |\n`;
     }
     md += '\n';
   }
@@ -843,34 +999,28 @@ function renderMarkdown(d) {
     if (d.spellcasting.attackBonus) md += ` | **Attack Bonus:** ${d.spellcasting.attackBonus}`;
     md += '\n\n';
 
-    function spellTable(spells) {
-      if (spells.length === 0) return '';
-      const rows = [];
-      for (let i = 0; i < spells.length; i += 5) {
-        const row = [];
-        for (let j = 0; j < 5; j++) {
-          row.push(i + j < spells.length ? spells[i + j] : '');
-        }
-        rows.push(`| ${row.join(' | ')} |`);
-      }
-      let t = rows[0] + '\n|---|---|---|---|---|\n';
-      for (let i = 1; i < rows.length; i++) t += rows[i] + '\n';
-      return t;
-    }
-
     if (d.cantrips.length > 0) {
       md += `### Cantrips\n`;
-      md += spellTable(d.cantrips) + '\n';
+      md += `| Spell |\n|---|\n`;
+      for (const c of d.cantrips) md += `| ${mdEsc(c)} |\n`;
+      md += '\n';
     }
 
     const levelNames = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
     for (const [lvl, data] of Object.entries(d.spells)) {
       const label = levelNames[lvl] || lvl + 'th';
       md += `### ${label} Level`;
-      if (data.maxSlots && data.maxSlots !== '0') md += ` (${data.maxSlots} slots)`;
+      if (data.maxSlots && data.maxSlots !== '0') {
+        md += ` (${data.maxSlots} slots`;
+        if (data.curSlots) md += `, ${data.curSlots} remaining`;
+        md += `)`;
+      }
       md += '\n';
       if (data.spells.length > 0) {
-        md += spellTable(data.spells);
+        md += `| Prepared | Spell |\n|:---:|---|\n`;
+        for (const s of data.spells) {
+          md += `| ${s.prepared ? '◉' : '〇'} | ${mdEsc(s.name)} |\n`;
+        }
       }
       md += '\n';
     }
