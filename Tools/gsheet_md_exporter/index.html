@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GSheet Character Sheet Exporter</title>
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --surface: #16213e;
+    --surface2: #0f3460;
+    --accent: #e94560;
+    --accent-hover: #ff6b81;
+    --text: #eee;
+    --text-muted: #aaa;
+    --border: #333;
+    --success: #2ecc71;
+    --mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 0.25rem;
+    font-size: 1.8rem;
+    color: var(--accent);
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 800px;
+    margin: 0 auto 1.5rem;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  input[type="text"]::placeholder { color: var(--text-muted); }
+  input[type="text"]:focus { outline: none; border-color: var(--accent); }
+
+  button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: #1a4a7a; }
+  .btn-secondary.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .status {
+    text-align: center;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+  .status.error { color: var(--accent); }
+  .status.success { color: var(--success); }
+  .status.loading { color: var(--text-muted); }
+
+  .output-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    z-index: 1;
+  }
+  .copy-btn:hover { background: var(--accent); color: white; }
+
+  #output {
+    width: 100%;
+    min-height: 400px;
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-y: auto;
+    max-height: 80vh;
+    resize: vertical;
+  }
+
+  .template-note {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-top: 1rem;
+  }
+</style>
+</head>
+<body>
+
+<h1>GSheet Character Sheet Exporter</h1>
+<p class="subtitle">Export D&D 5e character sheets from Google Sheets to Markdown/JSON for LLMs</p>
+
+<div class="input-row">
+  <input type="text" id="urlInput" placeholder="Paste your public Google Sheet URL here..." />
+  <button class="btn-primary" id="fetchBtn" onclick="fetchSheet()">Fetch</button>
+</div>
+<div class="input-row">
+  <input type="text" id="nameInput" placeholder="Character name (optional — overrides sheet value)" />
+</div>
+
+<div class="controls">
+  <button class="btn-secondary active" id="btnMd" onclick="setFormat('markdown')">Markdown</button>
+  <button class="btn-secondary" id="btnJson" onclick="setFormat('json')">JSON</button>
+</div>
+
+<div id="statusEl" class="status"></div>
+
+<div class="output-wrapper">
+  <button class="copy-btn" onclick="copyOutput()">Copy</button>
+  <div id="output">Paste a Google Sheet URL above and click Fetch to export your character sheet.</div>
+</div>
+
+<p class="template-note">Currently supports: The Starry Shore Gsheet 4.0</p>
+
+<script>
+// ── State ──
+let currentFormat = 'markdown';
+let characterData = null;
+
+// ── UI Helpers ──
+function setStatus(msg, type) {
+  const el = document.getElementById('statusEl');
+  el.textContent = msg;
+  el.className = 'status ' + (type || '');
+}
+
+function setFormat(fmt) {
+  currentFormat = fmt;
+  document.getElementById('btnMd').classList.toggle('active', fmt === 'markdown');
+  document.getElementById('btnJson').classList.toggle('active', fmt === 'json');
+  if (characterData) renderOutput();
+}
+
+function copyOutput() {
+  const text = document.getElementById('output').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+  });
+}
+
+// ── URL Parsing ──
+function parseSheetUrl(url) {
+  const idMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (!idMatch) return null;
+  const sheetId = idMatch[1];
+  const gidMatch = url.match(/[?&#]gid=(\d+)/);
+  const gid = gidMatch ? gidMatch[1] : '0';
+  return { sheetId, gid };
+}
+
+// ── CORS TEST: Fetch via direct CSV export ──
+function fetchSheet() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) { setStatus('Please enter a Google Sheet URL.', 'error'); return; }
+
+  const parsed = parseSheetUrl(url);
+  if (!parsed) { setStatus('Invalid Google Sheet URL format.', 'error'); return; }
+
+  const fetchBtn = document.getElementById('fetchBtn');
+  fetchBtn.disabled = true;
+  setStatus('Testing CSV export fetch (CORS test)...', 'loading');
+
+  const csvUrl = `https://docs.google.com/spreadsheets/d/${parsed.sheetId}/export?format=csv&gid=${parsed.gid}`;
+
+  fetch(csvUrl)
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
+      return r.text();
+    })
+    .then(csv => {
+      const lines = csv.split('\n');
+      const totalRows = lines.length;
+      const nonEmpty = lines.filter(l => l.trim().length > 0).length;
+
+      // Check for key fields
+      const hasName = csv.includes('Nyx') || csv.includes('nyx');
+      const hasSpeed = /\d+ ft/i.test(csv);
+      const hasFeatMobile = csv.includes('Feat: Mobile') || csv.includes('Mobile');
+      const hasWarlock = csv.includes('Warlock');
+      const hasWeight = /\d+lbs/i.test(csv);
+      const hasHair = csv.includes('Hair');
+      const hasSlots = csv.includes('SLOTS') || csv.includes('slots');
+      const hasProfMarker = csv.includes('◉');
+
+      let msg = `✅ CSV EXPORT FETCH SUCCEEDED!\n\n`;
+      msg += `Rows: ${totalRows} (${nonEmpty} non-empty)\n`;
+      msg += `Size: ${csv.length} bytes\n\n`;
+      msg += `Field checks:\n`;
+      msg += `  Character Name: ${hasName ? '✅' : '❌'}\n`;
+      msg += `  Speed:          ${hasSpeed ? '✅' : '❌'}\n`;
+      msg += `  Weight:         ${hasWeight ? '✅' : '❌'}\n`;
+      msg += `  Hair:           ${hasHair ? '✅' : '❌'}\n`;
+      msg += `  Features:       ${hasFeatMobile ? '✅' : '❌'}\n`;
+      msg += `  Spellcasting:   ${hasWarlock ? '✅' : '❌'}\n`;
+      msg += `  Spell Slots:    ${hasSlots ? '✅' : '❌'}\n`;
+      msg += `  Prof Markers:   ${hasProfMarker ? '✅' : '❌'}\n\n`;
+      msg += `First 5 rows:\n`;
+      for (let i = 0; i < Math.min(5, lines.length); i++) {
+        msg += `  ${i}: ${lines[i].substring(0, 120)}...\n`;
+      }
+
+      document.getElementById('output').textContent = msg;
+      setStatus('CSV export test complete!', 'success');
+      fetchBtn.disabled = false;
+    })
+    .catch(err => {
+      let msg = `❌ CSV EXPORT FETCH FAILED\n\n`;
+      msg += `Error: ${err.message}\n\n`;
+      msg += `This means CORS is blocking the request from this origin.\n`;
+      msg += `Current origin: ${window.location.origin}\n`;
+      msg += `URL attempted: ${csvUrl}\n\n`;
+      msg += `To fix: serve this page from an HTTP server.`;
+
+      document.getElementById('output').textContent = msg;
+      setStatus('CORS blocked — see output for details.', 'error');
+      fetchBtn.disabled = false;
+    });
+
+  // Keep the rest of the original callback to avoid syntax errors
+  return;
+
+  // --- ORIGINAL GVIZ CODE (disabled) ---
+  /* original fetchSheet body preserved below for reference */
+  const callbackName = '_gsheetCallback_' + Date.now();
+  const gvizUrl = `https://docs.google.com/spreadsheets/d/${parsed.sheetId}/gviz/tq?tqx=responseHandler:${callbackName}&gid=${parsed.gid}&headers=0`;
+
+  const timeout = setTimeout(() => {
+    cleanup();
+    setStatus('Request timed out. Make sure the sheet is public.', 'error');
+    fetchBtn.disabled = false;
+  }, 15000);
+
+  const script = document.createElement('script');
+
+  function cleanup() {
+    clearTimeout(timeout);
+    delete window[callbackName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+  }
+
+  window[callbackName] = function(response) {
+    cleanup();
+    try {
+      if (response.status === 'error') {
+        setStatus('Google Sheets error: ' + (response.errors?.[0]?.detailed_message || 'Unknown error'), 'error');
+        fetchBtn.disabled = false;
+        return;
+      }
+
+      setStatus('Parsing character data...', 'loading');
+      const rows = gvizToRows(response.table);
+
+      const template = detectTemplate(rows);
+      if (!template) {
+        setStatus('Unknown template. Only "The Starry Shore Gsheet 4.0" is currently supported.', 'error');
+        fetchBtn.disabled = false;
+        return;
+      }
+
+      characterData = extract(rows, template);
+      renderOutput();
+      setStatus(`Exported "${characterData.name}" successfully!`, 'success');
+    } catch (e) {
+      setStatus('Error parsing sheet: ' + e.message, 'error');
+      console.error(e);
+    }
+    fetchBtn.disabled = false;
+  };
+
+  script.onerror = function() {
+    cleanup();
+    setStatus('Could not fetch sheet. Make sure the sheet is public.', 'error');
+    fetchBtn.disabled = false;
+  };
+
+  script.src = gvizUrl;
+  document.head.appendChild(script);
+}
+
+// ── Convert gviz DataTable to 2D string array ──
+function gvizToRows(table) {
+  const numCols = table.cols.length;
+  const rows = [];
+  for (const row of table.rows) {
+    const r = [];
+    for (let c = 0; c < numCols; c++) {
+      const cell = row.c?.[c];
+      if (cell == null || cell.v == null) {
+        r.push('');
+      } else {
+        r.push(String(cell.f != null ? cell.f : cell.v));
+      }
+    }
+    rows.push(r);
+  }
+  return rows;
+}
+
+// ── Cell Helpers ──
+function cell(rows, r, c) {
+  if (r < 0 || r >= rows.length) return '';
+  if (c < 0 || c >= rows[r].length) return '';
+  return (rows[r][c] || '').trim();
+}
+
+function cellNum(rows, r, c) {
+  const v = cell(rows, r, c).replace(/[^0-9.\-+]/g, '');
+  return v === '' ? null : Number(v);
+}
+
+// Escape a string for use inside a markdown table cell
+function mdEsc(v) {
+  if (!v) return '—';
+  return v.replace(/\|/g, '∣').replace(/\n/g, ' ');
+}
+
+// ── Template Position Maps ──
+// Pure JSON-serializable data. To add a new template, copy a map and adjust positions.
+// detect: [row, col, substring] — identifies the template
+// Simple fields: [row, col]
+// Ranges: { rows: [start, end], col/cols }
+// Abilities: [key, scoreRow, modRow] — all at col 2
+
+const TEMPLATES = {
+  starry_shore_40: {
+    name: "The Starry Shore Gsheet 4.0",
+    detect: [0, 19, "Starry Shore Gsheet 4.0"],
+
+    charName:          [3, 2],
+    classLevel:        [2, 19],
+    race:              [4, 19],
+    playerName:        [2, 30],
+    background:        [7, 35],
+    alignment:         [24, 35],
+
+    ac:                [8, 17],
+    initiative:        [8, 21],
+    hpMax:             [12, 20],
+    currentHp:         [13, 17],
+    tempHp:            [17, 17],
+    condition:         [16, 20],
+    hitDice:           [21, 17],
+    profBonus:         [10, 7],
+    passivePerception: [40, 2],
+    // Speed and Inspiration: unreadable merged cells
+
+    abilities: [
+      ["STR", 11, 9],
+      ["DEX", 16, 14],
+      ["CON", 21, 19],
+      ["INT", 26, 24],
+      ["WIS", 31, 29],
+      ["CHA", 36, 34]
+    ],
+
+    saves:  { rows: [13, 18], profCol: 7, modCol: 8, nameCol: 9 },
+    skills: { rows: [21, 38], profCol: 7, modCol: 8, nameCol: 9 },
+
+    attacks: {
+      rows: [28, 32], nameCol: 17, bonusCol: 24, damageCol: 28,
+      extraRows: [33, 38]
+    },
+
+    languages: { rows: [40, 51], col: 17 },
+    equipment: { rows: [40, 51], col: 28 },
+
+    proficiencies: { rows: [44, 50], labelCol: 2, valueCol: 8 },
+
+    personality: {
+      col: 30,
+      traits: [8, 9, 10],
+      ideals: [12, 13, 14],
+      bonds:  [16, 17, 18],
+      flaws:  [20, 21, 22]
+    },
+
+    features: { rows: [53, 78], cols: [2, 15, 28] },
+
+    spellcasting: {
+      class:       [86, 2],
+      ability:     [86, 20],
+      saveDC:      [86, 27],
+      attackBonus: [86, 34]
+    },
+
+    cantrips: { rows: [91, 93], cols: [13, 23, 33] },
+
+    // Each spell level: [markerCol, nameCol] pairs
+    spells: [
+      { level: 1, startRow: 95,  rows: 5, cols: [[2,3],[12,13],[22,23]],  maxSlots: [96,36]  },
+      { level: 2, startRow: 100, rows: 5, cols: [[12,13],[22,23],[32,33]], maxSlots: [101,4]  },
+      { level: 3, startRow: 105, rows: 5, cols: [[2,3],[12,13],[22,23]],  maxSlots: [106,36] },
+      { level: 4, startRow: 110, rows: 4, cols: [[12,13],[22,23],[32,33]], maxSlots: [111,4]  },
+      { level: 5, startRow: 114, rows: 4, cols: [[2,3],[12,13],[22,23]],  maxSlots: [115,36] },
+      { level: 6, startRow: 118, rows: 4, cols: [[12,13],[22,23],[32,33]], maxSlots: [119,4]  },
+      { level: 7, startRow: 122, rows: 3, cols: [[2,3],[12,13],[22,23]],  maxSlots: [123,36] },
+      { level: 8, startRow: 125, rows: 3, cols: [[12,13],[22,23],[32,33]], maxSlots: [126,4]  },
+      { level: 9, startRow: 128, rows: 3, cols: [[2,3],[12,13],[22,23]],  maxSlots: [129,36] }
+    ],
+
+    physical: {
+      age: [131, 2], height: [131, 5], weight: [131, 8], size: [131, 11],
+      gender: [133, 2], eyes: [133, 5], hair: [133, 8], skin: [133, 11]
+    },
+
+    allies:    { rows: [130, 145], col: 17 },
+    backstory: { rows: [148, 160], col: 17 },
+
+    characterImage: [138, 2],
+    appearanceUrl:  [159, 2],
+    symbolUrl:      [159, 8]
+  }
+};
+
+// ── D&D Game Knowledge (not template-specific) ──
+const SKILL_ABILITIES = {
+  'Acrobatics': 'DEX', 'Animal Handling': 'WIS', 'Arcana': 'INT',
+  'Athletics': 'STR', 'Deception': 'CHA', 'History': 'INT',
+  'Insight': 'WIS', 'Intimidation': 'CHA', 'Investigation': 'INT',
+  'Medicine': 'WIS', 'Nature': 'INT', 'Perception': 'WIS',
+  'Performance': 'CHA', 'Persuasion': 'CHA', 'Religion': 'INT',
+  'Sleight of Hand': 'DEX', 'Stealth': 'DEX', 'Survival': 'WIS'
+};
+
+// ── Template Detection ──
+function detectTemplate(rows) {
+  for (const tmpl of Object.values(TEMPLATES)) {
+    const [r, c, substr] = tmpl.detect;
+    if (cell(rows, r, c).includes(substr)) return tmpl;
+  }
+  return null;
+}
+
+// ── Extract Character Data ──
+function extract(rows, map) {
+  const d = {};
+
+  // Basic Info
+  const nameOverride = document.getElementById('nameInput').value.trim();
+  d.name = nameOverride || cell(rows, ...map.charName);
+  d.classLevel = cell(rows, ...map.classLevel);
+  d.race = cell(rows, ...map.race);
+  d.player = cell(rows, ...map.playerName);
+  d.background = cell(rows, ...map.background);
+  d.alignment = cell(rows, ...map.alignment);
+
+  // Combat Stats
+  d.ac = cell(rows, ...map.ac);
+  d.initiative = cell(rows, ...map.initiative);
+  d.hpMax = cell(rows, ...map.hpMax);
+  d.currentHp = cell(rows, ...map.currentHp);
+  d.tempHp = cell(rows, ...map.tempHp);
+  d.condition = cell(rows, ...map.condition);
+  d.hitDice = cell(rows, ...map.hitDice);
+  d.profBonus = cell(rows, ...map.profBonus);
+  d.passivePerception = cell(rows, ...map.passivePerception);
+
+  // Ability Scores — map entries are [key, scoreRow, modRow], all at col 2
+  const profBonusNum = parseInt(d.profBonus) || 0;
+  d.abilities = [];
+  for (const [key, scoreRow, modRow] of map.abilities) {
+    d.abilities.push({
+      key,
+      score: cell(rows, scoreRow, 2),
+      modifier: cell(rows, modRow, 2)
+    });
+  }
+
+  // Saving Throws — ◉ marker IS readable for saves (v=1.0 prof, v=0.0 not)
+  const sv = map.saves;
+  d.saves = [];
+  for (let r = sv.rows[0]; r <= sv.rows[1]; r++) {
+    const name = cell(rows, r, sv.nameCol);
+    if (!name) continue;
+    const prof = cell(rows, r, sv.profCol);
+    d.saves.push({
+      name,
+      modifier: cell(rows, r, sv.modCol),
+      proficient: prof === '◉'
+    });
+  }
+
+  // Skills — reads name from sheet, uses math for proficiency/expertise detection
+  // (◉ marker is unreadable on real sheets due to merged cells)
+  const sk = map.skills;
+  d.skills = [];
+  for (let r = sk.rows[0]; r <= sk.rows[1]; r++) {
+    const name = cell(rows, r, sk.nameCol);
+    if (!name) continue;
+    const mod = cell(rows, r, sk.modCol);
+    const modNum = parseInt(mod) || 0;
+
+    let proficiency = '';
+    if (profBonusNum > 0) {
+      const abilityKey = SKILL_ABILITIES[name];
+      const ab = abilityKey && d.abilities.find(a => a.key === abilityKey);
+      const abMod = ab ? (parseInt(ab.modifier) || 0) : 0;
+      if (modNum >= abMod + profBonusNum * 2) proficiency = 'Expertise';
+      else if (modNum >= abMod + profBonusNum) proficiency = 'Proficient';
+    }
+    d.skills.push({ name, modifier: mod, proficiency });
+  }
+
+  // Attacks
+  const atk = map.attacks;
+  d.attacks = [];
+  for (let r = atk.rows[0]; r <= atk.rows[1]; r++) {
+    const name = cell(rows, r, atk.nameCol);
+    if (name) d.attacks.push({ name, hit: cell(rows, r, atk.bonusCol), damage: cell(rows, r, atk.damageCol) });
+  }
+  d.additionalAttacks = [];
+  for (let r = atk.extraRows[0]; r <= atk.extraRows[1]; r++) {
+    const name = cell(rows, r, atk.nameCol);
+    if (name) d.additionalAttacks.push(name);
+  }
+
+  // Languages
+  d.languages = [];
+  for (let r = map.languages.rows[0]; r <= map.languages.rows[1]; r++) {
+    const v = cell(rows, r, map.languages.col);
+    if (v && v !== 'LANGUAGES') d.languages.push(v);
+  }
+
+  // Equipment
+  d.equipment = [];
+  for (let r = map.equipment.rows[0]; r <= map.equipment.rows[1]; r++) {
+    const v = cell(rows, r, map.equipment.col);
+    if (v && v !== 'EQUIPPED ITEMS') {
+      const attunement = v.startsWith('*');
+      d.equipment.push({ name: attunement ? v.slice(1) : v, attunement });
+    }
+  }
+
+  // Proficiencies — reads labels from sheet
+  const pr = map.proficiencies;
+  d.proficiencies = [];
+  for (let r = pr.rows[0]; r <= pr.rows[1]; r++) {
+    const label = cell(rows, r, pr.labelCol).replace(/:?\s*$/, '');
+    const value = cell(rows, r, pr.valueCol);
+    if (value && label !== 'PROFICIENCIES') d.proficiencies.push({ label, value });
+  }
+
+  // Personality
+  const pers = map.personality;
+  function readPersonality(valueRows) {
+    return valueRows.map(r => cell(rows, r, pers.col)).filter(Boolean).join(', ');
+  }
+  d.personalityTraits = readPersonality(pers.traits);
+  d.ideals = readPersonality(pers.ideals);
+  d.bonds = readPersonality(pers.bonds);
+  d.flaws = readPersonality(pers.flaws);
+
+  // Features & Traits — read column by column (left, middle, right) to preserve grouping
+  const ft = map.features;
+  d.features = [];
+  for (const c of ft.cols) {
+    for (let r = ft.rows[0]; r <= ft.rows[1]; r++) {
+      const v = cell(rows, r, c);
+      if (v && v !== 'FEATURES & TRAITS') d.features.push(v);
+    }
+  }
+
+  // Spellcasting
+  const sc = map.spellcasting;
+  d.spellcasting = {
+    class: cell(rows, ...sc.class),
+    ability: cell(rows, ...sc.ability),
+    saveDC: cell(rows, ...sc.saveDC),
+    attackBonus: cell(rows, ...sc.attackBonus)
+  };
+
+  // Cantrips
+  const ct = map.cantrips;
+  d.cantrips = [];
+  for (let r = ct.rows[0]; r <= ct.rows[1]; r++) {
+    for (const c of ct.cols) {
+      const v = cell(rows, r, c);
+      if (v) d.cantrips.push(v);
+    }
+  }
+
+  // Leveled Spells — cols are [markerCol, nameCol] pairs
+  d.spells = {};
+  for (const sp of map.spells) {
+    const spellsAtLevel = [];
+    for (let r = sp.startRow; r < sp.startRow + sp.rows; r++) {
+      for (const [markerCol, nameCol] of sp.cols) {
+        if (cell(rows, r, markerCol) === '◉') {
+          const name = cell(rows, r, nameCol);
+          if (name) spellsAtLevel.push(name);
+        }
+      }
+    }
+    const maxSlots = cell(rows, ...sp.maxSlots);
+    if (spellsAtLevel.length > 0 || maxSlots) {
+      d.spells[sp.level] = { spells: spellsAtLevel, maxSlots: maxSlots || '0' };
+    }
+  }
+
+  // Physical Description
+  d.physical = {};
+  for (const [key, pos] of Object.entries(map.physical)) {
+    const v = cell(rows, ...pos);
+    if (v) d.physical[key] = v;
+  }
+
+  // Allies & Organizations
+  d.allies = [];
+  for (let r = map.allies.rows[0]; r <= map.allies.rows[1]; r++) {
+    const v = cell(rows, r, map.allies.col);
+    if (v && v !== 'ALLIES & ORGANIZATIONS') d.allies.push(v);
+  }
+
+  // Backstory
+  d.backstory = [];
+  for (let r = map.backstory.rows[0]; r <= map.backstory.rows[1]; r++) {
+    const v = cell(rows, r, map.backstory.col);
+    if (v && v !== 'CHARACTER BACKSTORY') d.backstory.push(v);
+  }
+
+  // Images/URLs
+  d.characterImage = cell(rows, ...map.characterImage);
+  d.appearanceUrl = cell(rows, ...map.appearanceUrl);
+
+  return d;
+}
+
+// ── Render Output ──
+function renderOutput() {
+  if (!characterData) return;
+  const el = document.getElementById('output');
+  el.textContent = currentFormat === 'markdown' ? renderMarkdown(characterData) : renderJSON(characterData);
+}
+
+function renderMarkdown(d) {
+  let md = '';
+
+  // Name
+  md += `# ${d.name || 'Unknown Character'}\n\n`;
+
+  // Basic Info table
+  md += `| **Race** | ${d.race || '—'} |\n`;
+  md += `|---|---|\n`;
+  md += `| **Class** | ${d.classLevel || '—'} |\n`;
+  md += `| **Background** | ${d.background || '—'} |\n`;
+  md += `| **Alignment** | ${d.alignment || '—'} |\n`;
+  md += `| **Player** | ${d.player || '—'} |\n\n`;
+
+  // Personality & Physical
+  const ppRows = [];
+  if (d.personalityTraits) ppRows.push(['**Personality Traits**', d.personalityTraits]);
+  if (d.ideals) ppRows.push(['**Ideals**', d.ideals]);
+  if (d.bonds) ppRows.push(['**Bonds**', d.bonds]);
+  if (d.flaws) ppRows.push(['**Flaws**', d.flaws]);
+  for (const [key, val] of Object.entries(d.physical)) {
+    ppRows.push([`**${key.charAt(0).toUpperCase() + key.slice(1)}**`, val]);
+  }
+  if (ppRows.length > 0) {
+    md += `| ${ppRows[0][0]} | ${ppRows[0][1]} |\n`;
+    md += `|---|---|\n`;
+    for (let i = 1; i < ppRows.length; i++) {
+      md += `| ${ppRows[i][0]} | ${ppRows[i][1]} |\n`;
+    }
+    md += '\n';
+  }
+
+  // Combat Stats
+  md += `## Combat Stats\n`;
+  md += `| AC | HP | Initiative | Prof Bonus | Hit Dice |\n`;
+  md += `|:--:|:--:|:----------:|:----------:|:--------:|\n`;
+  md += `| ${d.ac || '—'} | ${d.hpMax || '—'} | ${d.initiative || '—'} | ${d.profBonus || '—'} | ${d.hitDice || '—'} |\n\n`;
+
+  if (d.currentHp || d.tempHp || d.condition) {
+    md += `**Current HP:** ${d.currentHp || '—'}`;
+    if (d.tempHp) md += ` | **Temp HP:** ${d.tempHp}`;
+    if (d.condition) md += ` | **Condition:** ${d.condition}`;
+    md += '\n\n';
+  }
+  if (d.passivePerception) md += `**Passive Perception:** ${d.passivePerception}\n\n`;
+
+  // Ability Scores
+  if (d.abilities.length > 0) {
+    md += `## Ability Scores\n`;
+    md += `| Ability | Score | Modifier |\n`;
+    md += `|---------|:-----:|:--------:|\n`;
+    for (const ab of d.abilities) {
+      md += `| ${ab.key} | ${ab.score || '—'} | ${ab.modifier || '—'} |\n`;
+    }
+    md += '\n';
+  }
+
+  // Saving Throws
+  if (d.saves.length > 0) {
+    md += `## Saving Throws\n`;
+    md += `| Ability | Modifier | Proficient |\n`;
+    md += `|---------|:--------:|:----------:|\n`;
+    for (const sv of d.saves) {
+      md += `| ${sv.name} | ${sv.modifier || '—'} | ${sv.proficient ? 'Yes' : ''} |\n`;
+    }
+    md += '\n';
+  }
+
+  // Skills
+  if (d.skills.length > 0) {
+    md += `## Skills\n`;
+    md += `| Skill | Modifier | Proficient | Expert |\n`;
+    md += `|-------|:--------:|:----------:|:------:|\n`;
+    for (const sk of d.skills) {
+      const prof = sk.proficiency ? 'Yes' : '';
+      const expert = sk.proficiency === 'Expertise' ? 'Yes' : '';
+      md += `| ${sk.name} | ${sk.modifier || '—'} | ${prof} | ${expert} |\n`;
+    }
+    md += '\n';
+  }
+
+  // Proficiencies
+  const visibleProfs = d.proficiencies.filter(p => p.value);
+  if (visibleProfs.length > 0) {
+    md += `## Proficiencies\n`;
+    md += `| ${visibleProfs[0].label} | ${visibleProfs[0].value} |\n`;
+    md += `|---|---|\n`;
+    for (let i = 1; i < visibleProfs.length; i++) {
+      md += `| ${visibleProfs[i].label} | ${visibleProfs[i].value} |\n`;
+    }
+    md += '\n';
+  }
+
+  // Attacks
+  if (d.attacks.length > 0) {
+    md += `## Attacks\n`;
+    md += `| Weapon | Hit | Damage |\n`;
+    md += `|--------|:---:|--------|\n`;
+    for (const atk of d.attacks) {
+      md += `| ${mdEsc(atk.name)} | ${mdEsc(atk.hit)} | ${mdEsc(atk.damage)} |\n`;
+    }
+    if (d.additionalAttacks.length > 0) {
+      md += '\n**Additional:**\n';
+      for (const a of d.additionalAttacks) md += `- ${a}\n`;
+    }
+    md += '\n';
+  }
+
+  // Features & Traits
+  if (d.features.length > 0) {
+    md += `## Features & Traits\n`;
+    for (const f of d.features) md += `- ${f}\n`;
+    md += '\n';
+  }
+
+  // Equipment
+  if (d.equipment.length > 0) {
+    md += `## Equipment\n`;
+    for (const item of d.equipment) {
+      md += `- ${item.name}${item.attunement ? ' (attunement)' : ''}\n`;
+    }
+    md += '\n';
+  }
+
+  // Languages
+  if (d.languages.length > 0) {
+    md += `## Languages\n`;
+    md += d.languages.join(', ') + '\n\n';
+  }
+
+  // Spellcasting
+  const hasSpells = d.cantrips.length > 0 || Object.keys(d.spells).length > 0;
+  if (hasSpells) {
+    md += `## Spellcasting\n`;
+    if (d.spellcasting.class) md += `**Class:** ${d.spellcasting.class}`;
+    if (d.spellcasting.ability) md += ` | **Ability:** ${d.spellcasting.ability}`;
+    if (d.spellcasting.saveDC) md += ` | **Save DC:** ${d.spellcasting.saveDC}`;
+    if (d.spellcasting.attackBonus) md += ` | **Attack Bonus:** ${d.spellcasting.attackBonus}`;
+    md += '\n\n';
+
+    function spellTable(spells) {
+      if (spells.length === 0) return '';
+      const rows = [];
+      for (let i = 0; i < spells.length; i += 5) {
+        const row = [];
+        for (let j = 0; j < 5; j++) {
+          row.push(i + j < spells.length ? spells[i + j] : '');
+        }
+        rows.push(`| ${row.join(' | ')} |`);
+      }
+      let t = rows[0] + '\n|---|---|---|---|---|\n';
+      for (let i = 1; i < rows.length; i++) t += rows[i] + '\n';
+      return t;
+    }
+
+    if (d.cantrips.length > 0) {
+      md += `### Cantrips\n`;
+      md += spellTable(d.cantrips) + '\n';
+    }
+
+    const levelNames = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
+    for (const [lvl, data] of Object.entries(d.spells)) {
+      const label = levelNames[lvl] || lvl + 'th';
+      md += `### ${label} Level`;
+      if (data.maxSlots && data.maxSlots !== '0') md += ` (${data.maxSlots} slots)`;
+      md += '\n';
+      if (data.spells.length > 0) {
+        md += spellTable(data.spells);
+      }
+      md += '\n';
+    }
+  }
+
+  // Allies & Organizations
+  if (d.allies.length > 0) {
+    md += `## Allies & Organizations\n`;
+    for (const a of d.allies) md += `- ${a}\n`;
+    md += '\n';
+  }
+
+  // Backstory
+  if (d.backstory.length > 0) {
+    md += `## Backstory\n`;
+    md += d.backstory.join('\n') + '\n\n';
+  }
+
+  return md.trim();
+}
+
+function renderJSON(d) {
+  return JSON.stringify(d, null, 2);
+}
+
+// Allow Enter key to trigger fetch
+document.getElementById('urlInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') fetchSheet();
+});
+</script>
+</body>
+</html>
