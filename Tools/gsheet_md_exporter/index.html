@@ -481,7 +481,157 @@ function renderTabs(tabs, usedNames, detectedTypes) {
 }
 
 // ── Fetch via direct CSV export ──
-function fetchSheet() {
+async function fetchCsv(sheetId, gid) {
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
+  return parseCSV(await r.text());
+}
+
+async function fetchExtraTabs(sheetId, template, tabs) {
+  const knownNames = new Set([
+    tabs[0]?.name,
+    template.additionalTab?.name,
+    template.inventoryTab?.name,
+    'Spell Preparation',
+    ...IGNORED_TABS
+  ]);
+
+  const fetches = [];
+  const keys = [];
+
+  // Known tabs: Additional, Inventory
+  for (const tabDef of [template.additionalTab, template.inventoryTab]) {
+    const key = tabDef === template.additionalTab ? 'additional' : 'inventory';
+    keys.push(key);
+    if (!tabDef) { fetches.push(Promise.resolve(null)); continue; }
+    const tab = tabs.find(t => t.name === tabDef.name);
+    if (!tab) { fetches.push(Promise.resolve(null)); continue; }
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${tab.gid}`;
+    fetches.push(fetch(url).then(r => r.ok ? r.text() : null));
+  }
+
+  // Spell Preparation tab
+  keys.push('spellPrep');
+  const spellPrepTab = tabs.find(t => t.name === 'Spell Preparation');
+  if (spellPrepTab) {
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${spellPrepTab.gid}`;
+    fetches.push(fetch(url).then(r => r.ok ? r.text() : null));
+  } else {
+    fetches.push(Promise.resolve(null));
+  }
+
+  // Unknown/custom tabs
+  const customTabs = tabs.filter(t => !knownNames.has(t.name));
+  for (const tab of customTabs) {
+    keys.push(`custom:${tab.name}`);
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${tab.gid}`;
+    fetches.push(fetch(url).then(r => r.ok ? r.text() : null));
+  }
+
+  const results = await Promise.all(fetches);
+  return {
+    addCsv: results[0],
+    invCsv: results[1],
+    spellPrepCsv: results[2],
+    customCsvs: results.slice(3),
+    customTabs
+  };
+}
+
+function integrateSpellPrep(d, spellPrepCsv) {
+  if (!spellPrepCsv) return false;
+  const spellPrepRows = parseCSV(spellPrepCsv);
+  const spellPrepData = extractSpellPreparation(spellPrepRows);
+  if (!spellPrepData || !hasSpellData(spellPrepData)) return false;
+
+  d.cantrips = spellPrepData.cantrips;
+  d.additionalCantrips = null;
+  for (const [lvl, spells] of Object.entries(spellPrepData.spells)) {
+    if (d.spells[lvl]) {
+      d.spells[lvl].spells = spells;
+    } else {
+      d.spells[lvl] = { spells, maxSlots: '0', curSlots: '' };
+    }
+  }
+  d.spellSource = 'spell_prep';
+  return true;
+}
+
+function processCustomTabs(d, customTabs, customCsvs, template) {
+  const detectedTypes = {};
+  const usedNames = [];
+  d.extraInventories = [];
+
+  for (let i = 0; i < customTabs.length; i++) {
+    const csv = customCsvs[i];
+    if (!csv) continue;
+    const rows = parseCSV(csv);
+    const tabType = detectTabType(rows);
+    if (!tabType) continue;
+
+    detectedTypes[customTabs[i].name] = tabType;
+    usedNames.push(customTabs[i].name);
+
+    if (tabType === 'additional') {
+      extractAdditional(d, rows, template.additionalTab);
+    } else if (tabType === 'inventory') {
+      const container = { name: customTabs[i].name };
+      extractInventory(container, rows, template.inventoryTab);
+      d.extraInventories.push(container);
+    }
+  }
+  return { detectedTypes, usedNames };
+}
+
+function assembleCharacterData(mainRows, template, extra) {
+  const d = extract(mainRows, template);
+  const usedTabs = [discoveredTabs[0]?.name];
+  const detectedTypes = {};
+
+  if (extra.addCsv && template.additionalTab) {
+    extractAdditional(d, parseCSV(extra.addCsv), template.additionalTab);
+    usedTabs.push(template.additionalTab.name);
+  }
+  if (extra.invCsv && template.inventoryTab) {
+    extractInventory(d, parseCSV(extra.invCsv), template.inventoryTab);
+    usedTabs.push(template.inventoryTab.name);
+  }
+
+  if (integrateSpellPrep(d, extra.spellPrepCsv)) {
+    usedTabs.push('Spell Preparation');
+  }
+
+  const custom = processCustomTabs(d, extra.customTabs, extra.customCsvs, template);
+  usedTabs.push(...custom.usedNames);
+  Object.assign(detectedTypes, custom.detectedTypes);
+
+  return { data: d, usedTabs, detectedTypes };
+}
+
+async function loadCharacterData(parsed) {
+  setStatus('Discovering sheet tabs...', 'loading');
+  const tabs = await discoverTabs(parsed.sheetId);
+  discoveredTabs = tabs;
+  const mainGid = tabs.length > 0 ? tabs[0].gid : parsed.gid;
+  renderTabs(tabs);
+
+  setStatus('Fetching main sheet...', 'loading');
+  const mainRows = await fetchCsv(parsed.sheetId, mainGid);
+
+  let template = detectTemplate(mainRows);
+  if (!template) {
+    template = TEMPLATES.starry_shore_40;
+    setStatus('Unknown template — using Starry Shore 4.0 layout as fallback. Some fields may be wrong.', 'loading');
+  }
+
+  setStatus('Fetching extra sheets...', 'loading');
+  const extra = await fetchExtraTabs(parsed.sheetId, template, tabs);
+
+  return assembleCharacterData(mainRows, template, extra);
+}
+
+async function fetchSheet() {
   const url = document.getElementById('urlInput').value.trim();
   if (!url) { setStatus('Please enter a Google Sheet URL.', 'error'); return; }
 
@@ -490,151 +640,20 @@ function fetchSheet() {
 
   const fetchBtn = document.getElementById('fetchBtn');
   fetchBtn.disabled = true;
-  setStatus('Discovering sheet tabs...', 'loading');
 
-  let mainRows, template;
+  try {
+    const result = await loadCharacterData(parsed);
+    if (!result) return;
 
-  discoverTabs(parsed.sheetId)
-    .then(tabs => {
-      discoveredTabs = tabs;
-      // Always use the first tab as the main character sheet
-      const mainGid = tabs.length > 0 ? tabs[0].gid : parsed.gid;
-      renderTabs(tabs); // No active tabs yet
-      setStatus('Fetching main sheet...', 'loading');
-
-      const csvUrl = `https://docs.google.com/spreadsheets/d/${parsed.sheetId}/export?format=csv&gid=${mainGid}`;
-      return fetch(csvUrl).then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
-        return r.text();
-      });
-    })
-    .then(csv => {
-      setStatus('Parsing main sheet...', 'loading');
-      mainRows = parseCSV(csv);
-
-      template = detectTemplate(mainRows);
-      if (!template) {
-        setStatus('Unknown template. Only "The Starry Shore Gsheet 4.0" is currently supported.', 'error');
-        fetchBtn.disabled = false;
-        return Promise.reject('unknown_template');
-      }
-
-      // Fetch known extra tabs + all unknown tabs (excluding ignored ones) in parallel
-      setStatus('Fetching extra sheets...', 'loading');
-      const knownNames = new Set([
-        discoveredTabs[0]?.name,            // main sheet (first tab)
-        template.additionalTab?.name,        // 'Additional'
-        template.inventoryTab?.name,         // 'Inventory'
-        'Spell Preparation',                 // spell prep tab
-        ...IGNORED_TABS                      // internal sheets
-      ]);
-
-      const extraFetches = [];
-      // Known tabs: Additional, Inventory, Spell Preparation
-      for (const tabDef of [template.additionalTab, template.inventoryTab]) {
-        if (!tabDef) { extraFetches.push(Promise.resolve(null)); continue; }
-        const tab = discoveredTabs.find(t => t.name === tabDef.name);
-        if (!tab) { extraFetches.push(Promise.resolve(null)); continue; }
-        const tabUrl = `https://docs.google.com/spreadsheets/d/${parsed.sheetId}/export?format=csv&gid=${tab.gid}`;
-        extraFetches.push(fetch(tabUrl).then(r => r.ok ? r.text() : null));
-      }
-      // Spell Preparation tab
-      const spellPrepTab = discoveredTabs.find(t => t.name === 'Spell Preparation');
-      if (spellPrepTab) {
-        const spUrl = `https://docs.google.com/spreadsheets/d/${parsed.sheetId}/export?format=csv&gid=${spellPrepTab.gid}`;
-        extraFetches.push(fetch(spUrl).then(r => r.ok ? r.text() : null));
-      } else {
-        extraFetches.push(Promise.resolve(null));
-      }
-
-      // Unknown/custom tabs — fetch all that aren't known or ignored
-      const customTabs = discoveredTabs.filter(t => !knownNames.has(t.name));
-      for (const tab of customTabs) {
-        const tabUrl = `https://docs.google.com/spreadsheets/d/${parsed.sheetId}/export?format=csv&gid=${tab.gid}`;
-        extraFetches.push(fetch(tabUrl).then(r => r.ok ? r.text() : null));
-      }
-
-      return Promise.all(extraFetches).then(results => ({ results, customTabs }));
-    })
-    .then(payload => {
-      if (!payload) return; // unknown_template bail
-      const { results, customTabs } = payload;
-
-      const addCsv = results[0];
-      const invCsv = results[1];
-      const spellPrepCsv = results[2];
-      const customCsvs = results.slice(3);
-
-      characterData = extract(mainRows, template);
-
-      // Track which tabs were actually used and detected types for tooltips
-      const usedTabs = [discoveredTabs[0]?.name]; // main sheet always used
-      const detectedTypes = {};
-
-      if (addCsv && template.additionalTab) {
-        extractAdditional(characterData, parseCSV(addCsv), template.additionalTab);
-        usedTabs.push(template.additionalTab.name);
-      }
-      if (invCsv && template.inventoryTab) {
-        extractInventory(characterData, parseCSV(invCsv), template.inventoryTab);
-        usedTabs.push(template.inventoryTab.name);
-      }
-
-      // Process Spell Preparation tab
-      if (spellPrepCsv) {
-        const spellPrepRows = parseCSV(spellPrepCsv);
-        const spellPrepData = extractSpellPreparation(spellPrepRows);
-        if (spellPrepData && hasSpellData(spellPrepData)) {
-          // Replace cantrips with spell prep data
-          characterData.cantrips = spellPrepData.cantrips;
-          characterData.additionalCantrips = null;
-          // Replace spell lists but keep slots from v4.0
-          for (const [lvl, spells] of Object.entries(spellPrepData.spells)) {
-            if (characterData.spells[lvl]) {
-              characterData.spells[lvl].spells = spells;
-            } else {
-              characterData.spells[lvl] = { spells, maxSlots: '0', curSlots: '' };
-            }
-          }
-          characterData.spellSource = 'spell_prep';
-          usedTabs.push('Spell Preparation');
-        }
-      }
-
-      // Process custom tabs — auto-detect type from headers
-      characterData.extraInventories = [];
-      for (let i = 0; i < customTabs.length; i++) {
-        const csv = customCsvs[i];
-        if (!csv) continue;
-        const rows = parseCSV(csv);
-        const tabType = detectTabType(rows);
-        if (!tabType) continue; // unrecognized structure — skip
-
-        detectedTypes[customTabs[i].name] = tabType;
-        usedTabs.push(customTabs[i].name);
-
-        if (tabType === 'additional') {
-          // Merge into existing character data using the same Additional position map
-          extractAdditional(characterData, rows, template.additionalTab);
-        } else if (tabType === 'inventory') {
-          // Extract as a separate named container
-          const container = { name: customTabs[i].name };
-          extractInventory(container, rows, template.inventoryTab);
-          characterData.extraInventories.push(container);
-        }
-      }
-
-      renderTabs(discoveredTabs, usedTabs, detectedTypes);
-
-      renderOutput();
-      setStatus(`Exported "${characterData.name || 'character'}" successfully!`, 'success');
-      fetchBtn.disabled = false;
-    })
-    .catch(err => {
-      if (err === 'unknown_template') return;
-      setStatus('Fetch failed: ' + err.message + ' — Make sure the sheet is public and this page is served via HTTP.', 'error');
-      fetchBtn.disabled = false;
-    });
+    characterData = result.data;
+    renderTabs(discoveredTabs, result.usedTabs, result.detectedTypes);
+    renderOutput();
+    setStatus(`Exported "${characterData.name || 'character'}" successfully!`, 'success');
+  } catch (err) {
+    setStatus('Fetch failed: ' + err.message + ' — Make sure the sheet is public and this page is served via HTTP.', 'error');
+  } finally {
+    fetchBtn.disabled = false;
+  }
 }
 
 // ── Cell Helpers ──
@@ -653,6 +672,64 @@ function cellNum(rows, r, c) {
 function mdEsc(v) {
   if (!v) return '—';
   return v.replace(/\|/g, ' — ').replace(/\n/g, ' ').trim();
+}
+
+// ── Extraction Helpers ──
+// Scan a single column for non-empty values, excluding label rows
+function scanColumn(rows, startRow, endRow, col, excludeLabels = []) {
+  const exclude = new Set(excludeLabels);
+  const result = [];
+  for (let r = startRow; r <= endRow; r++) {
+    const v = cell(rows, r, col);
+    if (v && !exclude.has(v)) result.push(v);
+  }
+  return result;
+}
+
+// Scan a grid of columns across rows (for cantrips etc.)
+function scanGrid(rows, startRow, endRow, cols) {
+  const result = [];
+  for (let r = startRow; r <= endRow; r++) {
+    for (const c of cols) {
+      const v = cell(rows, r, c);
+      if (v) result.push(v);
+    }
+  }
+  return result;
+}
+
+// Scan spell levels from marker/name column pairs
+function scanSpells(rows, spellDefs) {
+  const result = {};
+  for (const sp of spellDefs) {
+    const spellsAtLevel = [];
+    for (let r = sp.startRow; r < sp.startRow + sp.rows; r++) {
+      for (const [markerCol, nameCol] of sp.cols) {
+        const name = cell(rows, r, nameCol);
+        if (name) {
+          const marker = cell(rows, r, markerCol);
+          spellsAtLevel.push({ name, prepared: marker === '◉' });
+        }
+      }
+    }
+    const maxSlots = sp.maxSlots ? cell(rows, ...sp.maxSlots) : null;
+    const curSlots = sp.curSlots ? cell(rows, ...sp.curSlots) : null;
+    if (spellsAtLevel.length > 0 || maxSlots) {
+      result[sp.level] = { spells: spellsAtLevel, maxSlots: maxSlots || '0', curSlots: curSlots || '' };
+    }
+  }
+  return result;
+}
+
+// Merge source spell data into target (mutates target)
+function mergeSpells(target, source) {
+  for (const [lvl, data] of Object.entries(source)) {
+    if (target[lvl]) {
+      target[lvl].spells.push(...data.spells);
+    } else {
+      target[lvl] = { spells: data.spells, maxSlots: data.maxSlots, curSlots: data.curSlots };
+    }
+  }
 }
 
 // ── Template Position Maps (CSV-based) ──
@@ -906,18 +983,10 @@ function extract(rows, map) {
     const name = cell(rows, r, atk.nameCol);
     if (name) d.attacks.push({ name, hit: cell(rows, r, atk.bonusCol), damage: cell(rows, r, atk.damageCol) });
   }
-  d.additionalAttacks = [];
-  for (let r = atk.extraRows[0]; r <= atk.extraRows[1]; r++) {
-    const name = cell(rows, r, atk.nameCol);
-    if (name) d.additionalAttacks.push(name);
-  }
+  d.additionalAttacks = scanColumn(rows, atk.extraRows[0], atk.extraRows[1], atk.nameCol);
 
   // Languages
-  d.languages = [];
-  for (let r = map.languages.rows[0]; r <= map.languages.rows[1]; r++) {
-    const v = cell(rows, r, map.languages.col);
-    if (v && v !== 'LANGUAGES') d.languages.push(v);
-  }
+  d.languages = scanColumn(rows, map.languages.rows[0], map.languages.rows[1], map.languages.col, ['LANGUAGES']);
 
   // Equipment
   d.equipment = [];
@@ -952,10 +1021,7 @@ function extract(rows, map) {
   const ft = map.features;
   d.features = [];
   for (const c of ft.cols) {
-    for (let r = ft.rows[0]; r <= ft.rows[1]; r++) {
-      const v = cell(rows, r, c);
-      if (v && v !== 'FEATURES & TRAITS') d.features.push(v);
-    }
+    d.features.push(...scanColumn(rows, ft.rows[0], ft.rows[1], c, ['FEATURES & TRAITS']));
   }
 
   // Spellcasting
@@ -967,36 +1033,11 @@ function extract(rows, map) {
     attackBonus: cell(rows, ...sc.attackBonus)
   };
 
-  // Cantrips
-  const ct = map.cantrips;
-  d.cantrips = [];
-  for (let r = ct.rows[0]; r <= ct.rows[1]; r++) {
-    for (const c of ct.cols) {
-      const v = cell(rows, r, c);
-      if (v) d.cantrips.push(v);
-    }
-  }
+  // Cantrips — always store as {name} objects
+  d.cantrips = scanGrid(rows, map.cantrips.rows[0], map.cantrips.rows[1], map.cantrips.cols).map(name => ({ name }));
 
-  // Leveled Spells — cols are [markerCol, nameCol] pairs
-  // Show all spells with names; mark ◉ as prepared
-  d.spells = {};
-  for (const sp of map.spells) {
-    const spellsAtLevel = [];
-    for (let r = sp.startRow; r < sp.startRow + sp.rows; r++) {
-      for (const [markerCol, nameCol] of sp.cols) {
-        const name = cell(rows, r, nameCol);
-        if (name) {
-          const marker = cell(rows, r, markerCol);
-          spellsAtLevel.push({ name, prepared: marker === '◉' });
-        }
-      }
-    }
-    const maxSlots = cell(rows, ...sp.maxSlots);
-    const curSlots = cell(rows, ...sp.curSlots);
-    if (spellsAtLevel.length > 0 || maxSlots) {
-      d.spells[sp.level] = { spells: spellsAtLevel, maxSlots: maxSlots || '0', curSlots: curSlots || '' };
-    }
-  }
+  // Leveled Spells
+  d.spells = scanSpells(rows, map.spells);
 
   // Physical Description
   d.physical = {};
@@ -1006,18 +1047,10 @@ function extract(rows, map) {
   }
 
   // Allies & Organizations
-  d.allies = [];
-  for (let r = map.allies.rows[0]; r <= map.allies.rows[1]; r++) {
-    const v = cell(rows, r, map.allies.col);
-    if (v && v !== 'ALLIES & ORGANIZATIONS') d.allies.push(v);
-  }
+  d.allies = scanColumn(rows, map.allies.rows[0], map.allies.rows[1], map.allies.col, ['ALLIES & ORGANIZATIONS']);
 
   // Backstory
-  d.backstory = [];
-  for (let r = map.backstory.rows[0]; r <= map.backstory.rows[1]; r++) {
-    const v = cell(rows, r, map.backstory.col);
-    if (v && v !== 'CHARACTER BACKSTORY') d.backstory.push(v);
-  }
+  d.backstory = scanColumn(rows, map.backstory.rows[0], map.backstory.rows[1], map.backstory.col, ['CHARACTER BACKSTORY']);
 
   // Images/URLs
   d.characterImage = cell(rows, ...map.characterImage);
@@ -1057,25 +1090,7 @@ function extractAdditional(d, rows, map) {
   }
 
   // Extended Leveled Spells — merge into existing spells
-  for (const sp of map.spells) {
-    const spellsAtLevel = [];
-    for (let r = sp.startRow; r < sp.startRow + sp.rows; r++) {
-      for (const [markerCol, nameCol] of sp.cols) {
-        const name = cell(rows, r, nameCol);
-        if (name) {
-          const marker = cell(rows, r, markerCol);
-          spellsAtLevel.push({ name, prepared: marker === '◉' });
-        }
-      }
-    }
-    if (spellsAtLevel.length > 0) {
-      if (d.spells[sp.level]) {
-        d.spells[sp.level].spells.push(...spellsAtLevel);
-      } else {
-        d.spells[sp.level] = { spells: spellsAtLevel, maxSlots: '0', curSlots: '' };
-      }
-    }
-  }
+  mergeSpells(d.spells, scanSpells(rows, map.spells));
 
   // Multiclass Info
   const cls = map.classes;
@@ -1088,17 +1103,9 @@ function extractAdditional(d, rows, map) {
   d.totalLevel = cell(rows, ...map.totalLevel);
 
   // Resistances, Immunities, Vulnerabilities
-  function readDefenseList(def) {
-    const items = [];
-    for (let r = def.rows[0]; r <= def.rows[1]; r++) {
-      const v = cell(rows, r, def.col);
-      if (v) items.push(v);
-    }
-    return items;
-  }
-  d.resistances = readDefenseList(map.resistances);
-  d.immunities = readDefenseList(map.immunities);
-  d.vulnerabilities = readDefenseList(map.vulnerabilities);
+  d.resistances = scanColumn(rows, map.resistances.rows[0], map.resistances.rows[1], map.resistances.col);
+  d.immunities = scanColumn(rows, map.immunities.rows[0], map.immunities.rows[1], map.immunities.col);
+  d.vulnerabilities = scanColumn(rows, map.vulnerabilities.rows[0], map.vulnerabilities.rows[1], map.vulnerabilities.col);
 }
 
 // ── Extract Spell Preparation Tab Data ──
@@ -1335,53 +1342,37 @@ function inlineFormat(text) {
   return text;
 }
 
-function renderMarkdown(d) {
+// ── Rendering Helpers ──
+function renderTable(columns, data) {
+  let md = '| ' + columns.map(c => c.header).join(' | ') + ' |\n';
+  md += '|' + columns.map(c => c.sep || '---').join('|') + '|\n';
+  for (const item of data) {
+    md += '| ' + columns.map(c => c.value(item)).join(' | ') + ' |\n';
+  }
+  return md;
+}
+
+function renderKvTable(rows) {
+  if (rows.length === 0) return '';
+  let md = `| ${rows[0][0]} | ${rows[0][1]} |\n`;
+  md += '|---|---|\n';
+  for (let i = 1; i < rows.length; i++) {
+    md += `| ${rows[i][0]} | ${rows[i][1]} |\n`;
+  }
+  return md;
+}
+
+function renderBullets(items, format) {
   let md = '';
-
-  // Name
-  md += `# ${d.name || 'Unknown Character'}\n\n`;
-
-  // Basic Info table
-  md += `| **Race** | ${d.race || '—'} |\n`;
-  md += `|---|---|\n`;
-  md += `| **Class** | ${d.classLevel || '—'} |\n`;
-  md += `| **Background** | ${d.background || '—'} |\n`;
-  md += `| **Alignment** | ${d.alignment || '—'} |\n`;
-  md += `| **Player** | ${d.player || '—'} |\n`;
-  if (d.totalLevel) md += `| **Total Level** | ${d.totalLevel} |\n`;
-  md += '\n';
-
-  // Multiclass Breakdown
-  if (d.classes && d.classes.length > 0) {
-    md += `## Classes\n`;
-    md += `| Class | Level |\n`;
-    md += `|-------|:-----:|\n`;
-    for (const c of d.classes) {
-      md += `| ${mdEsc(c.name)} | ${mdEsc(c.level)} |\n`;
-    }
-    md += '\n';
+  for (const item of items) {
+    md += `- ${format ? format(item) : item}\n`;
   }
+  return md;
+}
 
-  // Personality & Physical
-  const ppRows = [];
-  if (d.personalityTraits) ppRows.push(['**Personality Traits**', d.personalityTraits]);
-  if (d.ideals) ppRows.push(['**Ideals**', d.ideals]);
-  if (d.bonds) ppRows.push(['**Bonds**', d.bonds]);
-  if (d.flaws) ppRows.push(['**Flaws**', d.flaws]);
-  for (const [key, val] of Object.entries(d.physical)) {
-    ppRows.push([`**${key.charAt(0).toUpperCase() + key.slice(1)}**`, val]);
-  }
-  if (ppRows.length > 0) {
-    md += `| ${ppRows[0][0]} | ${ppRows[0][1]} |\n`;
-    md += `|---|---|\n`;
-    for (let i = 1; i < ppRows.length; i++) {
-      md += `| ${ppRows[i][0]} | ${ppRows[i][1]} |\n`;
-    }
-    md += '\n';
-  }
-
-  // Combat Stats
-  md += `## Combat Stats\n`;
+// ── Custom Section Renderers ──
+function renderCombatStats(d) {
+  let md = `## Combat Stats\n`;
   md += `| AC | HP | Initiative | Speed | Prof Bonus | Hit Dice |\n`;
   md += `|:--:|:--:|:----------:|:-----:|:----------:|:--------:|\n`;
   md += `| ${d.ac || '—'} | ${d.hpMax || '—'} | ${d.initiative || '—'} | ${d.speed || '—'} | ${d.profBonus || '—'} | ${d.hitDice || '—'} |\n\n`;
@@ -1395,235 +1386,333 @@ function renderMarkdown(d) {
   if (d.passivePerception) md += `**Passive Perception:** ${d.passivePerception}`;
   if (d.inspiration) md += ` | **Inspiration:** ${d.inspiration}`;
   if (d.passivePerception || d.inspiration) md += '\n\n';
+  return md;
+}
 
-  // Defenses
+function renderDefenses(d) {
   const hasDefenses = (d.resistances && d.resistances.length > 0) ||
                       (d.immunities && d.immunities.length > 0) ||
                       (d.vulnerabilities && d.vulnerabilities.length > 0);
-  if (hasDefenses) {
-    md += `## Defenses\n`;
-    if (d.resistances && d.resistances.length > 0) md += `**Resistances:** ${d.resistances.join(', ')}\n`;
-    if (d.immunities && d.immunities.length > 0) md += `**Immunities:** ${d.immunities.join(', ')}\n`;
-    if (d.vulnerabilities && d.vulnerabilities.length > 0) md += `**Vulnerabilities:** ${d.vulnerabilities.join(', ')}\n`;
-    md += '\n';
-  }
+  if (!hasDefenses) return '';
+  let md = `## Defenses\n`;
+  if (d.resistances && d.resistances.length > 0) md += `**Resistances:** ${d.resistances.join(', ')}\n`;
+  if (d.immunities && d.immunities.length > 0) md += `**Immunities:** ${d.immunities.join(', ')}\n`;
+  if (d.vulnerabilities && d.vulnerabilities.length > 0) md += `**Vulnerabilities:** ${d.vulnerabilities.join(', ')}\n`;
+  md += '\n';
+  return md;
+}
 
-  // Ability Scores
-  if (d.abilities.length > 0) {
-    md += `## Ability Scores\n`;
-    md += `| Ability | Score | Modifier |\n`;
-    md += `|---------|:-----:|:--------:|\n`;
-    for (const ab of d.abilities) {
-      md += `| ${ab.key} | ${ab.score || '—'} | ${ab.modifier || '—'} |\n`;
-    }
-    md += '\n';
+function renderAttacks(d) {
+  if (d.attacks.length === 0) return '';
+  const ATTACK_COLS = [
+    { header: 'Weapon', sep: '--------', value: a => mdEsc(a.name) },
+    { header: 'Hit', sep: ':---:', value: a => mdEsc(a.hit) },
+    { header: 'Damage', sep: '--------', value: a => mdEsc(a.damage) }
+  ];
+  let md = `## Attacks\n`;
+  md += renderTable(ATTACK_COLS, d.attacks);
+  if (d.additionalAttacks.length > 0) {
+    md += '\n**Additional:**\n';
+    for (const a of d.additionalAttacks) md += `- ${a}\n`;
   }
+  md += '\n';
+  return md;
+}
 
-  // Saving Throws
-  if (d.saves.length > 0) {
-    md += `## Saving Throws\n`;
-    md += `| Ability | Modifier | Proficient |\n`;
-    md += `|---------|:--------:|:----------:|\n`;
-    for (const sv of d.saves) {
-      md += `| ${sv.name} | ${sv.modifier || '—'} | ${sv.proficient ? 'Yes' : ''} |\n`;
-    }
-    md += '\n';
-  }
-
-  // Skills
-  if (d.skills.length > 0) {
-    md += `## Skills\n`;
-    md += `| Skill | Modifier | Proficient | Expert |\n`;
-    md += `|-------|:--------:|:----------:|:------:|\n`;
-    for (const sk of d.skills) {
-      const prof = sk.proficiency ? 'Yes' : '';
-      const expert = sk.proficiency === 'Expertise' ? 'Yes' : '';
-      md += `| ${sk.name} | ${sk.modifier || '—'} | ${prof} | ${expert} |\n`;
-    }
-    md += '\n';
-  }
-
-  // Proficiencies
-  const visibleProfs = d.proficiencies.filter(p => p.value);
-  if (visibleProfs.length > 0) {
-    md += `## Proficiencies\n`;
-    md += `| Type | Details |\n`;
-    md += `|---|---|\n`;
-    for (const p of visibleProfs) {
-      md += `| ${p.label} | ${p.value} |\n`;
-    }
-    md += '\n';
-  }
-
-  // Attacks
-  if (d.attacks.length > 0) {
-    md += `## Attacks\n`;
-    md += `| Weapon | Hit | Damage |\n`;
-    md += `|--------|:---:|--------|\n`;
-    for (const atk of d.attacks) {
-      md += `| ${mdEsc(atk.name)} | ${mdEsc(atk.hit)} | ${mdEsc(atk.damage)} |\n`;
-    }
-    if (d.additionalAttacks.length > 0) {
-      md += '\n**Additional:**\n';
-      for (const a of d.additionalAttacks) md += `- ${a}\n`;
-    }
-    md += '\n';
-  }
-
-  // Extended Attacks (from Additional tab)
-  if (d.additionalTabAttacks && d.additionalTabAttacks.length > 0) {
-    md += `## Extended Attacks\n`;
-    md += `| Weapon | Hit | Damage |\n`;
-    md += `|--------|:---:|--------|\n`;
-    for (const atk of d.additionalTabAttacks) {
-      md += `| ${mdEsc(atk.name)} | ${mdEsc(atk.hit)} | ${mdEsc(atk.damage)} |\n`;
-    }
-    md += '\n';
-  }
-
-  // Features & Traits
-  if (d.features.length > 0) {
-    md += `## Features & Traits\n`;
-    for (const f of d.features) md += `- ${f}\n`;
-    md += '\n';
-  }
-
-  // Equipment
-  if (d.equipment.length > 0) {
-    md += `## Equipment\n`;
-    for (const item of d.equipment) {
-      md += `- ${item.name}${item.attunement ? ' (attunement)' : ''}\n`;
-    }
-    md += '\n';
-  }
-
-  // Languages
-  if (d.languages.length > 0) {
-    md += `## Languages\n`;
-    md += d.languages.join(', ') + '\n\n';
-  }
-
-  // Spellcasting
+function renderSpellcasting(d) {
   const useSpellPrep = d.spellSource === 'spell_prep';
   const hasAdditionalCantrips = !useSpellPrep && d.additionalCantrips && d.additionalCantrips.length > 0;
   const hasSpells = d.cantrips.length > 0 || hasAdditionalCantrips || Object.keys(d.spells).length > 0;
-  if (hasSpells) {
-    md += `## Spellcasting\n`;
-    if (d.spellcasting.class) md += `**Class:** ${d.spellcasting.class}`;
-    if (d.spellcasting.ability) md += ` | **Ability:** ${d.spellcasting.ability}`;
-    if (d.spellcasting.saveDC) md += ` | **Save DC:** ${d.spellcasting.saveDC}`;
-    if (d.spellcasting.attackBonus) md += ` | **Attack Bonus:** ${d.spellcasting.attackBonus}`;
-    md += '\n\n';
+  if (!hasSpells) return '';
 
-    if (d.cantrips.length > 0 || hasAdditionalCantrips) {
-      md += `### Cantrips\n`;
-      if (useSpellPrep) {
-        md += `| Spell | Source |\n|---|---|\n`;
-        for (const c of d.cantrips) md += `| ${mdEsc(c.name)} | ${mdEsc(c.source)} |\n`;
-      } else {
-        md += `| Spell |\n|---|\n`;
-        for (const c of d.cantrips) md += `| ${mdEsc(typeof c === 'string' ? c : c.name)} |\n`;
-        if (hasAdditionalCantrips) {
-          for (const c of d.additionalCantrips) md += `| ${mdEsc(c.name)} |\n`;
-        }
+  let md = `## Spellcasting\n`;
+  if (d.spellcasting.class) md += `**Class:** ${d.spellcasting.class}`;
+  if (d.spellcasting.ability) md += ` | **Ability:** ${d.spellcasting.ability}`;
+  if (d.spellcasting.saveDC) md += ` | **Save DC:** ${d.spellcasting.saveDC}`;
+  if (d.spellcasting.attackBonus) md += ` | **Attack Bonus:** ${d.spellcasting.attackBonus}`;
+  md += '\n\n';
+
+  if (d.cantrips.length > 0 || hasAdditionalCantrips) {
+    md += `### Cantrips\n`;
+    if (useSpellPrep) {
+      md += `| Spell | Source |\n|---|---|\n`;
+      for (const c of d.cantrips) md += `| ${mdEsc(c.name)} | ${mdEsc(c.source)} |\n`;
+    } else {
+      md += `| Spell |\n|---|\n`;
+      for (const c of d.cantrips) md += `| ${mdEsc(c.name)} |\n`;
+      if (hasAdditionalCantrips) {
+        for (const c of d.additionalCantrips) md += `| ${mdEsc(c.name)} |\n`;
       }
-      md += '\n';
     }
-
-    const levelNames = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
-    for (const [lvl, data] of Object.entries(d.spells)) {
-      const label = levelNames[lvl] || lvl + 'th';
-      md += `### ${label} Level`;
-      if (data.maxSlots && data.maxSlots !== '0') {
-        md += ` (${data.maxSlots} slots`;
-        if (data.curSlots) md += `, ${data.curSlots} remaining`;
-        md += `)`;
-      }
-      md += '\n';
-      if (data.spells.length > 0) {
-        // Sort: always prepared first, then prepared, then unprepared
-        const sorted = [...data.spells].sort((a, b) => {
-          const aRank = a.alwaysPrepared ? 0 : a.prepared ? 1 : 2;
-          const bRank = b.alwaysPrepared ? 0 : b.prepared ? 1 : 2;
-          return aRank - bRank;
-        });
-        if (useSpellPrep) {
-          md += `| Prepared | Spell | Source |\n|:---:|---|---|\n`;
-          for (const s of sorted) {
-            const mark = s.alwaysPrepared ? 'Always' : s.prepared ? '◉' : '〇';
-            md += `| ${mark} | ${mdEsc(s.name)} | ${mdEsc(s.source)} |\n`;
-          }
-        } else {
-          md += `| Prepared | Spell |\n|:---:|---|\n`;
-          for (const s of sorted) {
-            md += `| ${s.prepared ? '◉' : '〇'} | ${mdEsc(s.name)} |\n`;
-          }
-        }
-      }
-      md += '\n';
-    }
-  }
-
-  // Allies & Organizations
-  if (d.allies.length > 0) {
-    md += `## Allies & Organizations\n`;
-    for (const a of d.allies) md += `- ${a}\n`;
     md += '\n';
   }
 
-  // Backstory
-  if (d.backstory.length > 0) {
-    md += `## Backstory\n`;
-    md += d.backstory.join('\n') + '\n\n';
-  }
-
-  // Inventory (last — least important for LLM context)
-  if (d.inventory && d.inventory.length > 0) {
-    md += `## Inventory\n`;
-    if (d.currency && Object.keys(d.currency).length > 0) {
-      md += `| CP | SP | EP | GP | PP |\n`;
-      md += `|:--:|:--:|:--:|:--:|:--:|\n`;
-      md += `| ${d.currency.copper || '0'} | ${d.currency.silver || '0'} | ${d.currency.electrum || '0'} | ${d.currency.gold || '0'} | ${d.currency.platinum || '0'} |\n\n`;
+  const levelNames = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
+  for (const [lvl, data] of Object.entries(d.spells)) {
+    const label = levelNames[lvl] || lvl + 'th';
+    md += `### ${label} Level`;
+    if (data.maxSlots && data.maxSlots !== '0') {
+      md += ` (${data.maxSlots} slots`;
+      if (data.curSlots) md += `, ${data.curSlots} remaining`;
+      md += `)`;
     }
-    const summaryParts = [];
-    if (d.wealth) summaryParts.push(`**Wealth:** ${d.wealth}`);
-    if (d.coinValue) summaryParts.push(`**Coin Value:** ${d.coinValue}`);
-    if (d.currentWeight || d.maxWeight) summaryParts.push(`**Weight:** ${d.currentWeight || '?'} / ${d.maxWeight || '?'}`);
-    if (summaryParts.length > 0) md += summaryParts.join(' | ') + '\n\n';
+    md += '\n';
+    if (data.spells.length > 0) {
+      const sorted = [...data.spells].sort((a, b) => {
+        const aRank = a.alwaysPrepared ? 0 : a.prepared ? 1 : 2;
+        const bRank = b.alwaysPrepared ? 0 : b.prepared ? 1 : 2;
+        return aRank - bRank;
+      });
+      if (useSpellPrep) {
+        md += `| Prepared | Spell | Source |\n|:---:|---|---|\n`;
+        for (const s of sorted) {
+          const mark = s.alwaysPrepared ? 'Always' : s.prepared ? '◉' : '〇';
+          md += `| ${mark} | ${mdEsc(s.name)} | ${mdEsc(s.source)} |\n`;
+        }
+      } else {
+        md += `| Prepared | Spell |\n|:---:|---|\n`;
+        for (const s of sorted) {
+          md += `| ${s.prepared ? '◉' : '〇'} | ${mdEsc(s.name)} |\n`;
+        }
+      }
+    }
+    md += '\n';
+  }
+  return md;
+}
+
+function renderInventoryContainer(c) {
+  let md = '';
+  if (c.currency && Object.keys(c.currency).length > 0) {
+    md += `| CP | SP | EP | GP | PP |\n`;
+    md += `|:--:|:--:|:--:|:--:|:--:|\n`;
+    md += `| ${c.currency.copper || '0'} | ${c.currency.silver || '0'} | ${c.currency.electrum || '0'} | ${c.currency.gold || '0'} | ${c.currency.platinum || '0'} |\n\n`;
+  }
+  const parts = [];
+  if (c.wealth) parts.push(`**Wealth:** ${c.wealth}`);
+  if (c.coinValue) parts.push(`**Coin Value:** ${c.coinValue}`);
+  if (c.currentWeight || c.maxWeight) parts.push(`**Weight:** ${c.currentWeight || '?'} / ${c.maxWeight || '?'}`);
+  if (parts.length > 0) md += parts.join(' | ') + '\n\n';
+  if (c.inventory && c.inventory.length > 0) {
     md += `| Qty | Item | Cost | Weight |\n`;
     md += `|:---:|------|------|-------:|\n`;
-    for (const item of d.inventory) {
+    for (const item of c.inventory) {
       md += `| ${mdEsc(item.qty)} | ${mdEsc(item.name)} | ${mdEsc(item.cost)} | ${mdEsc(item.weight)} |\n`;
     }
     md += '\n';
   }
+  return md;
+}
 
-  // Extra Inventory Containers (custom tabs like Heward's Handy Haversack)
+function renderInventorySection(d) {
+  let md = '';
+  if (d.inventory && d.inventory.length > 0) {
+    md += `## Inventory\n`;
+    md += renderInventoryContainer(d);
+  }
   if (d.extraInventories && d.extraInventories.length > 0) {
     for (const container of d.extraInventories) {
       md += `## ${container.name}\n`;
-      if (container.currency && Object.keys(container.currency).length > 0) {
-        md += `| CP | SP | EP | GP | PP |\n`;
-        md += `|:--:|:--:|:--:|:--:|:--:|\n`;
-        md += `| ${container.currency.copper || '0'} | ${container.currency.silver || '0'} | ${container.currency.electrum || '0'} | ${container.currency.gold || '0'} | ${container.currency.platinum || '0'} |\n\n`;
-      }
-      const cParts = [];
-      if (container.wealth) cParts.push(`**Wealth:** ${container.wealth}`);
-      if (container.coinValue) cParts.push(`**Coin Value:** ${container.coinValue}`);
-      if (container.currentWeight || container.maxWeight) cParts.push(`**Weight:** ${container.currentWeight || '?'} / ${container.maxWeight || '?'}`);
-      if (cParts.length > 0) md += cParts.join(' | ') + '\n\n';
-      if (container.inventory && container.inventory.length > 0) {
-        md += `| Qty | Item | Cost | Weight |\n`;
-        md += `|:---:|------|------|-------:|\n`;
-        for (const item of container.inventory) {
-          md += `| ${mdEsc(item.qty)} | ${mdEsc(item.name)} | ${mdEsc(item.cost)} | ${mdEsc(item.weight)} |\n`;
-        }
-        md += '\n';
-      }
+      md += renderInventoryContainer(container);
     }
   }
+  return md;
+}
 
-  return md.trim();
+// ── Section Descriptors ──
+const SECTIONS = [
+  // 1. Character Name
+  { type: 'custom', render: d => `# ${d.name || 'Unknown Character'}\n\n` },
+
+  // 2. Basic Info
+  {
+    type: 'kv_table',
+    rows: d => {
+      const rows = [
+        ['**Race**', d.race || '—'],
+        ['**Class**', d.classLevel || '—'],
+        ['**Background**', d.background || '—'],
+        ['**Alignment**', d.alignment || '—'],
+        ['**Player**', d.player || '—']
+      ];
+      if (d.totalLevel) rows.push(['**Total Level**', d.totalLevel]);
+      return rows;
+    }
+  },
+
+  // 3. Classes (conditional)
+  {
+    type: 'table',
+    heading: 'Classes',
+    show: d => d.classes && d.classes.length > 0,
+    columns: [
+      { header: 'Class', sep: '-------', value: c => mdEsc(c.name) },
+      { header: 'Level', sep: ':-----:', value: c => mdEsc(c.level) }
+    ],
+    data: d => d.classes
+  },
+
+  // 4. Personality & Physical
+  {
+    type: 'kv_table',
+    rows: d => {
+      const rows = [];
+      if (d.personalityTraits) rows.push(['**Personality Traits**', d.personalityTraits]);
+      if (d.ideals) rows.push(['**Ideals**', d.ideals]);
+      if (d.bonds) rows.push(['**Bonds**', d.bonds]);
+      if (d.flaws) rows.push(['**Flaws**', d.flaws]);
+      for (const [key, val] of Object.entries(d.physical)) {
+        rows.push([`**${key.charAt(0).toUpperCase() + key.slice(1)}**`, val]);
+      }
+      return rows;
+    }
+  },
+
+  // 5. Combat Stats
+  { type: 'custom', render: renderCombatStats },
+
+  // 6. Defenses
+  { type: 'custom', render: renderDefenses },
+
+  // 7. Ability Scores
+  {
+    type: 'table',
+    heading: 'Ability Scores',
+    show: d => d.abilities.length > 0,
+    columns: [
+      { header: 'Ability', sep: '---------', value: a => a.key },
+      { header: 'Score', sep: ':-----:', value: a => a.score || '—' },
+      { header: 'Modifier', sep: ':--------:', value: a => a.modifier || '—' }
+    ],
+    data: d => d.abilities
+  },
+
+  // 8. Saving Throws
+  {
+    type: 'table',
+    heading: 'Saving Throws',
+    show: d => d.saves.length > 0,
+    columns: [
+      { header: 'Ability', sep: '---------', value: s => s.name },
+      { header: 'Modifier', sep: ':--------:', value: s => s.modifier || '—' },
+      { header: 'Proficient', sep: ':----------:', value: s => s.proficient ? 'Yes' : '' }
+    ],
+    data: d => d.saves
+  },
+
+  // 9. Skills
+  {
+    type: 'table',
+    heading: 'Skills',
+    show: d => d.skills.length > 0,
+    columns: [
+      { header: 'Skill', sep: '-------', value: s => s.name },
+      { header: 'Modifier', sep: ':--------:', value: s => s.modifier || '—' },
+      { header: 'Proficient', sep: ':----------:', value: s => s.proficiency ? 'Yes' : '' },
+      { header: 'Expert', sep: ':------:', value: s => s.proficiency === 'Expertise' ? 'Yes' : '' }
+    ],
+    data: d => d.skills
+  },
+
+  // 10. Proficiencies
+  {
+    type: 'table',
+    heading: 'Proficiencies',
+    show: d => d.proficiencies.some(p => p.value),
+    columns: [
+      { header: 'Type', sep: '---', value: p => p.label },
+      { header: 'Details', sep: '---', value: p => p.value }
+    ],
+    data: d => d.proficiencies.filter(p => p.value)
+  },
+
+  // 11. Attacks
+  { type: 'custom', render: renderAttacks },
+
+  // 12. Extended Attacks (conditional)
+  {
+    type: 'table',
+    heading: 'Extended Attacks',
+    show: d => d.additionalTabAttacks && d.additionalTabAttacks.length > 0,
+    columns: [
+      { header: 'Weapon', sep: '--------', value: a => mdEsc(a.name) },
+      { header: 'Hit', sep: ':---:', value: a => mdEsc(a.hit) },
+      { header: 'Damage', sep: '--------', value: a => mdEsc(a.damage) }
+    ],
+    data: d => d.additionalTabAttacks
+  },
+
+  // 13. Features & Traits
+  {
+    type: 'bullets',
+    heading: 'Features & Traits',
+    show: d => d.features.length > 0,
+    items: d => d.features
+  },
+
+  // 14. Equipment
+  {
+    type: 'bullets',
+    heading: 'Equipment',
+    show: d => d.equipment.length > 0,
+    items: d => d.equipment,
+    format: item => `${item.name}${item.attunement ? ' (attunement)' : ''}`
+  },
+
+  // 15. Languages
+  {
+    type: 'text',
+    heading: 'Languages',
+    show: d => d.languages.length > 0,
+    text: d => d.languages.join(', ')
+  },
+
+  // 16. Spellcasting
+  { type: 'custom', render: renderSpellcasting },
+
+  // 17. Allies & Organizations
+  {
+    type: 'bullets',
+    heading: 'Allies & Organizations',
+    show: d => d.allies.length > 0,
+    items: d => d.allies
+  },
+
+  // 18. Backstory
+  {
+    type: 'text',
+    heading: 'Backstory',
+    show: d => d.backstory.length > 0,
+    text: d => d.backstory.join('\n')
+  },
+
+  // 19. Inventory
+  { type: 'custom', render: renderInventorySection }
+];
+
+function renderSection(s, d) {
+  switch (s.type) {
+    case 'custom': return s.render(d);
+    case 'kv_table': {
+      const rows = s.rows(d);
+      if (rows.length === 0) return '';
+      return (s.heading ? `## ${s.heading}\n` : '') + renderKvTable(rows) + '\n';
+    }
+    case 'table':
+      return `## ${s.heading}\n` + renderTable(s.columns, s.data(d)) + '\n';
+    case 'bullets':
+      return `## ${s.heading}\n` + renderBullets(s.items(d), s.format) + '\n';
+    case 'text':
+      return `## ${s.heading}\n` + s.text(d) + '\n\n';
+  }
+}
+
+function renderMarkdown(d) {
+  return SECTIONS
+    .filter(s => !s.show || s.show(d))
+    .map(s => renderSection(s, d))
+    .join('')
+    .trim();
 }
 
 function renderJSON(d) {
