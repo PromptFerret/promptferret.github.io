@@ -1,9 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GSheet Character Sheet Exporter</title>
+    <meta charset="UTF-8">
+    <title>GSheet D&D Character Exporter | Markdown & JSON for AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary SEO -->
+    <meta name="description" content="Export Google Sheets D&D character sheets to clean Markdown or JSON for AI workflows, chatbots, and structured analysis. Built for AI-assisted D&D planning and optimization.">
+    <meta name="keywords" content="D&D character exporter, Google Sheets D&D, DnD AI tools, character sheet to JSON, character sheet to markdown, AI D&D workflow, Avrae character sheet export">
+    <meta name="author" content="PromptFerret">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://promptferret.github.io/tools/gsheet_md_exporter/">
+
+    <!-- Open Graph (for link previews) -->
+    <meta property="og:title" content="GSheet D&D Character Exporter">
+    <meta property="og:description" content="Convert Google Sheets D&D character sheets into AI-friendly Markdown or JSON.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://promptferret.github.io/tools/gsheet_md_exporter/">
+
+    <!-- Optional: Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="GSheet D&D Character Exporter">
+    <meta name="twitter:description" content="Export Google Sheets D&D characters to Markdown or JSON for AI workflows.">
 <style>
   :root {
     --bg: #0f0f17;
@@ -284,8 +303,8 @@
 <body>
 
 <div class="header">
-  <h1><span>GSheet</span> Character Sheet Exporter</h1>
-  <p class="tagline">D&D 5e Google Sheets to Markdown/JSON</p>
+  <h1><span>GSheet</span> D&D Character Exporter</h1>
+  <p class="tagline">Google Sheets D&D 5e to Markdown & JSON for AI</p>
 </div>
 
 <div class="toolbar">
@@ -307,8 +326,8 @@
 </div>
 
 <div class="footer">
-  <span>Supports: Starry Shore Gsheet 4.0</span>
-  <span>Requires HTTP server (not file://)</span>
+  <span><a href="https://promptferret.github.io" style="color:var(--accent);text-decoration:none">PromptFerret</a> &middot; <a href="https://github.com/PromptFerret/tools/blob/main/LICENSE" style="color:var(--accent);text-decoration:none" target="_blank">MIT License</a> &middot; Vibe coded with <a href="https://docs.anthropic.com/en/docs/claude-code" style="color:var(--accent);text-decoration:none" target="_blank">Claude Code</a></span>
+  <span><a href="https://docs.google.com/spreadsheets/d/1etrBJ0qCDXACovYHUM4XvjE0erndThwRLcUQzX6ts8w/edit?gid=1750226729#gid=1750226729" style="color:var(--accent);text-decoration:none" target="_blank">D&amp;D 5e GSheet v1.4</a> &middot; Requires HTTP server (not file://)</span>
 </div>
 
 <script>
@@ -431,7 +450,7 @@ function discoverTabs(sheetId) {
 
 // Tab descriptions for tooltips
 const TAB_INFO = {
-  'v4.0':              'Main character sheet',
+  'v4.0':              'Main character sheet (v4.0 layout)',
   'Additional':        'Extended attacks, spells, multiclass, defenses',
   'Inventory':         'Currency, wealth, and item list',
   'Spell Preparation': 'Spell preparation management'
@@ -621,8 +640,8 @@ async function loadCharacterData(parsed) {
 
   let template = detectTemplate(mainRows);
   if (!template) {
-    template = TEMPLATES.starry_shore_40;
-    setStatus('Unknown template — using Starry Shore 4.0 layout as fallback. Some fields may be wrong.', 'loading');
+    template = TEMPLATES.dnd_5e_v40;
+    setStatus('Unknown template — using default v4.0 layout as fallback. Some fields may be wrong.', 'loading');
   }
 
   setStatus('Fetching extra sheets...', 'loading');
@@ -740,9 +759,9 @@ function mergeSpells(target, source) {
 // ?, Attack Info, Gear Info, Race Info, Class Info
 
 const TEMPLATES = {
-  starry_shore_40: {
-    name: "The Starry Shore Gsheet 4.0",
-    detect: [1, 19, "Starry Shore Gsheet 4.0"],
+  dnd_5e_v40: {
+    name: "D&D 5e Gsheet v4.0",
+    detect: [1, 19, "Gsheet 4.0"],
 
     charName:          [5, 2],
     classLevel:        [4, 19],
